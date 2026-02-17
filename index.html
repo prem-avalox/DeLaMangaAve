@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>De La Manga Ave. — Color, Foto y Audio</title>
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="script.js"></script>
+</head>
+<body>
+  <div class="fog fog--1" aria-hidden="true"></div>
+  <div class="fog fog--2" aria-hidden="true"></div>
+
+  <div class="page-shell">
+    <nav class="nav" aria-label="Páginas">
+      <div class="nav__brand"><a href="index.html">De La Manga Ave.</a></div>
+      <ul class="nav__links">
+        <li><a href="servicios.html" class="nav__link">Servicios</a></li>
+        <li><a href="about.html" class="nav__link">Acerca de mí</a></li>
+        <li><a href="contacto.html" class="nav__link">Contáctame</a></li>
+      </ul>
+    </nav>
+
+    <header class="hero-banner" data-reveal>
+      <div class="hero-banner__inner">
+        <div class="hero-banner__eyebrow">De La Manga Ave. — portafolio</div>
+        <h1 class="hero-banner__title">Tu visión creativa, con el acabado que merece.</h1>
+        <p class="hero-banner__lede">Soy un artista multidisciplinar autodidacta. Te ayudo a que tu proyecto se vea y suene como lo imaginaste — con buen color, fotos cuidadas y audio que suena fuerte, sin que tengas que pagar de más.</p>
+        <div class="hero-banner__tags">
+          <a href="#video" class="hero-banner__tag">Color grading</a>
+          <a href="#image" class="hero-banner__tag">Retoque estético</a>
+          <a href="#visualizer" class="hero-banner__tag">Mastering de audio</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="stack">
+      <section id="video" class="panel" data-reveal>
+        <div class="panel__head">
+          <p class="eyebrow">Color grading</p>
+          <div class="panel__title-group">
+            <h2>Dale atmósfera a tu video</h2>
+            <p>Uso DaVinci Resolve para darle a tus proyectos ese toque cinematográfico que marca la diferencia — sin presupuestos de agencia. Ya sea un Reel, un cortometraje o un video para tu marca, me enfoco en encontrar el mood exacto que necesita cada pieza para conectar.</p>
+          </div>
+        </div>
+        <div class="split" data-kind="video">
+          <div class="split__viewport" data-split-container style="--split:60%">
+            <video class="layer layer--before" muted loop playsinline autoplay data-video-display="before" src="resources/Ungraded.mp4" poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1600' height='900'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23dce3ea'/%3E%3Cstop offset='100%25' stop-color='%23b8c4d6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1600' height='900' fill='%23f5f6f8'/%3E%3Crect width='1600' height='900' fill='url(%23g)' opacity='0.8'/%3E%3Ctext x='50%25' y='52%25' dominant-baseline='middle' text-anchor='middle' fill='%2367778c' font-family='Helvetica Neue, Arial' font-size='56' letter-spacing='3'%3EBEFORE%3C/text%3E%3C/svg%3E"></video>
+            <video class="layer layer--after" muted loop playsinline autoplay data-video-display="after" src="resources/Graded.mp4" poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1600' height='900'%3E%3Cdefs%3E%3ClinearGradient id='g2' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23ffe0c2'/%3E%3Cstop offset='100%25' stop-color='%23f4b07a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1600' height='900' fill='%23fef6ed'/%3E%3Crect width='1600' height='900' fill='url(%23g2)' opacity='0.85'/%3E%3Ctext x='50%25' y='52%25' dominant-baseline='middle' text-anchor='middle' fill='%23c45b2c' font-family='Helvetica Neue, Arial' font-size='56' letter-spacing='3'%3EAFTER%3C/text%3E%3C/svg%3E"></video>
+            <div class="split__label split__label--before">Antes</div>
+            <div class="split__label split__label--after">Después</div>
+            <div class="split__overlay">
+              <div class="overlay-text-wrap">
+                <div class="overlay-chip">Antes / Después</div>
+                <div class="overlay-title">Misma toma, otro feeling</div>
+                <div class="overlay-meta">Arrastra el deslizador para ver cómo cambia el color y la atmósfera de la escena.</div>
+              </div>
+            </div>
+            <div class="split__divider" aria-hidden="true"></div>
+          </div>
+          <div class="split__controls">
+            <input type="range" min="0" max="100" value="60" step="1" aria-label="Reveal after grade" data-split-range>
+            <span class="hint">Desliza para comparar el antes y después.</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="image" class="panel" data-reveal>
+        <div class="panel__head">
+          <p class="eyebrow">Foto y retoque</p>
+          <div class="panel__title-group">
+            <h2>Fotos limpias, feed consistente</h2>
+            <p>Trabajo con Lightroom y herramientas inteligentes para darle a tus fotos un acabado limpio y profesional — rápido y sin complicaciones. Ideal para artistas, creadores y marcas locales que quieren un feed con buena estética sin pagar precios de estudio.</p>
+          </div>
+        </div>
+        <div class="split" data-kind="image">
+          <div class="split__viewport" data-split-container style="--split:55%">
+            <img class="layer layer--before" alt="Before edit" data-image-display="before" src="resources/unedited.jpeg">
+            <img class="layer layer--after" alt="After edit" data-image-display="after" src="resources/edited.jpeg">
+            <div class="split__label split__label--before">Antes</div>
+            <div class="split__label split__label--after">Después</div>
+            <div class="split__divider" aria-hidden="true"></div>
+          </div>
+          <div class="split__controls">
+            <input type="range" min="0" max="100" value="55" step="1" aria-label="Reveal after retouch" data-split-range>
+            <span class="hint">Mueve el deslizador para ver el retoque aplicado.</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="visualizer" class="panel" data-reveal>
+        <div class="panel__head">
+          <p class="eyebrow">Mastering</p>
+          <div class="panel__title-group">
+            <h2>Tu track, listo para sonar</h2>
+            <p>Llevo más de 10 años produciendo mi propia música, así que entiendo lo que se siente querer que tu tema suene a la altura. Te ayudo a que tu mezcla quede fuerte, amplia y lista para Spotify, Apple Music o donde la pongas. Prueba la diferencia tú mismo con el reproductor interactivo.</p>
+          </div>
+        </div>
+        <div class="split" data-kind="meter" data-reveal>
+          <div class="split__viewport" data-split-container style="--split:60%">
+            <video class="layer layer--before" loop playsinline autoplay data-meter-display="before" src="resources/Unmixed.mp4"></video>
+            <video class="layer layer--after" loop playsinline autoplay data-meter-display="after" src="resources/Mixed.mp4"></video>
+            <div class="split__label split__label--before">Antes</div>
+            <div class="split__label split__label--after">Después</div>
+            <div class="split__overlay split__overlay--meter">
+              <div class="overlay-text-wrap">
+                <div class="overlay-chip">Antes / Después</div>
+                <div class="overlay-title">Mezcla vs. master</div>
+                <div class="overlay-meta">Activa el audio y desliza para escuchar la diferencia entre la mezcla cruda y el master final.</div>
+              </div>
+            </div>
+            <div class="split__divider" aria-hidden="true"></div>
+          </div>
+          <div class="split__controls">
+            <input type="range" min="0" max="100" value="60" step="1" aria-label="Reveal after meters" data-split-range>
+            <span class="hint">Desliza para cruzar entre mezcla y master.</span>
+          </div>
+          <div class="audio__fader">
+            <div class="audio__ab">
+              <button type="button" class="ghost" data-action="enable-meter-audio">Activar audio</button>
+              <span class="hint">Toca una vez para habilitar el sonido. Después usa el deslizador para comparar.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer__meta">De La Manga Ave. &middot; 2026</div>
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,13 @@
+- [x] Verify that the copilot-instructions.md file in the .github directory is created.
+- [x] Clarify Project Requirements — static audiovisual portfolio with video, image, and audio before/after sections.
+- [x] Scaffold the Project — plain HTML/CSS/JS created in the current folder.
+- [x] Customize the Project — implemented split views, A/B audio, and three-font system.
+- [x] Install Required Extensions — none needed for static site.
+- [x] Compile the Project — not applicable; open `index.html` directly.
+- [x] Create and Run Task — not required for this static setup.
+- [x] Launch the Project — open `index.html` in a browser; no debugger needed.
+- [x] Ensure Documentation is Complete — README added and this file cleaned of comments.
+
+- Work through each checklist item systematically.
+- Keep communication concise and focused.
+- Follow development best practices.
