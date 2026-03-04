@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Operación 14 — De La Manga Ave.</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="album-operacion14.css">
+  <script defer src="script.js"></script>
+</head>
+<body class="album-page">
+  <div class="album-bg" aria-hidden="true"></div>
+
+  <div class="album-container">
+    <!-- Mini Nav -->
+    <nav class="album-nav">
+      <a href="index.html" class="album-nav__back">← Volver al portafolio</a>
+    </nav>
+
+    <!-- Hero Cover + Description -->
+    <section class="album-hero" data-reveal>
+      <div class="album-hero__cover">
+        <img src="resources/OPERACIÓN14.png" alt="Operación 14 - Album Cover" class="album-hero__image">
+        <div class="album-hero__description-overlay">
+          <div class="album-hero__description-content">
+            <h1 class="album-hero__title">Operación 14</h1>
+            <p class="album-hero__description">
+              Operación 14 es un EP que recopila grabaciones que datan de 2024 hasta el pasado 2025. Estas grabaciones fueron producidas en el Paraíso La Catorce desde mi habitación. También cuenta con la participación de artistas del Paraíso. El objetivo de este EP no es entregar una calidad sobrenatural, sino, la autenticidad de crear música con lo que se tiene a disposición.
+            </p>
+            <p class="album-hero__note">Encontrarás diferentes técnicas de grabación y producción dentro de cada tema en los cuales experimenté con el objetivo de mejorar mis habilidades para hacer canciones.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tracklist & Player -->
+    <section class="album-player" data-reveal>
+      <div class="album-tracklist">
+        <div class="track-card" data-track="0">
+          <div class="track-card__info">
+            <div class="track-card__number">01</div>
+            <div class="track-card__details">
+              <h3 class="track-card__title">4AM</h3>
+              <span class="track-card__duration">2:18</span>
+            </div>
+          </div>
+          <button class="track-card__button" aria-label="Play 4AM" data-track-src="resources/Albums/Operación 14/01 4AM.wav">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M8 5v14l11-7z" fill="currentColor"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="track-card" data-track="1">
+          <div class="track-card__info">
+            <div class="track-card__number">02</div>
+            <div class="track-card__details">
+              <h3 class="track-card__title">Fanático</h3>
+              <span class="track-card__duration">2:32</span>
+            </div>
+          </div>
+          <button class="track-card__button" aria-label="Play Fanático" data-track-src="resources/Albums/Operación 14/02 Fanático.wav">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M8 5v14l11-7z" fill="currentColor"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="track-card" data-track="2">
+          <div class="track-card__info">
+            <div class="track-card__number">03</div>
+            <div class="track-card__details">
+              <h3 class="track-card__title">Motivarte</h3>
+              <span class="track-card__duration">4:03</span>
+            </div>
+          </div>
+          <button class="track-card__button" aria-label="Play Motivarte" data-track-src="resources/Albums/Operación 14/03 Motivarte.wav">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M8 5v14l11-7z" fill="currentColor"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="track-card" data-track="3">
+          <div class="track-card__info">
+            <div class="track-card__number">04</div>
+            <div class="track-card__details">
+              <h3 class="track-card__title">Amadeus (Escándalo)</h3>
+              <span class="track-card__duration">2:28</span>
+            </div>
+          </div>
+          <button class="track-card__button" aria-label="Play Amadeus" data-track-src="resources/Albums/Operación 14/04 Amadeus (Escándalo).wav">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M8 5v14l11-7z" fill="currentColor"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="track-card" data-track="4">
+          <div class="track-card__info">
+            <div class="track-card__number">05</div>
+            <div class="track-card__details">
+              <h3 class="track-card__title">Encima del Mar</h3>
+              <span class="track-card__duration">2:53</span>
+            </div>
+          </div>
+          <button class="track-card__button" aria-label="Play Encima del Mar" data-track-src="resources/Albums/Operación 14/05 Encima del Mar.wav">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M8 5v14l11-7z" fill="currentColor"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Player Controls -->
+      <div class="album-controls" data-player>
+        <div class="player-display">
+          <div class="player-progress">
+            <div class="progress-bar">
+              <div class="progress-bar__filled" style="width: 0%"></div>
+            </div>
+            <div class="progress-time">
+              <span class="time-current">0:00</span>
+              <span class="time-duration">16:14</span>
+            </div>
+          </div>
+          <div class="player-info">
+            <button class="btn-album-play" aria-label="Play/Pause">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                <path d="M8 5v14l11-7z" fill="currentColor"/>
+              </svg>
+            </button>
+            <div class="player-track-info">
+              <span class="player-track-title">4AM</span>
+              <span class="player-track-artist">Operación 14</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <audio id="player-audio" crossorigin="anonymous" preload="metadata"></audio>
+</body>
+</html>

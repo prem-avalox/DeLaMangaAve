@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="format-detection" content="telephone=no">
+  <title>Operación 14 — EP</title>
+  <link rel="stylesheet" href="operacion14.css">
+  <script defer src="script.js"></script>
+</head>
+<body class="op14-page">
+  <!-- SECCIÓN 1: Hero + Portada Flotante -->
+  <section class="op14-section op14-section--1" style="background-image: url('resources/Albums/Operación 14/WPELEMENTS/1.jpeg')">
+    <div class="op14-section__overlay"></div>
+    <div class="op14-content">
+      <div class="glass-card" data-reveal>
+        <img src="resources/Albums/Operación 14/WPELEMENTS/OPERACIÓN14.png" alt="Operación 14" class="glass-card__image">
+        <div class="glass-card__title">Operación 14</div>
+        <div class="glass-card__subtitle">EP • 5 Tracks • 16:14</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECCIÓN 2: Descripción -->
+  <section class="op14-section op14-section--2" style="background-image: url('resources/Albums/Operación 14/WPELEMENTS/2.jpeg')">
+    <div class="op14-section__overlay"></div>
+    <div class="op14-content">
+      <div class="op14-text-block" data-reveal>
+        <img src="resources/Albums/Operación 14/WPELEMENTS/DESC.png" alt="Descripción del EP" class="op14-text-image">
+      </div>
+    </div>
+  </section>
+
+  <!-- SECCIÓN 3: Reproductor + Descarga -->
+  <section class="op14-section op14-section--3" style="background-image: url('resources/Albums/Operación 14/WPELEMENTS/3.jpeg')">
+    <div class="op14-section__overlay"></div>
+    <div class="op14-content">
+      <div class="op14-player-block" data-reveal>
+        <h2 class="op14-player-block__title">Escucha el EP</h2>
+        
+        <div class="op14-tracklist">
+          <div class="op14-track" data-track="0">
+            <div class="op14-track__info">
+              <span class="op14-track__num">01</span>
+              <h3 class="op14-track__title">4AM</h3>
+              <span class="op14-track__time">2:18</span>
+            </div>
+            <button class="op14-track__btn" aria-label="Play 4AM" data-track-src="resources/Albums/Operación 14/01 4AM.wav">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M8 5v14l11-7z" fill="currentColor"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="op14-track" data-track="1">
+            <div class="op14-track__info">
+              <span class="op14-track__num">02</span>
+              <h3 class="op14-track__title">Fanático</h3>
+              <span class="op14-track__time">2:32</span>
+            </div>
+            <button class="op14-track__btn" aria-label="Play Fanático" data-track-src="resources/Albums/Operación 14/02 Fanático.wav">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M8 5v14l11-7z" fill="currentColor"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="op14-track" data-track="2">
+            <div class="op14-track__info">
+              <span class="op14-track__num">03</span>
+              <h3 class="op14-track__title">Motivarte</h3>
+              <span class="op14-track__time">4:03</span>
+            </div>
+            <button class="op14-track__btn" aria-label="Play Motivarte" data-track-src="resources/Albums/Operación 14/03 Motivarte.wav">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M8 5v14l11-7z" fill="currentColor"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="op14-track" data-track="3">
+            <div class="op14-track__info">
+              <span class="op14-track__num">04</span>
+              <h3 class="op14-track__title">Amadeus (Escándalo)</h3>
+              <span class="op14-track__time">2:28</span>
+            </div>
+            <button class="op14-track__btn" aria-label="Play Amadeus" data-track-src="resources/Albums/Operación 14/04 Amadeus (Escándalo).wav">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M8 5v14l11-7z" fill="currentColor"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="op14-track" data-track="4">
+            <div class="op14-track__info">
+              <span class="op14-track__num">05</span>
+              <h3 class="op14-track__title">Encima del Mar</h3>
+              <span class="op14-track__time">2:53</span>
+            </div>
+            <button class="op14-track__btn" aria-label="Play Encima del Mar" data-track-src="resources/Albums/Operación 14/05 Encima del Mar.wav">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M8 5v14l11-7z" fill="currentColor"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="op14-player-controls" data-player>
+          <div class="op14-player-progress">
+            <div class="op14-progress-bar">
+              <div class="op14-progress-bar__filled" style="width: 0%"></div>
+            </div>
+            <div class="op14-progress-time">
+              <span class="op14-time-current">0:00</span>
+              <span class="op14-time-duration">16:14</span>
+            </div>
+          </div>
+          <div class="op14-player-main">
+            <button class="op14-play-btn" aria-label="Play/Pause">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                <path d="M8 5v14l11-7z" fill="currentColor"/>
+              </svg>
+            </button>
+            <div class="op14-player-info">
+              <div class="op14-player-title">4AM</div>
+              <div class="op14-player-artist">Operación 14</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="op14-download-section">
+          <a href="resources/Albums/Operación 14/Martín Alejandro - Operación 14.zip" class="op14-download-btn" download="Martín Alejandro - Operación 14.zip">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2v10m0 0l-3-3m3 3l3-3m-3 8v3m6-4H6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Descarga Gratuita
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECCIÓN 4: Nota Personal -->
+  <section class="op14-section op14-section--4" style="background-image: url('resources/Albums/Operación 14/WPELEMENTS/4.jpeg')">
+    <div class="op14-section__overlay"></div>
+    <div class="op14-content">
+      <div class="op14-text-block" data-reveal>
+        <img src="resources/Albums/Operación 14/WPELEMENTS/NOTAPERSONAL.png" alt="Nota Personal" class="op14-text-image">
+      </div>
+    </div>
+  </section>
+
+  <!-- Navigation -->
+  <nav class="op14-nav">
+    <a href="index.html" class="op14-nav__back op14-nav__back--dark-bg">← Volver</a>
+  </nav>
+
+  <audio id="player-audio" crossorigin="anonymous" preload="metadata"></audio>
+</body>
+</html>

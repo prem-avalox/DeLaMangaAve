@@ -1,0 +1,1243 @@
+/* ── Operación 14 Album Page Styles ─────────────────────────── */
+
+@font-face {
+  font-family: "Eurostile Bold";
+  src: url("/fonts/Eurostile Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Aquarius";
+  src: url("/fonts/Aquarius Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Aquarius Six";
+  src: url("/fonts/Aquarius Six Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: "Eurostile Bold", Arial, sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Prevent text-size adjustments and touch-zoom on mobile browsers */
+html, body {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  touch-action: manipulation;
+}
+
+.op14-page {
+  background: #f5f5f5;
+  color: #ffffff;
+}
+
+/* ── Sections ────────────────────────────────────────────────── */
+.op14-section {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  filter: brightness(1.1);
+}
+
+.op14-section__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, 
+    rgba(212, 212, 212, 0.12) 0%, 
+    rgba(180, 180, 180, 0.06) 50%, 
+    rgba(150, 150, 150, 0.10) 100%);
+  backdrop-filter: blur(1px) saturate(1.1);
+  -webkit-backdrop-filter: blur(1px) saturate(1.1);
+  z-index: 1;
+}
+
+.op14-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+}
+
+/* ── Glass Card (Section 1) ─────────────────────────────────── */
+.glass-card {
+  background: rgba(220, 220, 220, 0.12);
+  border: 1px solid rgba(220, 220, 220, 0.25);
+  border-radius: 16px;
+  padding: 0;
+  backdrop-filter: blur(20px) saturate(1.5);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.08),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.2),
+    inset -1px -1px 0 rgba(0, 0, 0, 0.1);
+  max-width: 700px;
+  width: 100%;
+  aspect-ratio: 1;
+  text-align: center;
+  transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.glass-card:hover {
+  background: rgba(220, 220, 220, 0.15);
+  border-color: rgba(220, 220, 220, 0.35);
+  box-shadow: 
+    0 12px 48px rgba(0, 0, 0, 0.12),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.25),
+    inset -1px -1px 0 rgba(0, 0, 0, 0.15);
+}
+
+.glass-card__image {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 0;
+  margin: 0;
+  padding: 0;
+  box-shadow: none;
+  display: block;
+}
+
+.glass-card__title {
+  font-family: "Aquarius", serif;
+  font-size: clamp(44px, 9vw, 72px);
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  margin: 0 0 12px;
+  color: #ffffff;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+  display: none;
+}
+
+.glass-card__subtitle {
+  font-family: "Aquarius Six", monospace;
+  font-size: 16px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin: 0;
+  opacity: 1;
+  display: none;
+}
+
+/* ── Text Block (Sections 2 & 4) ────────────────────────────── */
+.op14-text-block {
+  max-width: 700px;
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.op14-text-image {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1 / 1;
+  display: block;
+  border-radius: 0;
+  object-fit: cover;
+  object-position: center;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Player Block (Section 3) ────────────────────────────────── */
+.op14-player-block {
+  background: rgba(220, 220, 220, 0.08);
+  border: 1px solid rgba(220, 220, 220, 0.2);
+  border-radius: 16px;
+  padding: 35px 35px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  max-width: 700px;
+  width: 100%;
+  
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow: hidden;
+}
+
+.op14-player-block__title {
+  font-family: "Aquarius", serif;
+  font-size: 32px;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  margin: 0 0 14px;
+  color: #ffffff;
+  text-align: center;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* ── Tracklist ────────────────────────────────────────────────── */
+.op14-tracklist {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 0;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.op14-track {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: rgba(220, 220, 220, 0.06);
+  border: 1px solid rgba(220, 220, 220, 0.12);
+  border-radius: 10px;
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  min-height: 40px;
+}
+
+.op14-track:hover {
+  background: rgba(220, 220, 220, 0.12);
+  border-color: rgba(220, 220, 220, 0.2);
+  box-shadow: inset 0 0 12px rgba(255, 255, 255, 0.08);
+}
+
+.op14-track.is-playing {
+  background: rgba(220, 220, 220, 0.15);
+  border-color: rgba(220, 220, 220, 0.3);
+  box-shadow: 0 0 20px rgba(212, 212, 212, 0.2);
+}
+
+  gap: 8px;
+
+.op14-track__num {
+  font-family: "Aquarius Six", monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: #ffffff;
+  min-width: 24px;
+  text-align: center;
+}
+
+.op14-track__title {
+  font-family: "Aquarius", serif;
+  font-size: 13px;
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: #ffffff;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.op14-track__time {
+  font-family: "Aquarius Six", monospace;
+  font-size: 11px;
+  color: #ffffff;
+  margin-left: 8px;
+  margin-right: 8px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.op14-track__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: rgba(220, 220, 220, 0.1);
+  border: 1px solid rgba(220, 220, 220, 0.15);
+  border-radius: 50%;
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 250ms ease;
+  flex-shrink: 0;
+}
+
+.op14-track__btn:hover {
+  background: rgba(220, 220, 220, 0.2);
+  border-color: rgba(220, 220, 220, 0.3);
+  color: #ffffff;
+  transform: scale(1.08);
+}
+
+.op14-track.is-playing .op14-track__btn {
+  background: rgba(220, 220, 220, 0.25);
+  border-color: rgba(220, 220, 220, 0.4);
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(212, 212, 212, 0.3);
+}
+
+/* ── Player Controls ───────────────────────────────────────── */
+.op14-player-controls {
+  display: grid;
+  gap: 16px;
+  padding: 16px 0 0 0;
+  border-top: 1px solid rgba(220, 220, 220, 0.1);
+  border-bottom: 1px solid rgba(220, 220, 220, 0.1);
+  margin-bottom: 32px;
+}
+
+.op14-player-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.op14-player-progress {}
+
+.op14-play-btn {
+  border-radius: 50%;
+}
+
+.op14-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(220, 220, 220, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.op14-progress-bar__filled {
+  height: 100%;
+  background: linear-gradient(90deg, #ffffff, #d0d0d0);
+  transition: width 100ms linear;
+  box-shadow: 0 0 10px rgba(212, 212, 212, 0.5);
+}
+
+.op14-progress-time {
+  display: flex;
+  justify-content: space-between;
+  font-family: "Aquarius Six", monospace;
+  font-size: 13px;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.op14-player-main {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.op14-play-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  background: rgba(220, 220, 220, 0.18);
+  border: 1px solid rgba(220, 220, 220, 0.3);
+  border-radius: 50%;
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+  font-weight: 600;
+}
+
+.op14-play-btn:hover {
+  background: rgba(220, 220, 220, 0.25);
+  border-color: rgba(220, 220, 220, 0.35);
+  box-shadow: 0 0 24px rgba(212, 212, 212, 0.3);
+  transform: scale(1.1);
+}
+
+.op14-play-btn.is-playing {
+  background: rgba(220, 220, 220, 0.3);
+  border-color: rgba(220, 220, 220, 0.4);
+  box-shadow: 0 0 28px rgba(212, 212, 212, 0.4);
+}
+
+.op14-player-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.op14-player-title {
+  font-family: "Aquarius", serif;
+  font-size: 18px;
+  color: #ffffff;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+
+.op14-player-artist {
+  font-family: "Aquarius Six", monospace;
+  font-size: 14px;
+  color: #ffffff;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* ── Download Section ────────────────────────────────────────── */
+.op14-download-section {
+  text-align: center;
+}
+
+.op14-download-title {
+  font-family: "Aquarius Six", monospace;
+  font-size: 14px;
+  margin: 0 0 18px;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+}
+
+.op14-download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 36px;
+  background: rgba(220, 220, 220, 0.16);
+  border: 1px solid rgba(220, 220, 220, 0.28);
+  border-radius: 16px;
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  font-weight: 600;
+}
+
+.op14-download-btn:hover {
+  background: rgba(220, 220, 220, 0.2);
+  border-color: rgba(220, 220, 220, 0.35);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    0 8px 28px rgba(212, 212, 212, 0.2);
+  transform: translateY(-3px);
+}
+
+.op14-download-btn svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+}
+
+/* ── Navigation ──────────────────────────────────────────────── */
+.op14-nav {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 100;
+}
+
+.op14-nav__back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: "Eurostile Bold", sans-serif;
+  font-size: 13px;
+  color: #ffffff;
+  text-decoration: none;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: all 280ms ease;
+  padding: 16px 28px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  font-weight: 700;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+.op14-nav__back:hover {
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.45);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  transform: translateY(-2px);
+}
+
+/* ── Reveal Animation ────────────────────────────────────────── */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 600ms ease, transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Responsive – Tablet (768px) ───────────────────────────── */
+@media (max-width: 768px) {
+  .op14-section {
+    background-attachment: scroll;
+  }
+
+  .op14-content {
+    padding: 40px 16px;
+  }
+
+  .glass-card {
+    padding: 0 !important;
+  }
+
+  .glass-card__image {
+    margin: 0 !important;
+  }
+
+  .glass-card__title {
+    font-size: clamp(28px, 6vw, 42px);
+  }
+
+  .glass-card__subtitle {
+    font-size: 13px;
+  }
+
+  .op14-player-block {
+    padding: 28px;
+  }
+
+  .op14-player-block__title {
+    font-size: 26px;
+    margin-bottom: 20px;
+  }
+
+  .op14-tracklist {
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .op14-track {
+    padding: 12px 14px;
+  }
+
+  .op14-track__title {
+    font-size: 14px;
+  }
+
+  .op14-track__num {
+    font-size: 11px;
+    min-width: 26px;
+  }
+
+  .op14-track__time {
+    font-size: 10px;
+  }
+
+  .op14-track__btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .op14-play-btn {
+    width: 52px;
+    height: 52px;
+  }
+
+  .op14-player-title {
+    font-size: 14px;
+  }
+
+  .op14-download-btn {
+    padding: 13px 26px;
+    font-size: 12px;
+    gap: 10px;
+  }
+
+  .op14-nav {
+    top: 16px;
+    left: 16px;
+  }
+
+  .op14-nav__back {
+    font-size: 11px;
+    padding: 8px 14px;
+  }
+}
+
+
+/* ── Text Block (Sections 2 & 4) ────────────────────────────── */
+/* Styles defined in stable box sizing section below */
+
+/* Player: force high-contrast white text and set song names to Aquarius Six */
+.op14-player-block,
+.op14-player-block * {
+  color: #ffffff !important;
+}
+
+.op14-track__title,
+.op14-player-title {
+  font-family: "Aquarius Six", monospace !important;
+  color: #ffffff !important;
+}
+
+.op14-track__num,
+.op14-track__time,
+.op14-player-artist,
+.op14-download-btn,
+.op14-download-title {
+  color: #ffffff !important;
+}
+
+/* Hide redundant download heading if present */
+.op14-download-title {
+  display: none;
+}
+
+/* ── Player Block (Section 3) ────────────────────────────────── */
+.op14-player-block {
+  background: rgba(220, 220, 220, 0.08);
+  border: 1px solid rgba(220, 220, 220, 0.2);
+  border-radius: 20px;
+  padding: 40px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  max-width: 640px;
+  width: 100%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.op14-player-block__title {
+  font-family: "Aquarius", serif;
+  font-size: 32px;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  margin: 0 0 28px;
+  color: #dcdcdc;
+  text-align: center;
+}
+
+/* ── Tracklist ────────────────────────────────────────────────── */
+.op14-tracklist {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 32px;
+}
+
+.op14-track {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: rgba(220, 220, 220, 0.06);
+  border: 1px solid rgba(220, 220, 220, 0.12);
+  border-radius: 10px;
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  min-height: 40px;
+}
+
+.op14-track:hover {
+  background: rgba(220, 220, 220, 0.12);
+  border-color: rgba(220, 220, 220, 0.2);
+  box-shadow: inset 0 0 12px rgba(255, 255, 255, 0.08);
+}
+
+.op14-track.is-playing {
+  background: rgba(220, 220, 220, 0.15);
+  border-color: rgba(220, 220, 220, 0.3);
+  box-shadow: 0 0 20px rgba(212, 212, 212, 0.2);
+}
+
+.op14-track__info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+}
+
+.op14-track__num {
+  font-family: "Aquarius Six", monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: #a0a0a0;
+  min-width: 28px;
+  text-align: center;
+}
+
+.op14-track__title {
+  font-family: "Aquarius", serif;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: #dcdcdc;
+}
+
+.op14-track__time {
+  font-family: "Aquarius Six", monospace;
+  font-size: 11px;
+  color: #909090;
+  margin-left: auto;
+  margin-right: 12px;
+}
+
+.op14-track__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(220, 220, 220, 0.1);
+  border: 1px solid rgba(220, 220, 220, 0.15);
+  border-radius: 50%;
+  color: #c0c0c0;
+  cursor: pointer;
+  transition: all 250ms ease;
+  flex-shrink: 0;
+}
+
+.op14-track__btn:hover {
+  background: rgba(220, 220, 220, 0.2);
+  border-color: rgba(220, 220, 220, 0.3);
+  color: #dcdcdc;
+  transform: scale(1.08);
+}
+
+.op14-track.is-playing .op14-track__btn {
+  background: rgba(220, 220, 220, 0.25);
+  border-color: rgba(220, 220, 220, 0.4);
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(212, 212, 212, 0.3);
+}
+
+/* ── Player Controls ───────────────────────────────────────── */
+.op14-player-controls {
+  display: grid;
+  gap: 20px;
+  padding: 24px 0;
+  border-top: 1px solid rgba(220, 220, 220, 0.1);
+  border-bottom: 1px solid rgba(220, 220, 220, 0.1);
+  margin-bottom: 28px;
+}
+
+.op14-player-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.op14-progress-bar {
+  width: 100%;
+  height: 5px;
+  background: rgba(220, 220, 220, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.op14-progress-bar__filled {
+  height: 100%;
+  background: linear-gradient(90deg, #dcdcdc, #c0c0c0);
+  transition: width 100ms linear;
+  box-shadow: 0 0 8px rgba(212, 212, 212, 0.4);
+}
+
+.op14-progress-time {
+  display: flex;
+  justify-content: space-between;
+  font-family: "Aquarius Six", monospace;
+  font-size: 11px;
+  color: #909090;
+}
+
+.op14-player-main {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.op14-play-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  background: rgba(220, 220, 220, 0.15);
+  border: 1px solid rgba(220, 220, 220, 0.25);
+  border-radius: 50%;
+  color: #dcdcdc;
+  cursor: pointer;
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+}
+
+.op14-play-btn:hover {
+  background: rgba(220, 220, 220, 0.25);
+  border-color: rgba(220, 220, 220, 0.35);
+  box-shadow: 0 0 20px rgba(212, 212, 212, 0.25);
+  transform: scale(1.08);
+}
+
+.op14-play-btn.is-playing {
+  background: rgba(220, 220, 220, 0.3);
+  border-color: rgba(220, 220, 220, 0.4);
+  box-shadow: 0 0 24px rgba(212, 212, 212, 0.3);
+}
+
+.op14-player-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.op14-player-title {
+  font-family: "Aquarius", serif;
+  font-size: 15px;
+  color: #dcdcdc;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.op14-player-artist {
+  font-family: "Aquarius Six", monospace;
+  font-size: 11px;
+  color: #909090;
+  margin: 0;
+}
+
+/* ── Download Section ────────────────────────────────────────── */
+.op14-download-section {
+  text-align: center;
+}
+
+.op14-download-title {
+  font-family: "Aquarius Six", monospace;
+  font-size: 12px;
+  margin: 0 0 12px;
+  color: #a0a0a0;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.op14-download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 28px;
+  background: rgba(220, 220, 220, 0.12);
+  border: 1px solid rgba(220, 220, 220, 0.25);
+  border-radius: 10px;
+  color: #dcdcdc;
+  font-family: "Eurostile Bold", sans-serif;
+  font-size: 13px;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.op14-download-btn:hover {
+  background: rgba(220, 220, 220, 0.2);
+  border-color: rgba(220, 220, 220, 0.35);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    0 8px 24px rgba(212, 212, 212, 0.15);
+  transform: translateY(-2px);
+}
+
+.op14-download-btn svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+}
+
+/* ── Navigation ──────────────────────────────────────────────── */
+.op14-nav {
+  position: fixed;
+  top: 24px;
+  left: 24px;
+  z-index: 100;
+}
+
+.op14-nav__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: "Eurostile Bold", sans-serif;
+  font-size: 12px;
+  text-decoration: none;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: all 250ms ease;
+  padding: 8px 16px;
+  border-radius: 8px;
+  backup-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* ── Reveal Animation ────────────────────────────────────────── */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 600ms ease, transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .op14-section {
+    background-attachment: scroll;
+  }
+
+  .op14-content {
+    padding: 40px 16px;
+  }
+
+  .glass-card {
+    padding: 0;
+  }
+
+  .glass-card__image {
+    margin: 0;
+  }
+
+  .glass-card__title {
+    font-size: clamp(24px, 5vw, 36px);
+  }
+
+  .op14-player-block {
+    padding: 24px;
+    max-width: 100%;
+    aspect-ratio: 1;
+    height: auto;
+  }
+
+  .op14-player-block__title {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+
+  .op14-tracklist {
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .op14-track {
+    padding: 12px 14px;
+  }
+
+  .op14-track__title {
+    font-size: 14px;
+  }
+
+  .op14-track__num {
+    font-size: 11px;
+  }
+
+  .op14-track__time {
+    font-size: 10px;
+  }
+
+  .op14-track__btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .op14-play-btn {
+    width: 48px;
+    height: 48px;
+  }
+
+  .op14-nav {
+    top: 16px;
+    left: 16px;
+  }
+
+  .op14-nav__back {
+    font-size: 11px;
+    padding: 6px 12px;
+  }
+}
+
+/* ── Dynamic Back Button Styles ──────────────────────────────── */
+.op14-nav__back--dark-bg {
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.35);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  transition: all 280ms ease;
+}
+
+.op14-nav__back--dark-bg:hover {
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.45);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.op14-nav__back--light-bg {
+  color: #1a1a1a;
+  background: rgba(255, 255, 255, 0.72);
+  border: 2px solid rgba(0, 0, 0, 0.15);
+  transition: all 280ms ease;
+  font-weight: 700;
+}
+
+.op14-nav__back--light-bg:hover {
+  color: #000000;
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(0, 0, 0, 0.3);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+}
+
+/* Ensure Sections 2 & 4 images completely fill their boxes */
+.op14-text-block {
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.op14-text-block .op14-text-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 0;
+}
+
+/* Small tweak: if the image is taller than container, ensure center-crop */
+.op14-text-image {
+  object-position: center center;
+}
+
+/* ── Stable Box Sizing & Centering (clamp + aspect-ratio) ── */
+:root {
+  --op-card-min: 320px;
+  --op-card-pref: 45vw;
+  --op-card-max: 700px;
+  --op-text-min: 320px;
+  --op-text-pref: 60vw;
+  --op-text-max: 900px;
+}
+
+/* Keep the visual boxes stable across zoom and devices */
+.glass-card {
+  width: clamp(var(--op-card-min), var(--op-card-pref), var(--op-card-max)) !important;
+  aspect-ratio: 1 / 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+  position: relative !important;
+  padding: 0 !important;
+}
+
+.glass-card__image {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  display: block !important;
+  position: static !important;
+  border-radius: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.op14-text-block {
+  width: clamp(var(--op-text-min), var(--op-text-pref), var(--op-text-max)) !important;
+  aspect-ratio: 1 / 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+}
+
+.op14-text-image {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  display: block !important;
+  border-radius: 0 !important;
+  position: static !important;
+}
+
+/* Minor performance/consistency hints to reduce layout jitter while zooming */
+.op14-content,
+.op14-player-block {
+  -webkit-font-smoothing: antialiased;
+  transform: translateZ(0);
+}
+
+@media (max-width: 480px) {
+  .op14-section {
+    background-attachment: scroll;
+  }
+
+  .op14-content {
+    padding: 20px 12px;
+    min-height: auto;
+  }
+
+  .glass-card,
+  .op14-text-block {
+    width: calc(100% - 24px) !important;
+    aspect-ratio: 1 / 1 !important;
+    max-width: 100% !important;
+  }
+
+  .glass-card__image,
+  .op14-text-image {
+    height: 100% !important;
+    max-height: 100% !important;
+  }
+
+  .glass-card__title {
+    font-size: 24px;
+    display: none;
+  }
+
+  .glass-card__subtitle {
+    display: none;
+  }
+
+  .op14-player-block {
+    padding: 20px;
+    max-width: 100%;
+  }
+
+  .op14-player-block__title {
+    font-size: 22px;
+    margin-bottom: 16px;
+  }
+
+  .op14-tracklist {
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+
+  .op14-track {
+    padding: 10px 10px;
+    min-height: 36px;
+  }
+
+  .op14-track__info {
+    gap: 12px;
+  }
+
+  .op14-track__num {
+    font-size: 11px;
+    min-width: 24px;
+  }
+
+  .op14-track__title {
+    font-size: 13px;
+  }
+
+  .op14-track__time {
+    font-size: 10px;
+    margin-right: 8px;
+  }
+
+  .op14-track__btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .op14-player-controls {
+    gap: 12px;
+    padding: 12px 0;
+    margin-bottom: 16px;
+  }
+
+  .op14-play-btn {
+    width: 48px;
+    height: 48px;
+  }
+
+  .op14-player-title {
+    font-size: 13px;
+  }
+
+  .op14-player-artist {
+    font-size: 10px;
+  }
+
+  .op14-download-btn {
+    padding: 12px 20px;
+    font-size: 12px;
+    gap: 8px;
+  }
+
+  .op14-nav {
+    top: 12px;
+    left: 12px;
+  }
+
+  .op14-nav__back {
+    font-size: 11px;
+    padding: 8px 12px;
+  }
+
+  :root {
+    --op-card-min: 280px;
+    --op-card-pref: 90vw;
+    --op-card-max: 100%;
+    --op-text-min: 280px;
+    --op-text-pref: 90vw;
+    --op-text-max: 100%;
+  }
+}
+
