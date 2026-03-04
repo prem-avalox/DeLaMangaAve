@@ -717,15 +717,21 @@ function initOp14Player() {
   const playBtn = document.querySelector('.op14-play-btn');
   const trackItems = document.querySelectorAll('.op14-track');
   const progressBar = document.querySelector('.op14-progress-bar__filled');
+  const progressContainer = document.querySelector('.op14-progress-bar');
   const currentTimeEl = document.querySelector('.op14-time-current');
   const durationEl = document.querySelector('.op14-time-duration');
   const playerTitle = document.querySelector('.op14-player-title');
   const playerArtist = document.querySelector('.op14-player-artist');
-  const container = document.querySelector('[data-player]');
 
-  if (!audio || !playBtn || !trackItems.length || !container) return;
+  if (!audio || !playBtn || !trackItems.length) {
+    console.error('Op14 Player: Missing required elements', { audio, playBtn, trackItemsLength: trackItems.length });
+    return;
+  }
+
+  console.log('Op14 Player initialized with', trackItems.length, 'tracks');
 
   let currentTrackIndex = 0;
+  let isSeeking = false;
 
   const formatTime = (seconds) => {
     if (!seconds || !isFinite(seconds)) return '0:00';
@@ -735,59 +741,21 @@ function initOp14Player() {
   };
 
   const updateProgressBar = () => {
-    if (audio.duration && isFinite(audio.duration)) {
+    if (!isSeeking && progressBar && audio.duration && isFinite(audio.duration)) {
       const percentage = (audio.currentTime / audio.duration) * 100;
       progressBar.style.width = `${percentage}%`;
-      currentTimeEl.textContent = formatTime(audio.currentTime);
+      if (currentTimeEl) currentTimeEl.textContent = formatTime(audio.currentTime);
     }
-  };
-
-  const loadTrack = (index) => {
-    if (index < 0 || index >= trackItems.length) return;
-    currentTrackIndex = index;
-    
-    const trackItem = trackItems[index];
-    const button = trackItem.querySelector('[data-track-src]');
-    if (!button) return;
-
-    const src = button.dataset.trackSrc;
-    const title = trackItem.querySelector('.op14-track__title')?.textContent || '...';
-
-    audio.src = src;
-    playerTitle.textContent = title;
-    playerArtist.textContent = 'Operación 14';
-
-    trackItems.forEach((item, i) => {
-      item.classList.toggle('is-playing', i === index);
-    });
-  };
-
-  const play = () => {
-    if (!audio.src) loadTrack(0);
-    audio.play();
-    playBtn.classList.add('is-playing');
-    updatePlayIcon();
-    updateTrackIcons();
-  };
-
-  const pause = () => {
-    audio.pause();
-    playBtn.classList.remove('is-playing');
-    updatePlayIcon();
-    updateTrackIcons();
   };
 
   const updatePlayIcon = () => {
-    const svg = playBtn.querySelector('svg');
-    if (!svg) return;
-    
-    if (audio.paused) {
-      // Play icon (triangle)
-      svg.innerHTML = '<path d="M8 5v14l11-7z" fill="currentColor"/>';
-    } else {
-      // Pause icon (two bars)
-      svg.innerHTML = '<path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" fill="currentColor"/>';
+    const svg = playBtn.querySelector('svg:first-of-type');
+    if (!svg) {
+      console.warn('Op14 Player: SVG not found for play icon');
+      return;
     }
+    const newPath = audio.paused ? '<path d="M8 5v14l11-7z" fill="currentColor"/>' : '<path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" fill="currentColor"/>';
+    svg.innerHTML = newPath;
   };
 
   const updateTrackIcons = () => {
@@ -796,62 +764,177 @@ function initOp14Player() {
       if (!btn) return;
       const svg = btn.querySelector('svg');
       if (!svg) return;
-      
-      if (i === currentTrackIndex && !audio.paused) {
-        // Playing - show pause icon
-        svg.innerHTML = '<path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" fill="currentColor"/>';
-      } else {
-        // Not playing - show play icon
-        svg.innerHTML = '<path d="M8 5v14l11-7z" fill="currentColor"/>';
-      }
+      const isPlaying = i === currentTrackIndex && !audio.paused;
+      const newPath = isPlaying ? '<path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" fill="currentColor"/>' : '<path d="M8 5v14l11-7z" fill="currentColor"/>';
+      svg.innerHTML = newPath;
     });
   };
 
-  const togglePlay = () => {
-    if (audio.paused) play();
-    else pause();
+  const loadTrack = (index) => {
+    if (index < 0 || index >= trackItems.length) return;
+    currentTrackIndex = index;
+    
+    const trackItem = trackItems[index];
+    const button = trackItem.querySelector('[data-track-src]');
+    if (!button) {
+      console.warn('Op14 Player: No track source found for index', index);
+      return;
+    }
+
+    const src = button.dataset.trackSrc;
+    const title = trackItem.querySelector('.op14-track__title')?.textContent || '...';
+
+    console.log('Op14 Player: Loading track', index, '-', title, '-', src);
+
+    audio.src = src;
+    audio.load();
+    playerTitle.textContent = title;
+    playerArtist.textContent = 'Operación 14';
+    durationEl.textContent = 'cargando...';
+
+    trackItems.forEach((item, i) => {
+      item.classList.toggle('is-playing', i === index);
+    });
   };
 
-  // Event listeners
-  playBtn.addEventListener('click', togglePlay);
+  const play = () => {
+    if (!audio.src) {
+      console.log('Op14 Player: No src, loading first track');
+      loadTrack(0);
+    }
+    console.log('Op14 Player: Attempting to play');
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => console.log('Op14 Player: Play succeeded'))
+        .catch((error) => console.warn('Op14 Player: Play failed:', error));
+    }
+  };
 
+  const pause = () => {
+    console.log('Op14 Player: Pausing');
+    audio.pause();
+  };
+
+  const togglePlay = () => {
+    if (audio.paused) {
+      play();
+    } else {
+      pause();
+    }
+  };
+
+  // Play button click
+  playBtn.addEventListener('click', () => {
+    console.log('Op14 Player: Play button clicked');
+    togglePlay();
+  });
+
+  // Track clicks
   trackItems.forEach((item, index) => {
     const button = item.querySelector('[data-track-src]');
     if (button) {
       button.addEventListener('click', (e) => {
         e.stopPropagation();
-        loadTrack(index);
-        play();
+        console.log('Op14 Player: Track clicked:', index);
+        if (currentTrackIndex === index && !audio.paused) {
+          pause();
+        } else {
+          loadTrack(index);
+          play();
+        }
       });
     }
   });
 
-  // Update track icons when a new track is loaded
-  const originalLoadTrack = loadTrack;
-  loadTrack = (index) => {
-    originalLoadTrack(index);
-    updateTrackIcons();
+  // Seeking
+  const seek = (e) => {
+    if (!progressContainer || !audio.duration || !isFinite(audio.duration)) return;
+    const rect = progressContainer.getBoundingClientRect();
+    const percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    audio.currentTime = percent * audio.duration;
+    console.log('Op14 Player: Seek to', formatTime(audio.currentTime));
   };
 
-  const progressContainer = document.querySelector('.op14-progress-bar');
   if (progressContainer) {
-    progressContainer.addEventListener('click', (e) => {
-      const rect = progressContainer.getBoundingClientRect();
-      const percent = (e.clientX - rect.left) / rect.width;
-      audio.currentTime = percent * audio.duration;
+    progressContainer.addEventListener('click', seek);
+    progressContainer.addEventListener('mousedown', (e) => {
+      isSeeking = true;
+      seek(e);
+    });
+    document.addEventListener('mousemove', (e) => {
+      if (isSeeking) seek(e);
+    });
+    document.addEventListener('mouseup', () => {
+      isSeeking = false;
+    });
+
+    // Touch support
+    progressContainer.addEventListener('touchstart', (e) => {
+      isSeeking = true;
+      if (e.touches.length > 0) {
+        const touch = e.touches[0];
+        const rect = progressContainer.getBoundingClientRect();
+        const percent = Math.max(0, Math.min(1, (touch.clientX - rect.left) / rect.width));
+        audio.currentTime = percent * audio.duration;
+      }
+    });
+    document.addEventListener('touchmove', (e) => {
+      if (isSeeking && e.touches.length > 0) {
+        const touch = e.touches[0];
+        const rect = progressContainer.getBoundingClientRect();
+        const percent = Math.max(0, Math.min(1, (touch.clientX - rect.left) / rect.width));
+        audio.currentTime = percent * audio.duration;
+      }
+    });
+    document.addEventListener('touchend', () => {
+      isSeeking = false;
     });
   }
 
+  // Audio events
+  audio.addEventListener('loadstart', () => {
+    console.log('Op14 Player: loadstart event');
+    playBtn.classList.add('is-loading');
+  });
+
+  audio.addEventListener('canplay', () => {
+    console.log('Op14 Player: canplay event');
+    playBtn.classList.remove('is-loading');
+  });
+
+  audio.addEventListener('loadedmetadata', () => {
+    console.log('Op14 Player: loadedmetadata event, duration:', audio.duration);
+    if (durationEl) durationEl.textContent = formatTime(audio.duration);
+  });
+
   audio.addEventListener('timeupdate', updateProgressBar);
-  audio.addEventListener('ended', () => {
+
+  audio.addEventListener('play', () => {
+    console.log('Op14 Player: play event');
+    playBtn.classList.add('is-playing');
+    updatePlayIcon();
+    updateTrackIcons();
+  });
+
+  audio.addEventListener('pause', () => {
+    console.log('Op14 Player: pause event');
     playBtn.classList.remove('is-playing');
     updatePlayIcon();
     updateTrackIcons();
   });
-  audio.addEventListener('loadedmetadata', () => {
-    durationEl.textContent = formatTime(audio.duration);
+
+  audio.addEventListener('ended', () => {
+    console.log('Op14 Player: ended event');
+    playBtn.classList.remove('is-playing');
+    updatePlayIcon();
   });
 
+  audio.addEventListener('error', (event) => {
+    console.error('Op14 Player: Audio error:', event, 'Code:', audio.error?.code, 'Message:', audio.error?.message);
+  });
+
+  // Initialize with first track
   loadTrack(0);
 }
 
@@ -899,17 +982,4 @@ function initDynamicBackButton() {
   );
 
   sections.forEach((section) => observer.observe(section));
-}
-
-// Auto-initialize on page load
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    initOp14Player?.();
-    initDynamicBackButton?.();
-    initMusicPlayer?.();
-  });
-} else {
-  initOp14Player?.();
-  initDynamicBackButton?.();
-  initMusicPlayer?.();
 }
