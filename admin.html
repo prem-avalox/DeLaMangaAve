@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Admin local — Colecciones De La Manga</title>
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="portfolio-data.js"></script>
+  <script defer src="music-data.js"></script>
+  <script defer src="admin.js"></script>
+</head>
+<body>
+  <div class="fog fog--1" aria-hidden="true"></div>
+  <div class="fog fog--2" aria-hidden="true"></div>
+
+  <div class="page-shell">
+    <nav class="nav" aria-label="Herramientas">
+      <div class="nav__brand"><a href="colecciones.html">De La Manga</a></div>
+      <ul class="nav__links">
+        <li><a href="colecciones.html" class="nav__link">Ver colecciones</a></li>
+        <li><a href="index.html" class="nav__link">Sitio público</a></li>
+        <li><button type="button" class="nav__link nav__button" data-action="logout-admin">Cerrar sesión</button></li>
+      </ul>
+    </nav>
+
+    <header class="page-header">
+      <p class="eyebrow">Herramienta local</p>
+      <h1 class="page-header__title">Editor de archivo</h1>
+      <p class="page-header__desc">Editor visual para preparar colecciones y music archives sin escribir HTML. Guarda borradores en este navegador y, cuando el backend local está activo, sincroniza automáticamente los archivos de datos del proyecto.</p>
+      <p class="page-header__desc">Este panel es una herramienta local de administración: úsalo en tu computadora y no lo enlaces desde el sitio público.</p>
+    </header>
+
+    <main class="admin-layout" data-admin-app>
+      <aside class="admin-sidebar panel">
+        <div class="admin-tabs" role="tablist" aria-label="Tipo de contenido">
+          <button type="button" class="admin-tab is-active" data-mode="collections">Colecciones</button>
+          <button type="button" class="admin-tab" data-mode="music">Music Archives</button>
+        </div>
+
+        <div class="admin-sidebar__head">
+          <div>
+            <p class="eyebrow" data-sidebar-kicker>Colecciones</p>
+            <h2 data-sidebar-title>Archivo</h2>
+          </div>
+          <button type="button" class="admin-icon-button" data-action="new-entry" aria-label="Nuevo item">+</button>
+        </div>
+        <div class="admin-list" data-entry-list></div>
+      </aside>
+
+      <section class="admin-editor panel">
+        <div class="admin-toolbar">
+          <div>
+            <p class="eyebrow">Editor</p>
+            <h2 data-editor-title>Entrada</h2>
+          </div>
+          <div class="admin-actions">
+            <button type="button" class="ghost" data-action="preview-entry">Ver preview</button>
+            <button type="button" class="ghost admin-action--publish" data-action="publish-entry">Publicar</button>
+            <button type="button" class="ghost admin-action--hide" data-action="hide-entry">Ocultar</button>
+            <button type="button" class="ghost" data-action="open-media-library">Medios</button>
+            <button type="button" class="ghost" data-action="duplicate-entry">Duplicar</button>
+            <button type="button" class="ghost" data-action="delete-entry">Eliminar</button>
+          </div>
+        </div>
+
+        <form class="admin-form" data-editor-form>
+          <div data-form-fields></div>
+
+          <div class="admin-output">
+            <div>
+              <p class="eyebrow">Salida</p>
+              <h3>Publicación</h3>
+              <p data-output-help>Cuando termines, descarga el archivo y reemplaza el archivo de datos correspondiente. Tus medios deben estar copiados en las rutas que escribiste.</p>
+            </div>
+            <div class="admin-actions">
+              <button type="button" class="ghost" data-action="reset-from-site">Descartar cambios</button>
+              <button type="button" class="ghost" data-action="download-js">Exportar archivo</button>
+            </div>
+          </div>
+
+          <output class="admin-status" data-status data-admin-status aria-live="polite"></output>
+        </form>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

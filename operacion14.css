@@ -181,6 +181,31 @@ html, body {
   padding: 0;
 }
 
+.music-archive-text {
+  align-items: flex-start;
+  background: rgba(220, 220, 220, 0.1);
+  border: 1px solid rgba(220, 220, 220, 0.22);
+  color: #ffffff;
+  flex-direction: column;
+  gap: 18px;
+  padding: 36px;
+}
+
+.music-archive-text h2 {
+  font-family: "Aquarius", serif;
+  font-size: clamp(28px, 6vw, 46px);
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.music-archive-text p {
+  font-family: "Aquarius Six", monospace;
+  font-size: 14px;
+  line-height: 1.75;
+  margin: 0;
+}
+
 /* ── Player Block (Section 3) ────────────────────────────────── */
 .op14-player-block {
   background: rgba(220, 220, 220, 0.08);
@@ -245,8 +270,6 @@ html, body {
   border-color: rgba(220, 220, 220, 0.3);
   box-shadow: 0 0 20px rgba(212, 212, 212, 0.2);
 }
-
-  gap: 8px;
 
 .op14-track__num {
   font-family: "Aquarius Six", monospace;
@@ -337,6 +360,8 @@ html, body {
   border-radius: 4px;
   overflow: hidden;
   cursor: pointer;
+  touch-action: none;
+  user-select: none;
 }
 
 .op14-progress-bar__filled {
@@ -420,6 +445,81 @@ html, body {
   }
 }
 
+/* ── Music Archive streaming links ───────────────────────────── */
+.op14-streaming-links {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  width: 100%;
+}
+
+.op14-streaming-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 42px;
+  gap: 9px;
+  border: 1px solid rgba(220, 220, 220, 0.22);
+  border-radius: 12px;
+  background: rgba(220, 220, 220, 0.1);
+  color: #ffffff;
+  font-family: "Eurostile Bold", sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  padding: 11px 12px;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: transform 220ms ease, border-color 220ms ease, background 220ms ease, box-shadow 220ms ease;
+}
+
+.op14-streaming-link:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.34);
+  background: rgba(220, 220, 220, 0.16);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
+}
+
+.op14-streaming-link svg {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+}
+
+.op14-streaming-link--spotify {
+  background: rgba(30, 215, 96, 0.14);
+  border-color: rgba(30, 215, 96, 0.36);
+}
+
+.op14-streaming-link--apple-music {
+  background: rgba(252, 60, 68, 0.14);
+  border-color: rgba(252, 60, 68, 0.34);
+}
+
+.op14-streaming-link--soundcloud {
+  background: rgba(255, 119, 0, 0.14);
+  border-color: rgba(255, 119, 0, 0.34);
+}
+
+.music-archive-link--soundcloud {
+  background: rgba(255, 119, 0, 0.14);
+  border-color: rgba(255, 119, 0, 0.34);
+}
+
+@media (max-width: 480px) {
+  .op14-streaming-links {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .op14-streaming-link {
+    min-height: 40px;
+    font-size: 11px;
+    padding: 10px 12px;
+  }
+}
+
 .op14-player-info {
   display: flex;
   flex-direction: column;
@@ -448,6 +548,10 @@ html, body {
 
 /* ── Download Section ────────────────────────────────────────── */
 .op14-download-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
   text-align: center;
 }
 
@@ -476,6 +580,7 @@ html, body {
   transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
   font-weight: 600;
+  color: #ffffff;
 }
 
 .op14-download-btn:hover {
@@ -485,6 +590,16 @@ html, body {
     inset 0 1px 0 rgba(255, 255, 255, 0.15),
     0 8px 28px rgba(212, 212, 212, 0.2);
   transform: translateY(-3px);
+}
+
+.music-archive-link--spotify {
+  background: rgba(30, 215, 96, 0.16);
+  border-color: rgba(30, 215, 96, 0.32);
+}
+
+.music-archive-link--apple-music {
+  background: rgba(252, 60, 68, 0.14);
+  border-color: rgba(252, 60, 68, 0.30);
 }
 
 .op14-download-btn svg {
@@ -1270,4 +1385,3 @@ html, body {
     --op-text-max: 100%;
   }
 }
-

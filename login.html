@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Acceso de creación — De La Manga</title>
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="login.js"></script>
+</head>
+<body class="auth-page">
+  <div class="fog fog--1" aria-hidden="true"></div>
+  <div class="fog fog--2" aria-hidden="true"></div>
+
+  <main class="auth-shell">
+    <section class="auth-panel" aria-labelledby="auth-title">
+      <p class="eyebrow" data-auth-kicker>Acceso privado</p>
+      <h1 id="auth-title">Crear</h1>
+      <p data-auth-copy>Ingresa tu clave de administrador para abrir el CMS local.</p>
+
+      <form class="auth-form" data-auth-form>
+        <label class="admin-field">
+          <span>Clave</span>
+          <input type="password" name="password" autocomplete="current-password" minlength="8" required>
+        </label>
+        <button type="submit" class="ghost auth-submit" data-auth-submit>Entrar</button>
+      </form>
+
+      <output class="admin-status auth-status" data-auth-status aria-live="polite"></output>
+    </section>
+  </main>
+</body>
+</html>
