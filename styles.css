@@ -4361,20 +4361,27 @@ body.prototype-home .window--color::before {
 
 body.prototype-home .window--color:hover::before,
 body.prototype-home .window--color:focus-visible::before {
-  animation: colorFill 780ms cubic-bezier(0.16, 0.84, 0.25, 1) both;
+  opacity: 0.94;
+  animation: colorFill 620ms cubic-bezier(0.16, 0.84, 0.25, 1) both;
 }
 
 body.prototype-home .window--photo::before {
+  --photo-ring: 28%;
   border: 1px solid rgba(238, 242, 232, 0.36);
   background:
     linear-gradient(90deg, transparent calc(50% - 1px), rgba(238, 242, 232, 0.28) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)),
     linear-gradient(180deg, transparent calc(50% - 1px), rgba(238, 242, 232, 0.28) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)),
-    radial-gradient(circle at 50% 50%, transparent 0 32%, rgba(238, 242, 232, 0.22) 32.4% 33%, transparent 33.4%);
+    radial-gradient(
+      circle at 50% 50%,
+      transparent 0 calc(var(--photo-ring) - 0.9%),
+      rgba(238, 242, 232, 0.34) calc(var(--photo-ring) - 0.4%) calc(var(--photo-ring) + 0.6%),
+      transparent calc(var(--photo-ring) + 1.1%)
+    );
 }
 
 body.prototype-home .window--photo:hover::before,
 body.prototype-home .window--photo:focus-visible::before {
-  animation: photoCalibrate 860ms cubic-bezier(0.16, 0.84, 0.25, 1) both;
+  animation: photoRingGrow 1500ms cubic-bezier(0.45, 0, 0.2, 1) infinite alternate;
 }
 
 body.prototype-home .window--music::before {
@@ -4396,14 +4403,29 @@ body.prototype-home .window--origin::before {
   border-left: 1px solid rgba(238, 242, 232, 0.28);
   border-bottom: 1px solid rgba(238, 242, 232, 0.18);
   background:
-    repeating-linear-gradient(180deg, transparent 0 17px, rgba(238, 242, 232, 0.2) 17px 18px),
-    linear-gradient(135deg, transparent 0 48%, rgba(238, 242, 232, 0.22) 48% 49%, transparent 49%);
-  background-position: 0 0, 0 0;
+    linear-gradient(180deg, transparent calc(50% - 1px), rgba(238, 242, 232, 0.08) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)),
+    repeating-linear-gradient(180deg, transparent 0 16px, rgba(238, 242, 232, 0.18) 16px 17px, transparent 17px 25px),
+    linear-gradient(135deg, transparent 0 39%, rgba(238, 242, 232, 0.16) 39.4% 40%, transparent 40.4%),
+    linear-gradient(135deg, transparent 0 57%, rgba(238, 242, 232, 0.24) 57.4% 58%, transparent 58.4%);
+  background-position: 0 0, 0 0, 0 0, 0 0;
+  background-size: 100% 100%, 100% 25px, 100% 100%, 100% 100%;
 }
 
 body.prototype-home .window--origin:hover::before,
 body.prototype-home .window--origin:focus-visible::before {
-  animation: originScan 900ms cubic-bezier(0.16, 0.84, 0.25, 1) both;
+  background:
+    linear-gradient(180deg, transparent calc(50% - 1px), rgba(114, 203, 102, 0.84) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)),
+    repeating-linear-gradient(180deg, transparent 0 16px, rgba(238, 242, 232, 0.22) 16px 17px, transparent 17px 25px),
+    linear-gradient(135deg, transparent 0 39%, rgba(238, 242, 232, 0.18) 39.4% 40%, transparent 40.4%),
+    linear-gradient(135deg, transparent 0 57%, rgba(238, 242, 232, 0.3) 57.4% 58%, transparent 58.4%);
+  background-size: 100% 100%, 100% 25px, 100% 100%, 100% 100%;
+  animation: originEscalator 1100ms linear infinite;
+}
+
+body.prototype-home .window--music .wave {
+  justify-content: center;
+  margin-top: 60px;
+  width: 100%;
 }
 
 body.prototype-home .window:hover .wave,
@@ -4414,7 +4436,7 @@ body.prototype-home .window:focus-visible .wave {
 
 body.prototype-home .window--music:hover .wave i,
 body.prototype-home .window--music:focus-visible .wave i {
-  animation: waveStrike 680ms cubic-bezier(0.18, 0.9, 0.28, 1) both;
+  animation: wavePulse 860ms cubic-bezier(0.45, 0, 0.22, 1) infinite alternate;
   transform-origin: center;
 }
 
@@ -4436,6 +4458,11 @@ body.prototype-home .window--music:focus-visible .wave i:nth-child(5n) {
 body.prototype-home .window--music:hover .wave i:nth-child(7n),
 body.prototype-home .window--music:focus-visible .wave i:nth-child(7n) {
   animation-delay: 140ms;
+}
+
+body.prototype-home .window--music:hover .wave,
+body.prototype-home .window--music:focus-visible .wave {
+  animation: waveDrift 1350ms ease-in-out infinite alternate;
 }
 
 @keyframes windowSweep {
@@ -4468,26 +4495,38 @@ body.prototype-home .window--music:focus-visible .wave i:nth-child(7n) {
   }
 
   100% {
-    background-position: 0 0, 0 0, 4px 0;
-    filter: brightness(1.22) saturate(1.18);
+    background-position: 16px 0, 0 14px, 8px 0;
+    filter: brightness(1.46) saturate(1.34);
     transform: scale(1.025);
   }
 }
 
-@keyframes photoCalibrate {
+@property --photo-ring {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 28%;
+}
+
+@keyframes photoRingGrow {
   0% {
-    transform: scale(0.96);
-    opacity: 0.36;
+    --photo-ring: 20%;
+    opacity: 0.5;
+    filter: brightness(0.95);
+    transform: scale(0.985);
   }
 
-  48% {
-    transform: scale(1.08) rotate(0.001deg);
-    opacity: 0.9;
+  42% {
+    --photo-ring: 38%;
+    opacity: 0.92;
+    filter: brightness(1.34);
+    transform: scale(1.035);
   }
 
   100% {
-    transform: scale(1.025);
-    opacity: 0.78;
+    --photo-ring: 31%;
+    opacity: 0.82;
+    filter: brightness(1.12);
+    transform: scale(1.012);
   }
 }
 
@@ -4508,39 +4547,47 @@ body.prototype-home .window--music:focus-visible .wave i:nth-child(7n) {
   }
 }
 
-@keyframes waveStrike {
+@keyframes wavePulse {
   0% {
-    opacity: 0.3;
-    transform: scaleY(0.34);
+    opacity: 0.48;
+    transform: scaleY(0.5);
   }
 
-  46% {
+  50% {
     opacity: 1;
-    transform: scaleY(1.34);
+    transform: scaleY(1.42);
   }
 
   100% {
-    opacity: 0.84;
-    transform: scaleY(1);
+    opacity: 0.72;
+    transform: scaleY(0.86);
   }
 }
 
-@keyframes originScan {
+@keyframes waveDrift {
   0% {
-    background-position: 0 -34px, -34px 34px;
-    filter: brightness(0.8);
-    transform: translateY(4px);
-  }
-
-  58% {
-    background-position: 0 6px, 10px -10px;
-    filter: brightness(1.4);
-    transform: translateY(-2px);
+    transform: translateX(-9px) scaleX(1.04);
   }
 
   100% {
-    background-position: 0 0, 0 0;
-    filter: brightness(1.12);
+    transform: translateX(9px) scaleX(1.1);
+  }
+}
+
+@keyframes originEscalator {
+  0% {
+    background-position: 0 0, 0 0, 0 0, 0 0;
+    filter: brightness(1);
+    transform: translateY(0);
+  }
+
+  50% {
+    filter: brightness(1.36);
+  }
+
+  100% {
+    background-position: 0 0, 0 25px, 0 0, 0 0;
+    filter: brightness(1.08);
     transform: translateY(0);
   }
 }
