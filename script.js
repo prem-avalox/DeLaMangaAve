@@ -848,9 +848,37 @@ function initCollectionsPage() {
     nextBtn.addEventListener('click', () => showImageViewerItem(imageViewerIndex + 1));
     metadataBtn.addEventListener('click', () => toggleViewerMetadata());
     fullscreenBtn.addEventListener('click', () => toggleImageViewerFullscreen());
+    imageWrap.addEventListener('dblclick', event => toggleViewerImageZoom(event));
 
     imageViewer = viewer;
     return viewer;
+  };
+
+  const setImageViewerFullscreenState = isFullscreen => {
+    if (!imageViewer) return;
+
+    imageViewer.overlay.classList.toggle('is-viewer-fullscreen', isFullscreen);
+    imageViewer.fullscreenBtn.innerHTML = isFullscreen ? viewerIcons.exitFullscreen : viewerIcons.fullscreen;
+    imageViewer.fullscreenBtn.setAttribute('aria-label', isFullscreen ? 'Salir de pantalla completa' : 'Ver en pantalla completa');
+    imageViewer.fullscreenBtn.setAttribute('aria-pressed', String(isFullscreen));
+
+    if (!isFullscreen) {
+      imageViewer.overlay.classList.remove('is-image-zoomed');
+      imageViewer.image.style.removeProperty('--zoom-origin-x');
+      imageViewer.image.style.removeProperty('--zoom-origin-y');
+    }
+  };
+
+  const toggleViewerImageZoom = event => {
+    const viewer = createImageViewer();
+    const rect = viewer.image.getBoundingClientRect();
+    const originX = rect.width ? ((event.clientX - rect.left) / rect.width) * 100 : 50;
+    const originY = rect.height ? ((event.clientY - rect.top) / rect.height) * 100 : 50;
+    const zoomed = !viewer.overlay.classList.contains('is-image-zoomed');
+
+    viewer.image.style.setProperty('--zoom-origin-x', `${Math.min(100, Math.max(0, originX))}%`);
+    viewer.image.style.setProperty('--zoom-origin-y', `${Math.min(100, Math.max(0, originY))}%`);
+    viewer.overlay.classList.toggle('is-image-zoomed', zoomed);
   };
 
   const formatViewerMetadataRows = metadata => {
@@ -892,6 +920,9 @@ function initCollectionsPage() {
     imageViewerIndex = (index + imageViewerItems.length) % imageViewerItems.length;
     const item = imageViewerItems[imageViewerIndex];
 
+    viewer.overlay.classList.remove('is-image-zoomed');
+    viewer.image.style.removeProperty('--zoom-origin-x');
+    viewer.image.style.removeProperty('--zoom-origin-y');
     viewer.image.classList.add('is-switching');
     window.setTimeout(() => {
       viewer.image.src = item.src;
@@ -921,11 +952,11 @@ function initCollectionsPage() {
     if (!imageViewer || imageViewer.overlay.hidden) return;
 
     imageViewer.overlay.classList.remove('is-open');
-    imageViewer.overlay.classList.remove('is-viewer-fullscreen');
+    setImageViewerFullscreenState(false);
     document.body.classList.remove('image-viewer-open');
-    imageViewer.fullscreenBtn.innerHTML = viewerIcons.fullscreen;
-    imageViewer.fullscreenBtn.setAttribute('aria-label', 'Ver en pantalla completa');
-    imageViewer.fullscreenBtn.setAttribute('aria-pressed', 'false');
+    if (document.fullscreenElement === imageViewer.overlay) {
+      document.exitFullscreen?.().catch(() => {});
+    }
     window.setTimeout(() => {
       if (imageViewer) imageViewer.overlay.hidden = true;
     }, 180);
@@ -941,10 +972,22 @@ function initCollectionsPage() {
 
   const toggleImageViewerFullscreen = () => {
     const viewer = createImageViewer();
-    const isFullscreen = viewer.overlay.classList.toggle('is-viewer-fullscreen');
-    viewer.fullscreenBtn.innerHTML = isFullscreen ? viewerIcons.exitFullscreen : viewerIcons.fullscreen;
-    viewer.fullscreenBtn.setAttribute('aria-label', isFullscreen ? 'Salir de pantalla completa' : 'Ver en pantalla completa');
-    viewer.fullscreenBtn.setAttribute('aria-pressed', String(isFullscreen));
+    const isFullscreen = document.fullscreenElement === viewer.overlay || viewer.overlay.classList.contains('is-viewer-fullscreen');
+
+    if (isFullscreen) {
+      setImageViewerFullscreenState(false);
+      if (document.fullscreenElement === viewer.overlay) {
+        document.exitFullscreen?.().catch(() => {});
+      }
+      return;
+    }
+
+    setImageViewerFullscreenState(true);
+    if (viewer.overlay.requestFullscreen) {
+      viewer.overlay.requestFullscreen({ navigationUI: 'hide' }).catch(() => {
+        setImageViewerFullscreenState(true);
+      });
+    }
   };
 
   const handleViewerKeyboard = event => {
@@ -952,6 +995,10 @@ function initCollectionsPage() {
 
     if (event.key === 'Escape') {
       event.preventDefault();
+      if (document.fullscreenElement === imageViewer.overlay) {
+        document.exitFullscreen?.().catch(() => {});
+        return;
+      }
       closeImageViewer();
     } else if (event.key === 'ArrowLeft') {
       event.preventDefault();
@@ -963,6 +1010,11 @@ function initCollectionsPage() {
   };
 
   document.addEventListener('keydown', handleViewerKeyboard);
+  document.addEventListener('fullscreenchange', () => {
+    if (!imageViewer) return;
+    setImageViewerFullscreenState(document.fullscreenElement === imageViewer.overlay);
+  });
+
   const renderFilters = () => {
     filtersEl.replaceChildren();
 
