@@ -748,12 +748,20 @@ function initCollectionsPage() {
     return tag;
   };
 
-  const createViewerButton = (className, label, text = label) => {
+  const viewerIcons = {
+    close: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>',
+    fullscreen: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M21 16v5h-5M3 16v5h5"/></svg>',
+    exitFullscreen: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3v6H3M15 3v6h6M21 15h-6v6M3 15h6v6"/></svg>',
+    eye: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><path d="M12 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6Z"/></svg>',
+    eyeOff: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 3 18 18M10.6 10.6a2 2 0 0 0 2.8 2.8M9.1 5.4A10.9 10.9 0 0 1 12 5c6.5 0 10 7 10 7a18.4 18.4 0 0 1-3.1 4.1M6.6 6.6C3.6 8.6 2 12 2 12s3.5 7 10 7c1.2 0 2.3-.2 3.3-.6"/></svg>'
+  };
+
+  const createViewerButton = (className, label, content = label) => {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = className;
     button.setAttribute('aria-label', label);
-    button.textContent = text;
+    button.innerHTML = content;
     return button;
   };
 
@@ -772,20 +780,23 @@ function initCollectionsPage() {
     backdrop.className = 'image-viewer__backdrop';
     backdrop.setAttribute('aria-label', 'Cerrar visor');
 
-    const closeBtn = createViewerButton('image-viewer__close', 'Cerrar visor', 'X');
-    const prevBtn = createViewerButton('image-viewer__nav image-viewer__nav--prev', 'Imagen anterior', '<');
-    const nextBtn = createViewerButton('image-viewer__nav image-viewer__nav--next', 'Imagen siguiente', '>');
-    const fullscreenBtn = createViewerButton('image-viewer__tool', 'Ver en pantalla completa', 'Pantalla completa');
-    const metadataBtn = createViewerButton('image-viewer__tool', 'Ocultar metadatos', 'Ocultar metadata');
+    const closeBtn = createViewerButton('image-viewer__close image-viewer__glass', 'Cerrar visor', viewerIcons.close);
+    const prevBtn = createViewerButton('image-viewer__nav image-viewer__nav--prev', 'Imagen anterior', '<span aria-hidden="true">‹</span>');
+    const nextBtn = createViewerButton('image-viewer__nav image-viewer__nav--next', 'Imagen siguiente', '<span aria-hidden="true">›</span>');
+    const fullscreenBtn = createViewerButton('image-viewer__tool image-viewer__glass', 'Ver en pantalla completa', viewerIcons.fullscreen);
+    const metadataBtn = createViewerButton('image-viewer__tool image-viewer__glass', 'Ocultar metadatos', viewerIcons.eyeOff);
+
+    const stage = document.createElement('div');
+    stage.className = 'image-viewer__stage';
+
+    const category = document.createElement('div');
+    category.className = 'image-viewer__category';
 
     const shell = document.createElement('div');
     shell.className = 'image-viewer__shell';
 
     const imagePanel = document.createElement('figure');
     imagePanel.className = 'image-viewer__image-panel';
-
-    const category = document.createElement('div');
-    category.className = 'image-viewer__category';
 
     const imageWrap = document.createElement('div');
     imageWrap.className = 'image-viewer__image-wrap';
@@ -802,33 +813,27 @@ function initCollectionsPage() {
     tools.append(fullscreenBtn, metadataBtn);
 
     imageWrap.append(image);
-    imagePanel.append(category, imageWrap, tools);
+    imagePanel.append(imageWrap, tools);
 
     const metaPanel = document.createElement('aside');
     metaPanel.className = 'image-viewer__meta';
 
-    const metaTitle = document.createElement('p');
-    metaTitle.className = 'image-viewer__meta-kicker';
-
-    const metaCategory = document.createElement('h2');
-    metaCategory.className = 'image-viewer__meta-title';
-
     const metaRows = document.createElement('dl');
     metaRows.className = 'image-viewer__meta-list';
 
-    metaPanel.append(metaTitle, metaCategory, metaRows);
+    metaPanel.append(metaRows);
     shell.append(imagePanel, metaPanel);
-    overlay.append(backdrop, closeBtn, prevBtn, nextBtn, shell);
+    stage.append(category, shell);
+    overlay.append(backdrop, closeBtn, prevBtn, nextBtn, stage);
     document.body.append(overlay);
 
     const viewer = {
       overlay,
+      stage,
       shell,
       image,
       category,
       metaPanel,
-      metaTitle,
-      metaCategory,
       metaRows,
       closeBtn,
       prevBtn,
@@ -887,12 +892,15 @@ function initCollectionsPage() {
     imageViewerIndex = (index + imageViewerItems.length) % imageViewerItems.length;
     const item = imageViewerItems[imageViewerIndex];
 
-    viewer.image.src = item.src;
-    viewer.image.alt = item.alt || `${item.collectionTitle} - imagen del archivo`;
+    viewer.image.classList.add('is-switching');
+    window.setTimeout(() => {
+      viewer.image.src = item.src;
+      viewer.image.alt = item.alt || `${item.collectionTitle} - imagen del archivo`;
+      viewer.image.classList.remove('is-switching');
+    }, viewer.overlay.classList.contains('is-open') ? 140 : 0);
+
     viewer.category.textContent = item.collectionTitle;
-    viewer.metaTitle.textContent = item.collectionType;
-    viewer.metaCategory.textContent = item.collectionTitle;
-    viewer.metaCategory.dataset.counter = `${imageViewerIndex + 1} / ${imageViewerItems.length}`;
+    viewer.category.dataset.counter = `${imageViewerIndex + 1} / ${imageViewerItems.length}`;
     viewer.prevBtn.disabled = imageViewerItems.length < 2;
     viewer.nextBtn.disabled = imageViewerItems.length < 2;
     renderViewerMetadata(item);
@@ -925,7 +933,7 @@ function initCollectionsPage() {
   const toggleViewerMetadata = () => {
     const viewer = createImageViewer();
     const hidden = viewer.overlay.classList.toggle('is-metadata-hidden');
-    viewer.metadataBtn.textContent = hidden ? 'Mostrar metadata' : 'Ocultar metadata';
+    viewer.metadataBtn.innerHTML = hidden ? viewerIcons.eye : viewerIcons.eyeOff;
     viewer.metadataBtn.setAttribute('aria-label', hidden ? 'Mostrar metadatos' : 'Ocultar metadatos');
     viewer.metadataBtn.setAttribute('aria-pressed', String(hidden));
   };
@@ -959,7 +967,7 @@ function initCollectionsPage() {
   document.addEventListener('fullscreenchange', () => {
     if (!imageViewer) return;
     const isFullscreen = document.fullscreenElement === imageViewer.overlay;
-    imageViewer.fullscreenBtn.textContent = isFullscreen ? 'Salir de pantalla' : 'Pantalla completa';
+    imageViewer.fullscreenBtn.innerHTML = isFullscreen ? viewerIcons.exitFullscreen : viewerIcons.fullscreen;
     imageViewer.fullscreenBtn.setAttribute('aria-label', isFullscreen ? 'Salir de pantalla completa' : 'Ver en pantalla completa');
   });
 
