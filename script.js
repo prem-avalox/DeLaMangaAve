@@ -921,10 +921,11 @@ function initCollectionsPage() {
     if (!imageViewer || imageViewer.overlay.hidden) return;
 
     imageViewer.overlay.classList.remove('is-open');
+    imageViewer.overlay.classList.remove('is-viewer-fullscreen');
     document.body.classList.remove('image-viewer-open');
-    if (document.fullscreenElement === imageViewer.overlay) {
-      document.exitFullscreen?.().catch(() => {});
-    }
+    imageViewer.fullscreenBtn.innerHTML = viewerIcons.fullscreen;
+    imageViewer.fullscreenBtn.setAttribute('aria-label', 'Ver en pantalla completa');
+    imageViewer.fullscreenBtn.setAttribute('aria-pressed', 'false');
     window.setTimeout(() => {
       if (imageViewer) imageViewer.overlay.hidden = true;
     }, 180);
@@ -940,12 +941,10 @@ function initCollectionsPage() {
 
   const toggleImageViewerFullscreen = () => {
     const viewer = createImageViewer();
-    if (document.fullscreenElement === viewer.overlay) {
-      document.exitFullscreen?.().catch(() => {});
-      return;
-    }
-
-    viewer.overlay.requestFullscreen?.().catch(() => {});
+    const isFullscreen = viewer.overlay.classList.toggle('is-viewer-fullscreen');
+    viewer.fullscreenBtn.innerHTML = isFullscreen ? viewerIcons.exitFullscreen : viewerIcons.fullscreen;
+    viewer.fullscreenBtn.setAttribute('aria-label', isFullscreen ? 'Salir de pantalla completa' : 'Ver en pantalla completa');
+    viewer.fullscreenBtn.setAttribute('aria-pressed', String(isFullscreen));
   };
 
   const handleViewerKeyboard = event => {
@@ -964,13 +963,6 @@ function initCollectionsPage() {
   };
 
   document.addEventListener('keydown', handleViewerKeyboard);
-  document.addEventListener('fullscreenchange', () => {
-    if (!imageViewer) return;
-    const isFullscreen = document.fullscreenElement === imageViewer.overlay;
-    imageViewer.fullscreenBtn.innerHTML = isFullscreen ? viewerIcons.exitFullscreen : viewerIcons.fullscreen;
-    imageViewer.fullscreenBtn.setAttribute('aria-label', isFullscreen ? 'Salir de pantalla completa' : 'Ver en pantalla completa');
-  });
-
   const renderFilters = () => {
     filtersEl.replaceChildren();
 
