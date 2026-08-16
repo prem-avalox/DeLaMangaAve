@@ -3,6 +3,7 @@ window.DE_LA_MANGA_MUSIC_ARCHIVES = [
     "id": "operacion-14",
     "title": "Operación 14",
     "artist": "Martín Alejandro",
+    "summary": "EP de cinco canciones nacido como archivo sonoro de origen, nocturnidad y afirmación personal.",
     "releaseType": "EP",
     "year": "2025",
     "totalDuration": "14:09",

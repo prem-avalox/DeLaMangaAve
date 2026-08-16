@@ -24,7 +24,13 @@
   ];
   const COLLECTION_TYPES = [
     { value: 'Fotografía', label: 'Fotografía', detail: 'Series y ensayos fotográficos' },
+    { value: 'Sesión', label: 'Sesión', detail: 'Sesiones fotográficas por persona, fecha o estética' },
+    { value: 'Retrato', label: 'Retrato', detail: 'Retratos individuales o selección de rostros' },
+    { value: 'Calle', label: 'Calle', detail: 'Fotografía urbana, caminatas y observación de calle' },
+    { value: 'Paisaje', label: 'Paisaje', detail: 'Atardeceres, cielo, entorno y luz natural' },
+    { value: 'Automotriz', label: 'Automotriz', detail: 'Autos, detalles y sesiones de vehículo' },
     { value: 'Video', label: 'Video', detail: 'Piezas audiovisuales y color' },
+    { value: 'Música', label: 'Música', detail: 'Entrada enlazada al archivo musical' },
     { value: 'Demos musicales', label: 'Demos musicales', detail: 'Reservado para demos futuras' },
     { value: 'Otros archivos visuales', label: 'Otros archivos visuales', detail: 'Diseño, stills y material mixto' }
   ];
@@ -54,6 +60,8 @@
       placeholder: 'https://soundcloud.com/...'
     }
   ];
+  const UPLOAD_BATCH_MAX_FILES = 8;
+  const UPLOAD_BATCH_MAX_BYTES = 40 * 1024 * 1024;
 
   let mode = 'collections';
   let backendAvailable = false;
@@ -401,8 +409,11 @@
   }
 
   function validateCollectionEntry(issues, collection) {
-    requireValue(issues, collection, collection.cover, 'portada', 'Falta portada de colección.');
-    validateLocalAsset(issues, collection, collection.cover, 'Portada');
+    const isLinkedMusicArchive = collection.type === 'Música' || collection.href === 'musica.html';
+    if (!isLinkedMusicArchive) {
+      requireValue(issues, collection, collection.cover, 'portada', 'Falta portada de colección.');
+      validateLocalAsset(issues, collection, collection.cover, 'Portada');
+    }
     validateLinkValue(issues, collection, collection.href, 'Página dedicada');
 
     (collection.items || []).forEach((item, index) => {
@@ -599,7 +610,13 @@
   function collectionMediaTypes(collection = getCurrentEntry()) {
     const type = collection?.type || 'Fotografía';
     if (type === 'Fotografía') return ['image'];
+    if (type === 'Sesión') return ['image'];
+    if (type === 'Retrato') return ['image'];
+    if (type === 'Calle') return ['image'];
+    if (type === 'Paisaje') return ['image'];
+    if (type === 'Automotriz') return ['image'];
     if (type === 'Video') return ['video', 'image'];
+    if (type === 'Música') return ['image'];
     if (type === 'Demos musicales') return ['image', 'video'];
     return ['image', 'video'];
   }
@@ -1555,7 +1572,71 @@
     });
   }
 
+  function formatBytes(bytes) {
+    const value = Number(bytes) || 0;
+    if (value < 1024) return `${value} B`;
+    const units = ['KB', 'MB', 'GB'];
+    let size = value / 1024;
+    let unit = units.shift();
+    while (size >= 1024 && units.length) {
+      size /= 1024;
+      unit = units.shift();
+    }
+    return `${size >= 10 ? Math.round(size) : size.toFixed(1)} ${unit}`;
+  }
+
+  function totalFileSize(files) {
+    return files.reduce((total, file) => total + (Number(file.size) || 0), 0);
+  }
+
+  function createUploadBatches(files) {
+    const batches = [];
+    let batch = [];
+    let batchBytes = 0;
+
+    files.forEach(file => {
+      const size = Number(file.size) || 0;
+      const shouldStartNewBatch =
+        batch.length &&
+        (batch.length >= UPLOAD_BATCH_MAX_FILES || batchBytes + size > UPLOAD_BATCH_MAX_BYTES);
+
+      if (shouldStartNewBatch) {
+        batches.push(batch);
+        batch = [];
+        batchBytes = 0;
+      }
+
+      batch.push(file);
+      batchBytes += size;
+    });
+
+    if (batch.length) batches.push(batch);
+    return batches;
+  }
+
   async function uploadFiles(baseDir, files) {
+    const selectedFiles = Array.from(files || []);
+    if (!selectedFiles.length) return [];
+
+    const batches = createUploadBatches(selectedFiles);
+    const totalSize = totalFileSize(selectedFiles);
+    const uploadedFiles = [];
+
+    if (batches.length > 1) {
+      setStatus(`Subida grande: ${selectedFiles.length} archivo(s), ${formatBytes(totalSize)} en ${batches.length} lotes.`);
+    }
+
+    for (const [index, batch] of batches.entries()) {
+      if (batches.length > 1) {
+        setStatus(`Copiando lote ${index + 1}/${batches.length}: ${batch.length} archivo(s), ${formatBytes(totalFileSize(batch))}...`);
+      }
+      uploadedFiles.push(...await uploadFileBatch(baseDir, batch));
+    }
+
+    return uploadedFiles;
+  }
+
+  async function uploadFileBatch(baseDir, files) {
     const payloadFiles = [];
     for (const file of files) {
       payloadFiles.push({

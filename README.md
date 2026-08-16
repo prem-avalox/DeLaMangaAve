@@ -45,6 +45,7 @@ When served by `server.js`, the admin includes a media manager:
 - **Elegir** opens the local media library and fills the selected path into the field.
 - **Subir** copies a file into the correct project folder and fills the field automatically.
 - Collection media can be imported in bulk as images or videos.
+- Large collection imports are uploaded in smaller browser-safe batches. There is no fixed item-count limit, but very large original photos still make the git repo and public pages heavier; prefer web-sized JPG/WebP exports for the published gallery and keep full-resolution masters outside the site unless they are intentionally downloadable.
 - Music archive covers, section backgrounds, section images, audio files, and downloads can be uploaded from their fields.
 
 Imported audio files are copied into `resources/music/{release-id}/audio/`. Edits are autosaved into SQLite after a short pause, then `music-data.js` or `portfolio-data.js` is regenerated as the static public output. **Guardar ahora** remains available as a manual save and creates a timestamped `.bak-*` backup when the generated file changes.

@@ -583,16 +583,31 @@ function initReveal() {
   const elements = document.querySelectorAll('[data-reveal]');
   if (!elements.length) return;
 
+  const reveal = element => {
+    element.classList.add('is-visible');
+  };
+
   const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
-        entry.target.classList.add('is-visible');
+        reveal(entry.target);
         observer.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.28 });
+  }, { threshold: 0.01 });
 
-  elements.forEach(el => observer.observe(el));
+  elements.forEach(el => {
+    const rect = el.getBoundingClientRect();
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+    const isAlreadyVisible = rect.top < viewportHeight && rect.bottom > 0;
+
+    if (isAlreadyVisible) {
+      reveal(el);
+      return;
+    }
+
+    observer.observe(el);
+  });
 }
 
 function initNavActiveState() {
@@ -687,6 +702,9 @@ function initCollectionsPage() {
     const archives = (window.DE_LA_MANGA_MUSIC_ARCHIVES || []).filter(item => isPublishedStatus(item.status));
     const mosaic = document.createElement('div');
     mosaic.className = 'collection-music-mosaic';
+    if (archives.length <= 1) {
+      mosaic.classList.add('collection-music-mosaic--single');
+    }
 
     archives.slice(0, 4).forEach(archive => {
       const tile = document.createElement('div');
@@ -812,7 +830,7 @@ function initCollectionsPage() {
         const cta = document.createElement('a');
         cta.className = 'collection-detail__cta';
         cta.href = collection.href;
-        cta.textContent = collection.href === 'musica.html' ? 'Ver todos los proyectos musicales' : 'Abrir página dedicada';
+        cta.textContent = collection.href === 'musica.html' ? 'Ver proyectos musicales' : 'Abrir archivo';
         head.append(cta);
       }
 
@@ -824,8 +842,8 @@ function initCollectionsPage() {
         const empty = document.createElement('p');
         empty.className = 'collection-empty';
         empty.textContent = collection.href
-          ? 'Esta entrada funciona como enlace al archivo correspondiente.'
-          : 'Todavía no hay piezas cargadas explícitamente en esta colección.';
+          ? 'Archivo dedicado.'
+          : 'Colección en preparación.';
         mediaGrid.append(empty);
       }
 
@@ -856,7 +874,7 @@ function initCollectionsPage() {
     if (!filteredCollections.length) {
       const empty = document.createElement('p');
       empty.className = 'collection-empty';
-      empty.textContent = 'No hay colecciones publicadas en esta categoría.';
+      empty.textContent = 'Colección en preparación.';
       gridEl.append(empty);
     }
     hasRendered = true;
@@ -881,7 +899,7 @@ function initMusicIndexPage() {
   if (!archives.length) {
     const empty = document.createElement('p');
     empty.className = 'album-empty';
-    empty.textContent = 'Todavía no hay music archives publicados.';
+    empty.textContent = 'Archivo musical en preparación.';
     grid.append(empty);
     return;
   }
@@ -955,7 +973,7 @@ function getArchiveDescription(archive) {
   if (archive.summary) return archive.summary;
   const textSection = archive.sections?.find(section => section.body);
   if (textSection?.body) return textSection.body;
-  return `${archive.releaseType || 'Release'} de ${archive.artist || 'De La Manga'} en el archivo musical.`;
+  return `${archive.releaseType || 'Release'} de ${archive.artist || 'De La Manga'}.`;
 }
 
 function getArchiveInitials(title) {
@@ -984,7 +1002,7 @@ function initMusicArchivePage() {
     root.replaceChildren();
     const empty = document.createElement('p');
     empty.className = 'album-empty';
-    empty.textContent = 'Este music archive no está publicado.';
+    empty.textContent = 'Archivo musical no disponible.';
     root.append(empty);
     return;
   }
