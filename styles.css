@@ -4234,11 +4234,12 @@ body.prototype-home .window {
   color: var(--ink);
   text-decoration: none;
   transform-origin: center;
+  will-change: transform, box-shadow, background;
   transition:
-    background var(--motion-medium),
-    border-color var(--motion-medium),
-    box-shadow var(--motion-medium),
-    transform var(--motion-medium);
+    background 420ms cubic-bezier(0.2, 0.75, 0.18, 1),
+    border-color 420ms cubic-bezier(0.2, 0.75, 0.18, 1),
+    box-shadow 420ms cubic-bezier(0.2, 0.75, 0.18, 1),
+    transform 420ms cubic-bezier(0.2, 0.75, 0.18, 1);
 }
 
 body.prototype-home .window::before,
@@ -4246,7 +4247,12 @@ body.prototype-home .window::after {
   content: "";
   position: absolute;
   pointer-events: none;
-  transition: opacity var(--motion-medium), transform var(--motion-medium), border-color var(--motion-medium);
+  transition:
+    opacity 420ms cubic-bezier(0.2, 0.75, 0.18, 1),
+    transform 420ms cubic-bezier(0.2, 0.75, 0.18, 1),
+    border-color 420ms cubic-bezier(0.2, 0.75, 0.18, 1),
+    filter 420ms cubic-bezier(0.2, 0.75, 0.18, 1);
+  will-change: opacity, transform, filter, background-position;
 }
 
 body.prototype-home .window::before {
@@ -4257,6 +4263,10 @@ body.prototype-home .window::before {
 body.prototype-home .window::after {
   inset: 18px;
   border: 1px solid transparent;
+  background:
+    linear-gradient(110deg, transparent 0 42%, rgba(238, 242, 232, 0.12) 48%, transparent 54% 100%);
+  background-position: 140% 0;
+  background-size: 220% 100%;
   opacity: 0;
 }
 
@@ -4267,8 +4277,9 @@ body.prototype-home .window:focus-visible {
   background: var(--surface-hover);
   box-shadow:
     0 0 0 1px rgba(114, 203, 102, 0.22),
-    0 0 44px var(--glow-green);
-  transform: scale(1.035);
+    0 0 34px rgba(114, 203, 102, 0.12),
+    0 0 72px rgba(114, 203, 102, 0.08);
+  transform: scale(1.028);
 }
 
 body.prototype-home .window:active {
@@ -4282,13 +4293,14 @@ body.prototype-home .window:active {
 body.prototype-home .window:hover::before,
 body.prototype-home .window:focus-visible::before {
   opacity: 0.82;
-  transform: scale(1.05);
+  filter: brightness(1.35) saturate(1.22);
 }
 
 body.prototype-home .window:hover::after,
 body.prototype-home .window:focus-visible::after {
   border-color: rgba(238, 242, 232, 0.16);
   opacity: 1;
+  animation: windowSweep 720ms cubic-bezier(0.2, 0.75, 0.18, 1) both;
 }
 
 body.prototype-home .window span {
@@ -4298,6 +4310,7 @@ body.prototype-home .window span {
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
+  transition: color 260ms ease, text-shadow 420ms ease;
 }
 
 body.prototype-home .window small {
@@ -4311,6 +4324,19 @@ body.prototype-home .window small {
   font-size: 10px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  transition: color 260ms ease, text-shadow 420ms ease;
+}
+
+body.prototype-home .window:hover span,
+body.prototype-home .window:focus-visible span {
+  color: #ffffff;
+  text-shadow: 0 0 16px rgba(238, 242, 232, 0.3);
+}
+
+body.prototype-home .window:hover small,
+body.prototype-home .window:focus-visible small {
+  color: rgba(238, 242, 232, 0.72);
+  text-shadow: 0 0 14px rgba(114, 203, 102, 0.18);
 }
 
 body.prototype-home .window p {
@@ -4328,7 +4354,14 @@ body.prototype-home .window--color::before {
     linear-gradient(90deg, rgba(232, 110, 53, 0.52), transparent 38%),
     linear-gradient(180deg, rgba(179, 59, 112, 0.46), transparent 50%),
     repeating-linear-gradient(90deg, rgba(238, 242, 232, 0.18) 0 1px, transparent 1px 16px);
+  background-position: -60px 0, 0 -80px, 0 0;
+  background-size: 150% 100%, 100% 150%, 16px 100%;
   clip-path: polygon(0 0, 78% 0, 100% 100%, 18% 100%);
+}
+
+body.prototype-home .window--color:hover::before,
+body.prototype-home .window--color:focus-visible::before {
+  animation: colorFill 780ms cubic-bezier(0.16, 0.84, 0.25, 1) both;
 }
 
 body.prototype-home .window--photo::before {
@@ -4339,12 +4372,23 @@ body.prototype-home .window--photo::before {
     radial-gradient(circle at 50% 50%, transparent 0 32%, rgba(238, 242, 232, 0.22) 32.4% 33%, transparent 33.4%);
 }
 
+body.prototype-home .window--photo:hover::before,
+body.prototype-home .window--photo:focus-visible::before {
+  animation: photoCalibrate 860ms cubic-bezier(0.16, 0.84, 0.25, 1) both;
+}
+
 body.prototype-home .window--music::before {
   left: 18px;
   right: 18px;
   top: 45%;
   height: 1px;
   background: rgba(238, 242, 232, 0.34);
+  transform-origin: left center;
+}
+
+body.prototype-home .window--music:hover::before,
+body.prototype-home .window--music:focus-visible::before {
+  animation: musicTrace 760ms cubic-bezier(0.16, 0.84, 0.25, 1) both;
 }
 
 body.prototype-home .window--origin::before {
@@ -4354,12 +4398,162 @@ body.prototype-home .window--origin::before {
   background:
     repeating-linear-gradient(180deg, transparent 0 17px, rgba(238, 242, 232, 0.2) 17px 18px),
     linear-gradient(135deg, transparent 0 48%, rgba(238, 242, 232, 0.22) 48% 49%, transparent 49%);
+  background-position: 0 0, 0 0;
+}
+
+body.prototype-home .window--origin:hover::before,
+body.prototype-home .window--origin:focus-visible::before {
+  animation: originScan 900ms cubic-bezier(0.16, 0.84, 0.25, 1) both;
 }
 
 body.prototype-home .window:hover .wave,
 body.prototype-home .window:focus-visible .wave {
   opacity: 1;
   transform: scaleX(1.08);
+}
+
+body.prototype-home .window--music:hover .wave i,
+body.prototype-home .window--music:focus-visible .wave i {
+  animation: waveStrike 680ms cubic-bezier(0.18, 0.9, 0.28, 1) both;
+  transform-origin: center;
+}
+
+body.prototype-home .window--music:hover .wave i:nth-child(2n),
+body.prototype-home .window--music:focus-visible .wave i:nth-child(2n) {
+  animation-delay: 35ms;
+}
+
+body.prototype-home .window--music:hover .wave i:nth-child(3n),
+body.prototype-home .window--music:focus-visible .wave i:nth-child(3n) {
+  animation-delay: 70ms;
+}
+
+body.prototype-home .window--music:hover .wave i:nth-child(5n),
+body.prototype-home .window--music:focus-visible .wave i:nth-child(5n) {
+  animation-delay: 105ms;
+}
+
+body.prototype-home .window--music:hover .wave i:nth-child(7n),
+body.prototype-home .window--music:focus-visible .wave i:nth-child(7n) {
+  animation-delay: 140ms;
+}
+
+@keyframes windowSweep {
+  0% {
+    background-position: 140% 0;
+    opacity: 0;
+  }
+
+  34% {
+    opacity: 1;
+  }
+
+  100% {
+    background-position: -35% 0;
+    opacity: 1;
+  }
+}
+
+@keyframes colorFill {
+  0% {
+    background-position: -90px 0, 0 -120px, 0 0;
+    filter: brightness(0.86) saturate(0.92);
+    transform: scale(0.985);
+  }
+
+  62% {
+    background-position: 12px 0, 0 8px, 12px 0;
+    filter: brightness(1.42) saturate(1.36);
+    transform: scale(1.045);
+  }
+
+  100% {
+    background-position: 0 0, 0 0, 4px 0;
+    filter: brightness(1.22) saturate(1.18);
+    transform: scale(1.025);
+  }
+}
+
+@keyframes photoCalibrate {
+  0% {
+    transform: scale(0.96);
+    opacity: 0.36;
+  }
+
+  48% {
+    transform: scale(1.08) rotate(0.001deg);
+    opacity: 0.9;
+  }
+
+  100% {
+    transform: scale(1.025);
+    opacity: 0.78;
+  }
+}
+
+@keyframes musicTrace {
+  0% {
+    transform: scaleX(0.18);
+    opacity: 0.3;
+  }
+
+  54% {
+    transform: scaleX(1.06);
+    opacity: 0.78;
+  }
+
+  100% {
+    transform: scaleX(1);
+    opacity: 0.62;
+  }
+}
+
+@keyframes waveStrike {
+  0% {
+    opacity: 0.3;
+    transform: scaleY(0.34);
+  }
+
+  46% {
+    opacity: 1;
+    transform: scaleY(1.34);
+  }
+
+  100% {
+    opacity: 0.84;
+    transform: scaleY(1);
+  }
+}
+
+@keyframes originScan {
+  0% {
+    background-position: 0 -34px, -34px 34px;
+    filter: brightness(0.8);
+    transform: translateY(4px);
+  }
+
+  58% {
+    background-position: 0 6px, 10px -10px;
+    filter: brightness(1.4);
+    transform: translateY(-2px);
+  }
+
+  100% {
+    background-position: 0 0, 0 0;
+    filter: brightness(1.12);
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.prototype-home .window,
+  body.prototype-home .window::before,
+  body.prototype-home .window::after,
+  body.prototype-home .wave,
+  body.prototype-home .wave i {
+    animation: none !important;
+    transition-duration: 1ms !important;
+  }
 }
 
 body.prototype-home .footer {
