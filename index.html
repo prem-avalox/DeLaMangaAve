@@ -7,79 +7,78 @@
   <link rel="stylesheet" href="styles.css">
   <script defer src="script.js"></script>
 </head>
-<body class="home-page">
-  <div class="fog fog--1" aria-hidden="true"></div>
-  <div class="fog fog--2" aria-hidden="true"></div>
+<body class="prototype-home">
+  <div class="drawing" aria-hidden="true"></div>
 
-  <div class="page-shell page-shell--wide">
-    <nav class="nav" aria-label="Páginas">
-      <div class="nav__brand"><a href="index.html">De La Manga</a></div>
-      <ul class="nav__links">
-        <li><a href="colecciones.html" class="nav__link">Archivo</a></li>
-        <li><a href="musica.html" class="nav__link">Música</a></li>
-        <li><a href="about.html" class="nav__link">Acerca</a></li>
-        <li><a href="servicios.html" class="nav__link">Próximamente...</a></li>
-        <li><a href="contacto.html" class="nav__link">Contacto</a></li>
-      </ul>
+  <header class="topbar">
+    <a class="brand" href="index.html">De La Manga</a>
+    <nav aria-label="Páginas">
+      <a href="colecciones.html">Archivo</a>
+      <a href="musica.html">Música</a>
+      <a href="colecciones.html">Fotografía</a>
+      <a href="about.html">Origen</a>
+      <a href="servicios.html">Color</a>
+      <a href="contacto.html">Contacto</a>
     </nav>
+  </header>
 
-    <main>
-      <section id="archivo" class="archive-home" aria-labelledby="hero-title" data-reveal>
-        <div class="archive-home__identity">
-          <p class="kicker">Archivo audiovisual</p>
-          <h1 id="hero-title">De La Manga</h1>
-          <p class="statement">Archivo universal de los proyectos, ideas y pruebas desarrolladas bajo el ala temporal de De La Manga.</p>
-          <p class="statement muted">Por ahora, trabajado por Martín Alejandro Dávalos Cedeño.</p>
+  <main>
+    <section id="archivo" class="hero" aria-labelledby="hero-title">
+      <div class="identity">
+        <p class="kicker">Archivo audiovisual</p>
+        <h1 id="hero-title">De La Manga</h1>
+        <p class="statement">Archivo universal de los proyectos, ideas y pruebas desarrolladas bajo el ala temporal de De La Manga.</p>
+        <p class="statement muted">Por ahora, trabajado por Martín Alejandro Dávalos Cedeño.</p>
 
-          <div class="actions" aria-label="Acciones principales">
-            <a href="#ventanas">Ver archivo</a>
-            <a href="servicios.html">Próximamente...</a>
-          </div>
-
-          <dl class="archive-meta">
-            <div>
-              <dt>Base</dt>
-              <dd>Quito / Paraíso La 14</dd>
-            </div>
-            <div>
-              <dt>Áreas</dt>
-              <dd>Color / foto / música / mezcla</dd>
-            </div>
-          </dl>
+        <div class="actions" aria-label="Acciones principales">
+          <a href="#ventanas">Ver archivo</a>
+          <a href="servicios.html">Próximamente...</a>
         </div>
-      </section>
 
-      <section id="ventanas" class="archive-windows" aria-label="Entradas principales" data-reveal>
-        <a class="archive-window archive-window--color" href="servicios.html">
-          <span>Color</span>
-          <small>Color y post-producción</small>
-        </a>
-
-        <a class="archive-window archive-window--photo" href="colecciones.html">
-          <span>Fotografía</span>
-          <small>Composición y post-producción</small>
-        </a>
-
-        <a class="archive-window archive-window--music" href="musica.html">
-          <span>Música</span>
-          <div class="wave" aria-hidden="true">
-            <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-            <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        <dl class="meta">
+          <div>
+            <dt>Base</dt>
+            <dd>Quito / Paraíso La 14</dd>
           </div>
-          <small>Producción, composición e interpretación</small>
-        </a>
+          <div>
+            <dt>Áreas</dt>
+            <dd>Color / foto / música / mezcla</dd>
+          </div>
+        </dl>
+      </div>
+    </section>
 
-        <a class="archive-window archive-window--origin" href="about.html">
-          <span>Origen</span>
-          <p>La historia detrás del nombre, el archivo y el proceso.</p>
-          <small>Acerca / biografía</small>
-        </a>
-      </section>
-    </main>
+    <section id="ventanas" class="windows windows--home" aria-label="Entradas principales">
+      <a class="window window--color" href="servicios.html">
+        <span>Color</span>
+        <small>Color y post-producción</small>
+      </a>
 
-    <footer class="footer">
-      <div class="footer__meta">De La Manga — 2026</div>
-    </footer>
-  </div>
+      <a class="window window--photo" href="colecciones.html">
+        <span>Fotografía</span>
+        <small>Composición y post-producción</small>
+      </a>
+
+      <a class="window window--music" href="musica.html">
+        <span>Música</span>
+        <div class="wave" aria-hidden="true">
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <small>Producción, composición e interpretación</small>
+      </a>
+
+      <a class="window window--origin" href="about.html">
+        <span>Origen</span>
+        <p>La historia detrás del nombre, el archivo y el proceso.</p>
+        <small>Acerca / biografía</small>
+      </a>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>De La Manga</span>
+    <span>2026</span>
+  </footer>
 </body>
 </html>
