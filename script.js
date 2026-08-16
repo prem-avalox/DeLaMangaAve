@@ -650,12 +650,16 @@ function initCollectionsPage() {
     : sourceCollections;
   if (!app) return;
 
+  const metadataBySrc = window.DE_LA_MANGA_IMAGE_METADATA || {};
   const filtersEl = app.querySelector('[data-collection-filters]');
   const gridEl = app.querySelector('[data-collection-grid]');
   const detailsEl = app.querySelector('[data-collection-details]');
   const types = ['Todas', ...new Set(collections.map(collection => collection.type))];
   let activeType = 'Todas';
   let hasRendered = false;
+  let imageViewerItems = [];
+  let imageViewerIndex = 0;
+  let imageViewer = null;
 
   const isVideo = src => /\.(mp4|mov|webm)$/i.test(src || '');
 
@@ -678,6 +682,9 @@ function initCollectionsPage() {
     } else {
       media.alt = item.alt || item.caption || '';
       media.loading = 'lazy';
+      media.decoding = 'async';
+      media.draggable = false;
+      media.addEventListener('contextmenu', event => event.preventDefault());
     }
 
     return media;
@@ -741,6 +748,221 @@ function initCollectionsPage() {
     return tag;
   };
 
+  const createViewerButton = (className, label, text = label) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = className;
+    button.setAttribute('aria-label', label);
+    button.textContent = text;
+    return button;
+  };
+
+  const createImageViewer = () => {
+    if (imageViewer) return imageViewer;
+
+    const overlay = document.createElement('div');
+    overlay.className = 'image-viewer';
+    overlay.hidden = true;
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-label', 'Visor de imagen');
+
+    const backdrop = document.createElement('button');
+    backdrop.type = 'button';
+    backdrop.className = 'image-viewer__backdrop';
+    backdrop.setAttribute('aria-label', 'Cerrar visor');
+
+    const closeBtn = createViewerButton('image-viewer__close', 'Cerrar visor', 'X');
+    const prevBtn = createViewerButton('image-viewer__nav image-viewer__nav--prev', 'Imagen anterior', '<');
+    const nextBtn = createViewerButton('image-viewer__nav image-viewer__nav--next', 'Imagen siguiente', '>');
+    const fullscreenBtn = createViewerButton('image-viewer__tool', 'Ver en pantalla completa', 'Pantalla completa');
+    const metadataBtn = createViewerButton('image-viewer__tool', 'Ocultar metadatos', 'Ocultar metadata');
+
+    const shell = document.createElement('div');
+    shell.className = 'image-viewer__shell';
+
+    const imagePanel = document.createElement('figure');
+    imagePanel.className = 'image-viewer__image-panel';
+
+    const category = document.createElement('div');
+    category.className = 'image-viewer__category';
+
+    const imageWrap = document.createElement('div');
+    imageWrap.className = 'image-viewer__image-wrap';
+
+    const image = document.createElement('img');
+    image.className = 'image-viewer__image';
+    image.alt = '';
+    image.decoding = 'async';
+    image.draggable = false;
+    image.addEventListener('contextmenu', event => event.preventDefault());
+
+    const tools = document.createElement('div');
+    tools.className = 'image-viewer__tools';
+    tools.append(fullscreenBtn, metadataBtn);
+
+    imageWrap.append(image);
+    imagePanel.append(category, imageWrap, tools);
+
+    const metaPanel = document.createElement('aside');
+    metaPanel.className = 'image-viewer__meta';
+
+    const metaTitle = document.createElement('p');
+    metaTitle.className = 'image-viewer__meta-kicker';
+
+    const metaCategory = document.createElement('h2');
+    metaCategory.className = 'image-viewer__meta-title';
+
+    const metaRows = document.createElement('dl');
+    metaRows.className = 'image-viewer__meta-list';
+
+    metaPanel.append(metaTitle, metaCategory, metaRows);
+    shell.append(imagePanel, metaPanel);
+    overlay.append(backdrop, closeBtn, prevBtn, nextBtn, shell);
+    document.body.append(overlay);
+
+    const viewer = {
+      overlay,
+      shell,
+      image,
+      category,
+      metaPanel,
+      metaTitle,
+      metaCategory,
+      metaRows,
+      closeBtn,
+      prevBtn,
+      nextBtn,
+      fullscreenBtn,
+      metadataBtn
+    };
+
+    backdrop.addEventListener('click', closeImageViewer);
+    closeBtn.addEventListener('click', closeImageViewer);
+    prevBtn.addEventListener('click', () => showImageViewerItem(imageViewerIndex - 1));
+    nextBtn.addEventListener('click', () => showImageViewerItem(imageViewerIndex + 1));
+    metadataBtn.addEventListener('click', () => toggleViewerMetadata());
+    fullscreenBtn.addEventListener('click', () => toggleImageViewerFullscreen());
+
+    imageViewer = viewer;
+    return viewer;
+  };
+
+  const formatViewerMetadataRows = metadata => {
+    const rows = [
+      ['Cámara', metadata.camera],
+      ['Resolución', metadata.dimensions],
+      ['Fecha', metadata.date],
+      ['Proceso', metadata.software],
+      ['GPS', metadata.gps],
+      ['Crédito', metadata.copyright]
+    ].filter(([, value]) => value);
+
+    if (!rows.length) {
+      return [['Metadata', 'No disponible']];
+    }
+
+    return rows;
+  };
+
+  const renderViewerMetadata = item => {
+    const viewer = createImageViewer();
+    const metadata = metadataBySrc[item.src] || {};
+    const rows = formatViewerMetadataRows(metadata);
+
+    viewer.metaRows.replaceChildren();
+    rows.forEach(([label, value]) => {
+      const term = document.createElement('dt');
+      term.textContent = label;
+      const definition = document.createElement('dd');
+      definition.textContent = value;
+      viewer.metaRows.append(term, definition);
+    });
+  };
+
+  const showImageViewerItem = index => {
+    if (!imageViewerItems.length) return;
+
+    const viewer = createImageViewer();
+    imageViewerIndex = (index + imageViewerItems.length) % imageViewerItems.length;
+    const item = imageViewerItems[imageViewerIndex];
+
+    viewer.image.src = item.src;
+    viewer.image.alt = item.alt || `${item.collectionTitle} - imagen del archivo`;
+    viewer.category.textContent = item.collectionTitle;
+    viewer.metaTitle.textContent = item.collectionType;
+    viewer.metaCategory.textContent = item.collectionTitle;
+    viewer.metaCategory.dataset.counter = `${imageViewerIndex + 1} / ${imageViewerItems.length}`;
+    viewer.prevBtn.disabled = imageViewerItems.length < 2;
+    viewer.nextBtn.disabled = imageViewerItems.length < 2;
+    renderViewerMetadata(item);
+  };
+
+  const openImageViewer = index => {
+    const viewer = createImageViewer();
+    showImageViewerItem(index);
+    viewer.overlay.hidden = false;
+    document.body.classList.add('image-viewer-open');
+    requestAnimationFrame(() => {
+      viewer.overlay.classList.add('is-open');
+      viewer.closeBtn.focus({ preventScroll: true });
+    });
+  };
+
+  const closeImageViewer = () => {
+    if (!imageViewer || imageViewer.overlay.hidden) return;
+
+    imageViewer.overlay.classList.remove('is-open');
+    document.body.classList.remove('image-viewer-open');
+    if (document.fullscreenElement === imageViewer.overlay) {
+      document.exitFullscreen?.().catch(() => {});
+    }
+    window.setTimeout(() => {
+      if (imageViewer) imageViewer.overlay.hidden = true;
+    }, 180);
+  };
+
+  const toggleViewerMetadata = () => {
+    const viewer = createImageViewer();
+    const hidden = viewer.overlay.classList.toggle('is-metadata-hidden');
+    viewer.metadataBtn.textContent = hidden ? 'Mostrar metadata' : 'Ocultar metadata';
+    viewer.metadataBtn.setAttribute('aria-label', hidden ? 'Mostrar metadatos' : 'Ocultar metadatos');
+    viewer.metadataBtn.setAttribute('aria-pressed', String(hidden));
+  };
+
+  const toggleImageViewerFullscreen = () => {
+    const viewer = createImageViewer();
+    if (document.fullscreenElement === viewer.overlay) {
+      document.exitFullscreen?.().catch(() => {});
+      return;
+    }
+
+    viewer.overlay.requestFullscreen?.().catch(() => {});
+  };
+
+  const handleViewerKeyboard = event => {
+    if (!imageViewer || imageViewer.overlay.hidden) return;
+
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      closeImageViewer();
+    } else if (event.key === 'ArrowLeft') {
+      event.preventDefault();
+      showImageViewerItem(imageViewerIndex - 1);
+    } else if (event.key === 'ArrowRight') {
+      event.preventDefault();
+      showImageViewerItem(imageViewerIndex + 1);
+    }
+  };
+
+  document.addEventListener('keydown', handleViewerKeyboard);
+  document.addEventListener('fullscreenchange', () => {
+    if (!imageViewer) return;
+    const isFullscreen = document.fullscreenElement === imageViewer.overlay;
+    imageViewer.fullscreenBtn.textContent = isFullscreen ? 'Salir de pantalla' : 'Pantalla completa';
+    imageViewer.fullscreenBtn.setAttribute('aria-label', isFullscreen ? 'Salir de pantalla completa' : 'Ver en pantalla completa');
+  });
+
   const renderFilters = () => {
     filtersEl.replaceChildren();
 
@@ -803,6 +1025,7 @@ function initCollectionsPage() {
 
   const renderDetails = filteredCollections => {
     detailsEl.replaceChildren();
+    imageViewerItems = [];
 
     filteredCollections.forEach(collection => {
       const section = document.createElement('section');
@@ -850,6 +1073,25 @@ function initCollectionsPage() {
       items.forEach(item => {
         const figure = document.createElement('figure');
         figure.className = 'collection-media';
+        const viewerIndex = imageViewerItems.length;
+        if (!isVideo(item.src)) {
+          imageViewerItems.push({
+            ...item,
+            collectionId: collection.id,
+            collectionTitle: collection.title,
+            collectionType: collection.type
+          });
+          figure.tabIndex = 0;
+          figure.setAttribute('role', 'button');
+          figure.setAttribute('aria-label', `Abrir ${collection.title} en visor`);
+          figure.addEventListener('click', () => openImageViewer(viewerIndex));
+          figure.addEventListener('keydown', event => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              openImageViewer(viewerIndex);
+            }
+          });
+        }
         figure.append(createMedia(item));
 
         const caption = document.createElement('figcaption');
