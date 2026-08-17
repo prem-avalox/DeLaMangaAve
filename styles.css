@@ -4996,6 +4996,14 @@ body.prototype-home .window:active {
   transform: scale(1.012);
 }
 
+body.prototype-home .window--origin:hover,
+body.prototype-home .window--origin:focus-visible {
+  background: var(--surface);
+  border-color: var(--line);
+  box-shadow: none;
+  transform: none;
+}
+
 body.prototype-home .window:hover::before,
 body.prototype-home .window:focus-visible::before {
   opacity: 0.82;
@@ -5043,6 +5051,18 @@ body.prototype-home .window:hover small,
 body.prototype-home .window:focus-visible small {
   color: rgba(238, 242, 232, 0.72);
   text-shadow: 0 0 14px rgba(114, 203, 102, 0.18);
+}
+
+body.prototype-home .window--origin:hover span,
+body.prototype-home .window--origin:focus-visible span {
+  color: var(--ink);
+  text-shadow: none;
+}
+
+body.prototype-home .window--origin:hover small,
+body.prototype-home .window--origin:focus-visible small {
+  color: var(--muted);
+  text-shadow: none;
 }
 
 body.prototype-home .window p {
@@ -5134,6 +5154,8 @@ body.prototype-home .window--origin:focus-visible::before {
     linear-gradient(135deg, transparent 0 39%, rgba(238, 242, 232, 0.18) 39.4% 40%, transparent 40.4%),
     linear-gradient(135deg, transparent 0 57%, rgba(238, 242, 232, 0.3) 57.4% 58%, transparent 58.4%);
   background-size: 100% 25px, 100% 100%, 100% 100%;
+  opacity: 0.48;
+  filter: none;
   animation: originEscalator 1100ms linear infinite;
 }
 
@@ -5146,13 +5168,35 @@ body.prototype-home .window--origin:focus-visible::after {
 
 body.prototype-home .window--music .wave {
   position: absolute;
-  left: 20px;
-  right: 20px;
+  left: 12px;
+  right: 12px;
   top: 50%;
+  gap: 12px;
   justify-content: center;
+  height: 112px;
   width: auto;
   margin-top: 0;
   transform: translateY(-50%) scaleX(1);
+}
+
+body.prototype-home .window--music .wave i {
+  height: 24px;
+}
+
+body.prototype-home .window--music .wave i:nth-child(2n) {
+  height: 44px;
+}
+
+body.prototype-home .window--music .wave i:nth-child(3n) {
+  height: 14px;
+}
+
+body.prototype-home .window--music .wave i:nth-child(5n) {
+  height: 66px;
+}
+
+body.prototype-home .window--music .wave i:nth-child(7n) {
+  height: 82px;
 }
 
 body.prototype-home .window:hover .wave,
@@ -5304,17 +5348,15 @@ body.prototype-home .window--music:focus-visible .wave {
 @keyframes originEscalator {
   0% {
     background-position: 0 calc(50% - 1px), 0 0, 0 0;
-    filter: brightness(1);
     transform: translateY(0);
   }
 
   50% {
-    filter: brightness(1.36);
+    transform: translateY(0);
   }
 
   100% {
     background-position: 0 calc(50% + 24px), 0 0, 0 0;
-    filter: brightness(1.08);
     transform: translateY(0);
   }
 }
