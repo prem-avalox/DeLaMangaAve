@@ -7,7 +7,7 @@ window.DE_LA_MANGA_MUSIC_ARCHIVES = [
     "releaseType": "EP",
     "year": "2025",
     "totalDuration": "14:09",
-    "cover": "resources/Albums/Operación 14/WPELEMENTS/OPERACIÓN14.png",
+    "cover": "assets/music/operacion-14/web/cover.png",
     "backHref": "musica.html",
     "backLabel": "Volver a música",
     "status": "published",
@@ -31,7 +31,7 @@ window.DE_LA_MANGA_MUSIC_ARCHIVES = [
     "downloads": [
       {
         "label": "Descarga gratuita",
-        "href": "https://github.com/prem-avalox/DeLaMangaAve/raw/main/resources/Albums/Operaci%C3%B3n%2014/Operaci%C3%B3n%2014.zip",
+        "href": "https://github.com/prem-avalox/DeLaMangaAve/raw/main/assets/music/operacion-14/downloads/operacion-14.zip",
         "filename": "Operación 14.zip",
         "format": "ZIP"
       }
@@ -41,7 +41,7 @@ window.DE_LA_MANGA_MUSIC_ARCHIVES = [
         "id": "cover-01",
         "type": "cover",
         "title": "",
-        "background": "resources/Albums/Operación 14/WPELEMENTS/1.jpeg",
+        "background": "assets/music/operacion-14/web/section-01.jpeg",
         "image": null,
         "alt": "",
         "body": ""
@@ -50,8 +50,8 @@ window.DE_LA_MANGA_MUSIC_ARCHIVES = [
         "id": "graphic-02",
         "type": "image",
         "title": "",
-        "background": "resources/Albums/Operación 14/WPELEMENTS/2.jpeg",
-        "image": "resources/Albums/Operación 14/WPELEMENTS/DESC.png",
+        "background": "assets/music/operacion-14/web/section-02.jpeg",
+        "image": "assets/music/operacion-14/web/description.png",
         "alt": "Descripción del EP Operación 14",
         "body": ""
       },
@@ -59,7 +59,7 @@ window.DE_LA_MANGA_MUSIC_ARCHIVES = [
         "id": "player-03",
         "type": "player",
         "title": "Escucha el EP",
-        "background": "resources/Albums/Operación 14/WPELEMENTS/3.jpeg",
+        "background": "assets/music/operacion-14/web/section-03.jpeg",
         "image": null,
         "alt": "",
         "body": ""
@@ -68,8 +68,8 @@ window.DE_LA_MANGA_MUSIC_ARCHIVES = [
         "id": "graphic-04",
         "type": "image",
         "title": "",
-        "background": "resources/Albums/Operación 14/WPELEMENTS/4.jpeg",
-        "image": "resources/Albums/Operación 14/WPELEMENTS/NOTAPERSONAL.png",
+        "background": "assets/music/operacion-14/web/section-04.jpeg",
+        "image": "assets/music/operacion-14/web/nota-personal.png",
         "alt": "Nota personal de Operación 14",
         "body": ""
       }
@@ -79,31 +79,31 @@ window.DE_LA_MANGA_MUSIC_ARCHIVES = [
         "number": "01",
         "title": "4AM",
         "duration": "2:13",
-        "webAudio": "resources/Albums/Operación 14/01 4AM.wav"
+        "webAudio": "assets/music/operacion-14/audio/01-4am.wav"
       },
       {
         "number": "02",
         "title": "Fanático",
         "duration": "2:32",
-        "webAudio": "resources/Albums/Operación 14/02 Fanático.wav"
+        "webAudio": "assets/music/operacion-14/audio/02-fanatico.wav"
       },
       {
         "number": "03",
         "title": "Motivarte",
         "duration": "4:03",
-        "webAudio": "resources/Albums/Operación 14/03 Motivarte.wav"
+        "webAudio": "assets/music/operacion-14/audio/03-motivarte.wav"
       },
       {
         "number": "04",
         "title": "Amadeus (Escándalo)",
         "duration": "2:28",
-        "webAudio": "resources/Albums/Operación 14/04 Amadeus (Escándalo).wav"
+        "webAudio": "assets/music/operacion-14/audio/04-amadeus-escandalo.wav"
       },
       {
         "number": "05",
         "title": "Encima del Mar",
         "duration": "2:53",
-        "webAudio": "resources/Albums/Operación 14/05 Encima del Mar.wav"
+        "webAudio": "assets/music/operacion-14/audio/05-encima-del-mar.wav"
       }
     ]
   }

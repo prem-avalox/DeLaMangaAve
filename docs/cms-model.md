@@ -27,7 +27,7 @@ The database already has `roles`, `permissions`, `role_permissions`, and `users`
 1. `admin.html` loads editable content from SQLite through `GET /api/cms/content`.
 2. The admin posts normalized entities to `POST /api/cms/content`.
 3. `cms-db.js` stores the entities in SQLite as the editing source of truth.
-4. `server.js` regenerates `music-data.js` or `portfolio-data.js` from SQLite.
+4. `server.js` regenerates `data/music.js` or `data/collections.js` from SQLite.
 5. The public pages continue reading the generated JS files.
 
 This keeps the current web stable while making SQLite the source used by the CMS.

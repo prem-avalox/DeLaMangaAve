@@ -124,14 +124,14 @@
       year: '2026',
       status: 'draft',
       totalDuration: '0:00',
-      cover: 'resources/music/nuevo-release/cover.png',
+      cover: 'assets/music/nuevo-release/cover.png',
       backHref: 'musica.html',
       backLabel: 'Volver a música',
       links: defaultMusicLinks(),
       downloads: [
         {
           label: 'Descarga AIFF',
-          href: 'resources/music/nuevo-release/downloads/nuevo-release-aiff.zip',
+          href: 'assets/music/nuevo-release/downloads/nuevo-release-aiff.zip',
           filename: 'nuevo-release-aiff.zip',
           format: 'AIFF ZIP'
         }
@@ -145,7 +145,7 @@
           number: '01',
           title: 'Nueva canción',
           duration: '0:00',
-          webAudio: 'resources/music/nuevo-release/audio/01-nueva-cancion.mp3'
+          webAudio: 'assets/music/nuevo-release/audio/01-nueva-cancion.mp3'
         }
       ]
     };
@@ -309,7 +309,7 @@
   }
 
   function isLocalAssetReference(value) {
-    return normalizeLocalPath(value).startsWith('resources/');
+    return normalizeLocalPath(value).startsWith('assets/');
   }
 
   function localAssetExists(value) {
@@ -632,16 +632,16 @@
     const id = slugify(entry.id || entry.title || 'entrada');
 
     if (mode === 'music') {
-      if (role === 'music-cover') return `resources/music/${id}/cover`;
-      if (role === 'music-background') return `resources/music/${id}/backgrounds`;
-      if (role === 'music-image') return `resources/music/${id}/images`;
-      if (role === 'music-audio') return `resources/music/${id}/audio`;
-      if (role === 'music-download') return `resources/music/${id}/downloads`;
-      return `resources/music/${id}/media`;
+      if (role === 'music-cover') return `assets/music/${id}/cover`;
+      if (role === 'music-background') return `assets/music/${id}/backgrounds`;
+      if (role === 'music-image') return `assets/music/${id}/images`;
+      if (role === 'music-audio') return `assets/music/${id}/audio`;
+      if (role === 'music-download') return `assets/music/${id}/downloads`;
+      return `assets/music/${id}/media`;
     }
 
-    if (role === 'collection-cover') return `resources/collections/${id}/cover`;
-    return `resources/collections/${id}/media`;
+    if (role === 'collection-cover') return `assets/photography/${id}/cover`;
+    return `assets/photography/${id}/full`;
   }
 
   function fileNameWithoutExtension(filePath) {
@@ -730,11 +730,11 @@
     sidebarTitle.textContent = mode === 'music' ? 'Releases' : 'Archivo';
     outputHelp.innerHTML = mode === 'music'
       ? (backendAvailable
-        ? 'El admin lee y escribe SQLite. <code>music-data.js</code> se regenera automáticamente como salida pública. Los audios importados se copian a <code>resources/music/{release}/audio</code>.'
-        : 'Cuando termines, descarga el archivo y reemplaza <code>music-data.js</code>. Los audios, portadas y backgrounds deben estar copiados en las rutas que escribiste.')
+        ? 'El admin lee y escribe SQLite. <code>data/music.js</code> se regenera automáticamente como salida pública. Los audios importados se copian a <code>assets/music/{release}/audio</code>.'
+        : 'Cuando termines, descarga el archivo y reemplaza <code>data/music.js</code>. Los audios, portadas y backgrounds deben estar copiados en las rutas que escribiste.')
       : (backendAvailable
-        ? 'El admin lee y escribe SQLite. <code>portfolio-data.js</code> se regenera automáticamente como salida pública.'
-        : 'Cuando termines, descarga el archivo y reemplaza <code>portfolio-data.js</code>. Tus fotos y videos deben estar copiados en las rutas que escribiste.');
+        ? 'El admin lee y escribe SQLite. <code>data/collections.js</code> se regenera automáticamente como salida pública.'
+        : 'Cuando termines, descarga el archivo y reemplaza <code>data/collections.js</code>. Tus fotos y videos deben estar copiados en las rutas que escribiste.');
     if (exportButton) {
       exportButton.textContent = backendAvailable ? 'Guardar ahora' : 'Exportar archivo';
     }
@@ -830,7 +830,7 @@
               <span class="admin-collection-type-pill ${type.value === collection.type ? 'is-active' : ''}">${escapeHtml(type.label)}</span>
             `).join('')}
           </div>
-          ${mediaField('Portada de colección', 'cover', collection.cover, 'collection-cover', '', 'resources/collections/serie/cover.jpg')}
+          ${mediaField('Portada de colección', 'cover', collection.cover, 'collection-cover', '', 'assets/photography/serie/cover.jpg')}
         </div>
       </section>
     `;
@@ -906,7 +906,7 @@
           <div class="admin-actions">
             <button type="button" class="ghost" data-action="preview-music-archive">Vista previa</button>
           </div>
-          ${mediaField('Cover del release', 'cover', archive.cover, 'music-cover', 'required', 'resources/music/release/cover.png')}
+          ${mediaField('Cover del release', 'cover', archive.cover, 'music-cover', 'required', 'assets/music/release/cover.png')}
         </div>
       </section>
     `;
@@ -1042,7 +1042,7 @@
             ${mediaPreviewMarkup(item.src, 'Sin archivo')}
           </div>
           <div class="admin-collection-item-card__fields">
-            ${mediaField('Archivo', 'item-src', item.src, 'collection-media', '', 'resources/collections/serie/imagen.jpg')}
+          ${mediaField('Archivo', 'item-src', item.src, 'collection-media', '', 'assets/photography/serie/full/imagen.jpg')}
             <div class="admin-grid admin-grid--two">
               ${field('Texto alternativo', 'item-alt', item.alt)}
               ${field('Caption', 'item-caption', item.caption)}
@@ -1082,7 +1082,7 @@
               ])}
               ${field('Título', 'section-title', section.title)}
             </div>
-            ${mediaField('Background de sección', 'section-background', section.background, 'music-background', '', 'resources/music/release/backgrounds/01.jpg')}
+            ${mediaField('Background de sección', 'section-background', section.background, 'music-background', '', 'assets/music/release/backgrounds/01.jpg')}
             <div class="admin-grid admin-grid--two">
               ${mediaField('Imagen de contenido', 'section-image', section.image, 'music-image', '', 'Cover, descripción diseñada o gráfico central')}
               ${field('Descripción accesible', 'section-alt', section.alt, 'text', '', 'Texto breve para lectores de pantalla')}
@@ -1103,7 +1103,7 @@
           ${field('Título', 'track-title', track.title)}
           ${field('Duración', 'track-duration', track.duration, 'text', '', '2:13')}
         </div>
-        ${mediaField('Audio web', 'track-webAudio', track.webAudio, 'music-audio', '', 'resources/music/release/audio/01-track.mp3')}
+        ${mediaField('Audio web', 'track-webAudio', track.webAudio, 'music-audio', '', 'assets/music/release/audio/01-track.mp3')}
       </div>
     `;
   }
@@ -1263,7 +1263,7 @@
     render();
     setStatus(backendAvailable
       ? 'Datos recargados desde SQLite.'
-      : (mode === 'music' ? 'Datos recargados desde music-data.js.' : 'Datos recargados desde portfolio-data.js.'));
+      : (mode === 'music' ? 'Datos recargados desde data/music.js.' : 'Datos recargados desde data/collections.js.'));
   }
 
   function entriesForMode(targetMode) {
@@ -1319,7 +1319,7 @@
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = mode === 'music' ? 'music-data.js' : 'portfolio-data.js';
+    link.download = mode === 'music' ? 'music.js' : 'collections.js';
     document.body.append(link);
     link.click();
     link.remove();
@@ -1557,7 +1557,7 @@
 
   function filePathForTrack(fileName) {
     const entry = getCurrentEntry() || {};
-    return `resources/music/${entry.id || 'release'}/audio/${fileName}`;
+    return `assets/music/${entry.id || 'release'}/audio/${fileName}`;
   }
 
   function fileToBase64(file) {
@@ -1838,7 +1838,7 @@
     const uploadInput = mediaPicker.querySelector('[data-action="upload-media-picker"]');
     if (uploadHelp) {
       uploadHelp.textContent = role === 'library'
-        ? 'Los archivos se copian a resources/library.'
+        ? 'Los archivos se copian a assets/shared/library.'
         : `Los archivos se copian a ${uploadDirForRole(role)}.`;
     }
     if (uploadInput) uploadInput.accept = role === 'library' ? 'image/*,video/*,audio/*,.zip,.aif,.aiff,.flac,.wav,.mp3,.mp4,.mov,.webm' : acceptForRole(role);
@@ -1905,7 +1905,7 @@
   async function uploadFromMediaPicker(files) {
     if (!files.length) return;
     const role = mediaTarget?.role || 'library';
-    const baseDir = role === 'library' ? 'resources/library' : uploadDirForRole(role);
+    const baseDir = role === 'library' ? 'assets/shared/library' : uploadDirForRole(role);
     setStatus(`Copiando ${files.length} archivo(s) a ${baseDir}...`);
     const uploaded = await uploadFiles(baseDir, Array.from(files));
     await loadMediaAssets();
@@ -1948,7 +1948,7 @@
     syncCurrentFromForm();
     const entry = getCurrentEntry();
     const sortedFiles = Array.from(files).sort((a, b) => (a.lastModified || 0) - (b.lastModified || 0));
-    const uploadBaseDir = `resources/music/${entry.id || 'release'}/audio`;
+    const uploadBaseDir = `assets/music/${entry.id || 'release'}/audio`;
     let uploadedFiles = [];
     if (backendAvailable) {
       setStatus('Copiando audios al proyecto...');

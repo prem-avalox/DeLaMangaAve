@@ -346,8 +346,8 @@ function seedFromCurrentDataIfEmpty() {
   const collectionCount = db.prepare('SELECT COUNT(*) AS count FROM collections').get().count;
   if (archiveCount || collectionCount) return;
 
-  const music = readWindowDataFile('music-data.js', 'DE_LA_MANGA_MUSIC_ARCHIVES');
-  const collections = readWindowDataFile('portfolio-data.js', 'DE_LA_MANGA_COLLECTIONS');
+  const music = readWindowDataFile('data/music.js', 'DE_LA_MANGA_MUSIC_ARCHIVES');
+  const collections = readWindowDataFile('data/collections.js', 'DE_LA_MANGA_COLLECTIONS');
   importContent({ music, collections });
 }
 
@@ -621,7 +621,7 @@ function pruneMissingMediaAssets() {
   const rows = db.prepare(`
     SELECT id, file_path AS filePath
     FROM media_assets
-    WHERE file_path LIKE 'resources/%'
+    WHERE file_path LIKE 'assets/%'
   `).all();
   const remove = db.prepare('DELETE FROM media_assets WHERE id = ?');
 
@@ -633,7 +633,7 @@ function pruneMissingMediaAssets() {
 
 function isLocalAssetPath(filePath) {
   const value = String(filePath || '').trim();
-  return Boolean(value) && !/^[a-z][a-z0-9+.-]*:\/\//i.test(value) && value.startsWith('resources/');
+  return Boolean(value) && !/^[a-z][a-z0-9+.-]*:\/\//i.test(value) && value.startsWith('assets/');
 }
 
 function localFileSize(filePath) {

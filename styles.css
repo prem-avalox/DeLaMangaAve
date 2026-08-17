@@ -4,7 +4,7 @@
 
 @font-face {
   font-family: "Aquarius";
-  src: url("fonts/Aquarius Regular.ttf") format("truetype");
+  src: url("assets/fonts/aquarius-regular.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -12,7 +12,7 @@
 
 @font-face {
   font-family: "Aquarius Six";
-  src: url("fonts/Aquarius Six Regular.ttf") format("truetype");
+  src: url("assets/fonts/aquarius-six-regular.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -68,7 +68,7 @@ html, body {
 body {
   background:
     linear-gradient(rgba(4, 6, 4, 0.62), rgba(4, 6, 4, 0.62)),
-    url('resources/BGROUND.png') no-repeat fixed;
+    url('assets/brand/backgrounds/site-background.png') no-repeat fixed;
   background-size: cover, 160% 160%;
   background-position: center, 25% 20%;
   min-height: 100vh;
@@ -299,7 +299,7 @@ body::after {
   overflow: hidden;
   display: flex;
   align-items: flex-end;
-  background: url('resources/Banner.jpg') center / cover no-repeat;
+  background: url('assets/brand/backgrounds/banner.jpg') center / cover no-repeat;
   border: 1px solid var(--line-bright);
   box-shadow: var(--shadow-deep), var(--glow-oniric);
   clip-path: var(--chamfer);

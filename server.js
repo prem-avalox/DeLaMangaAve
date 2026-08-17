@@ -47,8 +47,8 @@ const MIME_TYPES = {
 };
 
 const DATA_FILES = {
-  collections: 'portfolio-data.js',
-  music: 'music-data.js'
+  collections: 'data/collections.js',
+  music: 'data/music.js'
 };
 
 const DATA_GLOBALS = {
@@ -261,7 +261,7 @@ async function handleUpload(request, response) {
   const baseDir = String(body.baseDir || '');
   const files = Array.isArray(body.files) ? body.files : [];
 
-  if (!baseDir.startsWith('resources/') || !files.length) {
+  if (!baseDir.startsWith('assets/') || !files.length) {
     sendJson(response, 400, { ok: false, error: 'Invalid upload payload' });
     return;
   }
