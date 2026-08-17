@@ -67,6 +67,7 @@ When served by `server.js`, the admin includes a media manager:
 - Collection media can be imported in bulk as images or videos.
 - Large collection imports are uploaded in smaller browser-safe batches. There is no fixed item-count limit, but very large original photos still make the git repo and public pages heavier; prefer web-sized JPG/WebP exports for the published gallery and keep full-resolution masters outside the site unless they are intentionally downloadable.
 - Music archive covers, section backgrounds, section images, audio files, and downloads can be uploaded from their fields.
+- Use **Revisar galería** inside a collection to inspect items at large size and remove pieces from that collection. This does not delete the physical file from `assets/`; it only removes the item from the published collection data.
 
 Imported audio files are copied into `assets/music/{release-id}/audio/`. Edits are autosaved into SQLite after a short pause, then `data/music.js` or `data/collections.js` is regenerated as the static public output. **Guardar ahora** remains available as a manual save and creates a timestamped `.bak-*` backup when the generated file changes.
 

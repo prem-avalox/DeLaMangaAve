@@ -88,6 +88,8 @@
   let mediaAssets = [];
   let mediaPicker = null;
   let mediaTarget = null;
+  let collectionGallery = null;
+  let collectionGalleryIndex = 0;
   let collections = loadStored(COLLECTIONS_KEY, window.DE_LA_MANGA_COLLECTIONS, [emptyCollection()]);
   let musicArchives = loadStored(MUSIC_KEY, window.DE_LA_MANGA_MUSIC_ARCHIVES, [emptyMusicArchive()]);
   let active = {
@@ -873,6 +875,9 @@
               <span class="admin-collection-type-pill ${type.value === collection.type ? 'is-active' : ''}">${escapeHtml(type.label)}</span>
             `).join('')}
           </div>
+          <div class="admin-actions">
+            <button type="button" class="ghost" data-action="open-collection-gallery" ${items.length ? '' : 'disabled'}>Revisar galería</button>
+          </div>
           ${mediaField('Portada de colección', 'cover', collection.cover, 'collection-cover', '', 'assets/photography/serie/cover.jpg')}
         </div>
       </section>
@@ -1591,6 +1596,169 @@
     setStatus('Fila eliminada. Guardado automático en curso.');
   }
 
+  function createCollectionGallery() {
+    if (collectionGallery) return collectionGallery;
+
+    collectionGallery = document.createElement('div');
+    collectionGallery.className = 'admin-gallery-modal';
+    collectionGallery.hidden = true;
+    collectionGallery.innerHTML = `
+      <div class="admin-gallery-modal__backdrop" data-action="close-collection-gallery"></div>
+      <section class="admin-gallery-panel" role="dialog" aria-modal="true" aria-label="Revisar galería">
+        <header class="admin-gallery-panel__head">
+          <div>
+            <p class="eyebrow">Revisión</p>
+            <h2 data-gallery-title>Galería</h2>
+          </div>
+          <button type="button" class="admin-icon-button" data-action="close-collection-gallery" aria-label="Cerrar">×</button>
+        </header>
+        <div class="admin-gallery-layout">
+          <div class="admin-gallery-stage">
+            <button type="button" class="admin-gallery-nav admin-gallery-nav--prev" data-action="gallery-prev" aria-label="Anterior">‹</button>
+            <div class="admin-gallery-media" data-gallery-media></div>
+            <button type="button" class="admin-gallery-nav admin-gallery-nav--next" data-action="gallery-next" aria-label="Siguiente">›</button>
+          </div>
+          <aside class="admin-gallery-side">
+            <div>
+              <p class="eyebrow">Pieza activa</p>
+              <h3 data-gallery-item-title>Sin selección</h3>
+              <p data-gallery-item-path></p>
+            </div>
+            <div class="admin-gallery-actions">
+              <button type="button" class="ghost admin-action--danger" data-action="remove-gallery-item">Quitar de colección</button>
+            </div>
+            <div class="admin-gallery-strip" data-gallery-strip aria-label="Miniaturas"></div>
+          </aside>
+        </div>
+      </section>
+    `;
+    collectionGallery.addEventListener('click', event => {
+      const button = event.target.closest('[data-action]');
+      if (!button) return;
+      const action = button.dataset.action;
+      if (action === 'close-collection-gallery') closeCollectionGallery();
+      if (action === 'gallery-prev') changeCollectionGallery(-1);
+      if (action === 'gallery-next') changeCollectionGallery(1);
+      if (action === 'select-gallery-item') {
+        collectionGalleryIndex = Number(button.dataset.galleryIndex) || 0;
+        renderCollectionGallery();
+      }
+      if (action === 'remove-gallery-item') removeCurrentGalleryItem();
+    });
+    document.body.append(collectionGallery);
+    return collectionGallery;
+  }
+
+  function galleryItems() {
+    const entry = getCurrentEntry();
+    return Array.isArray(entry?.items) ? entry.items.filter(item => item?.src) : [];
+  }
+
+  function openCollectionGallery(index = 0) {
+    if (mode !== 'collections') return;
+    syncCurrentFromForm();
+    const items = galleryItems();
+    if (!items.length) {
+      setStatus('Esta colección no tiene piezas para revisar.');
+      return;
+    }
+    collectionGalleryIndex = Math.max(0, Math.min(index, items.length - 1));
+    createCollectionGallery();
+    collectionGallery.hidden = false;
+    document.body.classList.add('admin-gallery-open');
+    renderCollectionGallery();
+  }
+
+  function closeCollectionGallery() {
+    if (!collectionGallery) return;
+    collectionGallery.hidden = true;
+    document.body.classList.remove('admin-gallery-open');
+  }
+
+  function handleGlobalKeydown(event) {
+    if (collectionGallery && !collectionGallery.hidden) {
+      if (event.key === 'Escape') closeCollectionGallery();
+      if (event.key === 'ArrowLeft') changeCollectionGallery(-1);
+      if (event.key === 'ArrowRight') changeCollectionGallery(1);
+      return;
+    }
+    if (event.key === 'Escape' && mediaPicker && !mediaPicker.hidden) closeMediaPicker();
+  }
+
+  function changeCollectionGallery(delta) {
+    const items = galleryItems();
+    if (!items.length) return;
+    collectionGalleryIndex = (collectionGalleryIndex + delta + items.length) % items.length;
+    renderCollectionGallery();
+  }
+
+  function renderCollectionGallery() {
+    if (!collectionGallery || collectionGallery.hidden) return;
+    const entry = getCurrentEntry();
+    const items = galleryItems();
+    if (!items.length) {
+      closeCollectionGallery();
+      return;
+    }
+
+    collectionGalleryIndex = Math.max(0, Math.min(collectionGalleryIndex, items.length - 1));
+    const item = items[collectionGalleryIndex];
+    const title = item.alt || item.caption || fileNameWithoutExtension(item.src) || `Pieza ${collectionGalleryIndex + 1}`;
+    const titleEl = collectionGallery.querySelector('[data-gallery-title]');
+    const mediaEl = collectionGallery.querySelector('[data-gallery-media]');
+    const itemTitleEl = collectionGallery.querySelector('[data-gallery-item-title]');
+    const itemPathEl = collectionGallery.querySelector('[data-gallery-item-path]');
+    const stripEl = collectionGallery.querySelector('[data-gallery-strip]');
+
+    if (titleEl) titleEl.textContent = `${entry.title || 'Colección'} / ${collectionGalleryIndex + 1} de ${items.length}`;
+    if (itemTitleEl) itemTitleEl.textContent = title;
+    if (itemPathEl) itemPathEl.textContent = item.src;
+    if (mediaEl) {
+      mediaEl.innerHTML = isVideoPath(item.src)
+        ? `<video src="${escapeAttribute(item.src)}" controls playsinline preload="metadata"></video>`
+        : `<img src="${escapeAttribute(item.src)}" alt="${escapeAttribute(item.alt || title)}">`;
+    }
+    if (stripEl) {
+      stripEl.innerHTML = items.map((galleryItem, index) => `
+        <button type="button" class="admin-gallery-thumb ${index === collectionGalleryIndex ? 'is-active' : ''}" data-action="select-gallery-item" data-gallery-index="${index}" aria-label="Ver pieza ${index + 1}">
+          ${isVideoPath(galleryItem.src)
+            ? `<video src="${escapeAttribute(galleryItem.src)}" muted playsinline preload="metadata"></video>`
+            : `<img src="${escapeAttribute(galleryItem.src)}" alt="">`}
+        </button>
+      `).join('');
+    }
+  }
+
+  function removeCurrentGalleryItem() {
+    if (mode !== 'collections') return;
+    syncCurrentFromForm();
+    const entry = getCurrentEntry();
+    if (!entry?.items?.length) return;
+    const itemsWithOriginalIndex = entry.items
+      .map((item, index) => ({ item, index }))
+      .filter(({ item }) => item?.src);
+    const selected = itemsWithOriginalIndex[collectionGalleryIndex];
+    if (!selected) return;
+
+    const ok = window.confirm('Quitar esta pieza de la colección? El archivo físico queda guardado en assets/.');
+    if (!ok) return;
+
+    const removed = entry.items.splice(selected.index, 1)[0];
+    if (entry.cover === removed.src) {
+      entry.cover = entry.items.find(item => item.src)?.src || '';
+    }
+
+    collectionGalleryIndex = Math.min(collectionGalleryIndex, Math.max(0, galleryItems().length - 1));
+    render();
+    persistDraft();
+    if (galleryItems().length) {
+      renderCollectionGallery();
+    } else {
+      closeCollectionGallery();
+    }
+    setStatus('Pieza quitada de la colección. El archivo físico no fue borrado.');
+  }
+
   function fileTitle(fileName) {
     return fileName
       .replace(/\.[^.]+$/, '')
@@ -1849,10 +2017,6 @@
         uploadFromMediaPicker(event.target.files);
         event.target.value = '';
       }
-    });
-
-    document.addEventListener('keydown', event => {
-      if (event.key === 'Escape' && mediaPicker && !mediaPicker.hidden) closeMediaPicker();
     });
 
     document.body.append(mediaPicker);
@@ -2139,6 +2303,15 @@
     if (action === 'delete-entry') deleteEntry();
     if (action === 'open-media-picker') openMediaPicker(button);
     if (action === 'open-media-library') openMediaPicker();
+    if (action === 'open-collection-gallery') openCollectionGallery();
+    if (action === 'close-collection-gallery') closeCollectionGallery();
+    if (action === 'gallery-prev') changeCollectionGallery(-1);
+    if (action === 'gallery-next') changeCollectionGallery(1);
+    if (action === 'select-gallery-item') {
+      collectionGalleryIndex = Number(button.dataset.galleryIndex) || 0;
+      renderCollectionGallery();
+    }
+    if (action === 'remove-gallery-item') removeCurrentGalleryItem();
     if (action === 'remove-row') removeRow(button);
     if (action === 'move-row-up') moveRow(button, -1);
     if (action === 'move-row-down') moveRow(button, 1);
@@ -2163,6 +2336,8 @@
     event.preventDefault();
     saveDraft();
   });
+
+  document.addEventListener('keydown', handleGlobalKeydown);
 
   render();
   detectBackend();
