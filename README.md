@@ -54,6 +54,8 @@ Open `admin.html` through the local Node server to create/edit collections and m
 - `data/collections.js` for collections.
 - `data/music.js` for music archives.
 
+On macOS, double-click `open-cms.command` from the project folder to start the local backend and open the admin without typing commands.
+
 If the backend is not running, the editor falls back to browser `localStorage` and JS export. This is not a private remote CMS: `admin.html` has no real authentication. Do not link it from the public navigation.
 
 For music archives, use **Importar audios** to select or drag audio files. The admin sorts them by file date, derives track numbers from that order, derives titles from filenames, reads durations from metadata, and recalculates the total release duration.
@@ -67,6 +69,15 @@ When served by `server.js`, the admin includes a media manager:
 - Music archive covers, section backgrounds, section images, audio files, and downloads can be uploaded from their fields.
 
 Imported audio files are copied into `assets/music/{release-id}/audio/`. Edits are autosaved into SQLite after a short pause, then `data/music.js` or `data/collections.js` is regenerated as the static public output. **Guardar ahora** remains available as a manual save and creates a timestamped `.bak-*` backup when the generated file changes.
+
+Upload limits keep the static site and Git repository manageable:
+
+- Images: 25 MB each.
+- Audio files: 180 MB each.
+- Short video pieces: 80 MB each.
+- Download bundles: 250 MB each.
+
+The CMS updates local files only. To publish the edited site, commit and push the changed data/assets to GitHub.
 
 The backend keeps the normalized CMS database as the editing source. The current schema includes reserved users/roles, permissions, media assets, music archives, tracks, archive sections, links, downloads, collections, tags, and collection items. The public site still reads `data/music.js` and `data/collections.js`, but those files are generated output.
 

@@ -22,6 +22,13 @@ const {
 const ROOT = __dirname;
 const PORT = Number(process.env.PORT || 8000);
 const MAX_BODY_BYTES = 1024 * 1024 * 900;
+const UPLOAD_LIMITS = {
+  image: 25 * 1024 * 1024,
+  audio: 180 * 1024 * 1024,
+  video: 80 * 1024 * 1024,
+  download: 250 * 1024 * 1024,
+  file: 250 * 1024 * 1024
+};
 const AUTH_COOKIE_NAME = 'delamanga_admin_session';
 const AUTH_SESSION_MAX_AGE_SECONDS = 14 * 24 * 60 * 60;
 
@@ -123,6 +130,34 @@ function sanitizeFileName(name) {
     .replace(/[\/\\?%*:|"<>]/g, '-')
     .replace(/\s+/g, ' ')
     .trim() || 'file';
+}
+
+function extensionForName(name) {
+  return path.extname(String(name || '')).toLowerCase();
+}
+
+function uploadKindForFile(file) {
+  const ext = extensionForName(file.name);
+  const mime = String(file.type || '').toLowerCase();
+  if (mime.startsWith('image/') || ['.jpg', '.jpeg', '.png', '.webp'].includes(ext)) return 'image';
+  if (mime.startsWith('audio/') || ['.wav', '.aif', '.aiff', '.flac', '.mp3'].includes(ext)) return 'audio';
+  if (mime.startsWith('video/') || ['.mp4', '.mov', '.webm'].includes(ext)) return 'video';
+  if (ext === '.zip') return 'download';
+  return 'file';
+}
+
+function validateUploadFile(file, buffer) {
+  const kind = uploadKindForFile(file);
+  const ext = extensionForName(file.name);
+  const allowed = new Set(['.jpg', '.jpeg', '.png', '.webp', '.wav', '.aif', '.aiff', '.flac', '.mp3', '.mp4', '.mov', '.webm', '.zip']);
+  if (!allowed.has(ext)) {
+    throw new Error(`Tipo de archivo no permitido: ${file.name}`);
+  }
+
+  const limit = UPLOAD_LIMITS[kind] || UPLOAD_LIMITS.file;
+  if (buffer.length > limit) {
+    throw new Error(`${file.name} pesa demasiado para ${kind}: max ${Math.round(limit / 1024 / 1024)} MB`);
+  }
 }
 
 function safeResolve(relativePath) {
@@ -274,6 +309,7 @@ async function handleUpload(request, response) {
     const name = sanitizeFileName(file.name);
     const data = String(file.dataBase64 || '');
     const buffer = Buffer.from(data, 'base64');
+    validateUploadFile({ ...file, name }, buffer);
     const filePath = safeResolve(path.join(baseDir, name));
     await fs.writeFile(filePath, buffer);
     const savedFile = {

@@ -62,6 +62,13 @@
   ];
   const UPLOAD_BATCH_MAX_FILES = 8;
   const UPLOAD_BATCH_MAX_BYTES = 40 * 1024 * 1024;
+  const UPLOAD_LIMITS = {
+    image: 25 * 1024 * 1024,
+    audio: 180 * 1024 * 1024,
+    video: 80 * 1024 * 1024,
+    download: 250 * 1024 * 1024,
+    file: 250 * 1024 * 1024
+  };
 
   let mode = 'collections';
   let backendAvailable = false;
@@ -625,6 +632,42 @@
     const types = collectionMediaTypes(collection);
     if (types.length === 1 && types[0] === 'image') return 'image/*,.jpg,.jpeg,.png,.webp';
     return 'image/*,video/*,.mp4,.mov,.webm,.jpg,.jpeg,.png,.webp';
+  }
+
+  function fileExtension(fileName) {
+    const match = String(fileName || '').toLowerCase().match(/\.[^.]+$/);
+    return match ? match[0] : '';
+  }
+
+  function uploadKindForFile(file, role = 'library') {
+    const ext = fileExtension(file.name);
+    const mime = String(file.type || '').toLowerCase();
+    if (role === 'music-download' && ext === '.zip') return 'download';
+    if (mime.startsWith('image/') || ['.jpg', '.jpeg', '.png', '.webp'].includes(ext)) return 'image';
+    if (mime.startsWith('audio/') || ['.wav', '.aif', '.aiff', '.flac', '.mp3'].includes(ext)) return 'audio';
+    if (mime.startsWith('video/') || ['.mp4', '.mov', '.webm'].includes(ext)) return 'video';
+    if (ext === '.zip') return 'download';
+    return 'file';
+  }
+
+  function validateUploadSelection(files, role = 'library') {
+    const allowedExtensions = new Set(['.jpg', '.jpeg', '.png', '.webp', '.wav', '.aif', '.aiff', '.flac', '.mp3', '.mp4', '.mov', '.webm', '.zip']);
+    const roleTypes = role === 'library' ? null : mediaTypesForRole(role);
+
+    for (const file of Array.from(files || [])) {
+      const ext = fileExtension(file.name);
+      const kind = uploadKindForFile(file, role);
+      if (!allowedExtensions.has(ext)) {
+        throw new Error(`No puedo importar ${file.name}. Usa JPG, PNG, WebP, WAV, AIFF, FLAC, MP3, MP4, MOV, WebM o ZIP.`);
+      }
+      if (roleTypes && !roleTypes.includes(kind) && !(roleTypes.includes('download') && kind === 'audio')) {
+        throw new Error(`${file.name} no corresponde a este campo.`);
+      }
+      const limit = UPLOAD_LIMITS[kind] || UPLOAD_LIMITS.file;
+      if (file.size > limit) {
+        throw new Error(`${file.name} pesa ${formatBytes(file.size)}. Limite para ${kind}: ${formatBytes(limit)}.`);
+      }
+    }
   }
 
   function uploadDirForRole(role) {
@@ -1614,9 +1657,10 @@
     return batches;
   }
 
-  async function uploadFiles(baseDir, files) {
+  async function uploadFiles(baseDir, files, role = 'library') {
     const selectedFiles = Array.from(files || []);
     if (!selectedFiles.length) return [];
+    validateUploadSelection(selectedFiles, role);
 
     const batches = createUploadBatches(selectedFiles);
     const totalSize = totalFileSize(selectedFiles);
@@ -1708,10 +1752,14 @@
     const file = files[0];
     const baseDir = uploadDirForRole(role);
     setStatus(`Copiando ${file.name} a ${baseDir}...`);
-    const uploaded = await uploadFiles(baseDir, [file]);
-    await loadMediaAssets();
-    await setMediaInputValue(input, uploaded[0]?.path, file);
-    syncAfterMediaChange(`Medio copiado a ${uploaded[0]?.path}.`);
+    try {
+      const uploaded = await uploadFiles(baseDir, [file], role);
+      await loadMediaAssets();
+      await setMediaInputValue(input, uploaded[0]?.path, file);
+      syncAfterMediaChange(`Medio copiado a ${uploaded[0]?.path}.`);
+    } catch (error) {
+      setStatus(error.message || 'No se pudo copiar el medio.');
+    }
   }
 
   async function importCollectionMedia(files) {
@@ -1726,8 +1774,14 @@
     const selectedFiles = Array.from(files);
     const baseDir = uploadDirForRole('collection-media');
     setStatus(`Copiando ${selectedFiles.length} medios a ${baseDir}...`);
-    const uploaded = await uploadFiles(baseDir, selectedFiles);
-    await loadMediaAssets();
+    let uploaded = [];
+    try {
+      uploaded = await uploadFiles(baseDir, selectedFiles, 'collection-media');
+      await loadMediaAssets();
+    } catch (error) {
+      setStatus(error.message || 'No se pudieron importar los medios.');
+      return;
+    }
 
     entry.items = entry.items || [];
     uploaded.forEach((file, index) => {
@@ -1907,8 +1961,14 @@
     const role = mediaTarget?.role || 'library';
     const baseDir = role === 'library' ? 'assets/shared/library' : uploadDirForRole(role);
     setStatus(`Copiando ${files.length} archivo(s) a ${baseDir}...`);
-    const uploaded = await uploadFiles(baseDir, Array.from(files));
-    await loadMediaAssets();
+    let uploaded = [];
+    try {
+      uploaded = await uploadFiles(baseDir, Array.from(files), role);
+      await loadMediaAssets();
+    } catch (error) {
+      setStatus(error.message || 'No se pudieron agregar los archivos.');
+      return;
+    }
 
     if (mediaTarget?.input && uploaded[0]?.path) {
       await setMediaInputValue(mediaTarget.input, uploaded[0].path, files[0]);
@@ -1952,7 +2012,12 @@
     let uploadedFiles = [];
     if (backendAvailable) {
       setStatus('Copiando audios al proyecto...');
-      uploadedFiles = await uploadFiles(uploadBaseDir, sortedFiles);
+      try {
+        uploadedFiles = await uploadFiles(uploadBaseDir, sortedFiles, 'music-audio');
+      } catch (error) {
+        setStatus(error.message || 'No se pudieron importar los audios.');
+        return;
+      }
     }
     const tracks = [];
 
