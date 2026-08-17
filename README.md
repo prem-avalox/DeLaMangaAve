@@ -80,6 +80,8 @@ Upload limits keep the static site and Git repository manageable:
 
 The CMS updates local files only. To publish the edited site, commit and push the changed data/assets to GitHub.
 
+Use **Publicar a GitHub** from the CMS to publish content changes without touching the terminal. It saves both collections and music data, stages `assets/` plus the generated files in `data/`, creates a commit, and pushes `main`. GitHub Pages can take about a minute to reflect the new site.
+
 The backend keeps the normalized CMS database as the editing source. The current schema includes reserved users/roles, permissions, media assets, music archives, tracks, archive sections, links, downloads, collections, tags, and collection items. The public site still reads `data/music.js` and `data/collections.js`, but those files are generated output.
 
 Useful local CMS endpoints:

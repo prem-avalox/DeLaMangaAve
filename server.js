@@ -2,6 +2,8 @@ const http = require('node:http');
 const nodeFs = require('node:fs');
 const fs = require('node:fs/promises');
 const path = require('node:path');
+const { execFile } = require('node:child_process');
+const { promisify } = require('node:util');
 const {
   createAuthSession,
   deleteAuthSession,
@@ -22,6 +24,7 @@ const {
 const ROOT = __dirname;
 const PORT = Number(process.env.PORT || 8000);
 const MAX_BODY_BYTES = 1024 * 1024 * 900;
+const execFileAsync = promisify(execFile);
 const UPLOAD_LIMITS = {
   image: 25 * 1024 * 1024,
   audio: 180 * 1024 * 1024,
@@ -324,6 +327,53 @@ async function handleUpload(request, response) {
   sendJson(response, 200, { ok: true, files: saved });
 }
 
+async function git(args, options = {}) {
+  const result = await execFileAsync('git', args, {
+    cwd: ROOT,
+    maxBuffer: 1024 * 1024 * 4,
+    timeout: options.timeout || 120000
+  });
+  return `${result.stdout || ''}${result.stderr || ''}`.trim();
+}
+
+async function hasStagedChanges() {
+  try {
+    await git(['diff', '--cached', '--quiet']);
+    return false;
+  } catch (error) {
+    if (error.code === 1) return true;
+    throw error;
+  }
+}
+
+async function handlePublishToGitHub(request, response) {
+  const body = await readJson(request);
+  const rawMessage = String(body.message || '').trim();
+  const stamp = new Date().toISOString().slice(0, 16).replace('T', ' ');
+  const message = rawMessage || `Publish CMS content ${stamp}`;
+
+  await git(['add', 'assets', 'data/collections.js', 'data/image-metadata.js', 'data/music.js']);
+  if (!(await hasStagedChanges())) {
+    sendJson(response, 200, {
+      ok: true,
+      changed: false,
+      message: 'No hay cambios de contenido para publicar.'
+    });
+    return;
+  }
+
+  await git(['commit', '-m', message]);
+  await git(['push', 'origin', 'main'], { timeout: 600000 });
+  const sha = await git(['rev-parse', '--short', 'HEAD']);
+
+  sendJson(response, 200, {
+    ok: true,
+    changed: true,
+    commit: sha,
+    message: `Publicado en GitHub: ${sha}`
+  });
+}
+
 async function serveStatic(request, response) {
   const url = new URL(request.url, `http://${request.headers.host}`);
   let pathname = decodeURIComponent(url.pathname);
@@ -437,7 +487,8 @@ const server = http.createServer(async (request, response) => {
     const protectedApi =
       pathname.startsWith('/api/cms') ||
       pathname === '/api/write-data' ||
-      pathname === '/api/upload';
+      pathname === '/api/upload' ||
+      pathname === '/api/publish/github';
     if (protectedApi && !requireAdminJson(request, response)) {
       return;
     }
@@ -489,6 +540,11 @@ const server = http.createServer(async (request, response) => {
 
     if (request.method === 'POST' && pathname === '/api/upload') {
       await handleUpload(request, response);
+      return;
+    }
+
+    if (request.method === 'POST' && pathname === '/api/publish/github') {
+      await handlePublishToGitHub(request, response);
       return;
     }
 

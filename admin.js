@@ -16,6 +16,7 @@
   const sidebarTitle = app.querySelector('[data-sidebar-title]');
   const outputHelp = app.querySelector('[data-output-help]');
   const exportButton = app.querySelector('[data-action="download-js"]');
+  const publishButton = app.querySelector('[data-action="publish-github"]');
   const PROJECT_SAVE_DELAY = 1200;
   const PUBLICATION_STATUSES = [
     { value: 'draft', label: 'Borrador', detail: 'Solo visible en el admin' },
@@ -783,6 +784,12 @@
     if (exportButton) {
       exportButton.textContent = backendAvailable ? 'Guardar ahora' : 'Exportar archivo';
     }
+    if (publishButton) {
+      publishButton.disabled = !backendAvailable;
+      publishButton.title = backendAvailable
+        ? 'Guardar contenido y subir data/assets a GitHub.'
+        : 'Requiere abrir el CMS con el backend local.';
+    }
     renderList();
     renderForm();
   }
@@ -1423,6 +1430,50 @@
     }
   }
 
+  async function publishToGitHub() {
+    if (!backendAvailable) {
+      setStatus('Abre el CMS con el backend local para publicar a GitHub.');
+      return;
+    }
+
+    const previousLabel = publishButton?.textContent;
+    if (publishButton) {
+      publishButton.disabled = true;
+      publishButton.textContent = 'Publicando...';
+    }
+
+    try {
+      syncCurrentFromForm();
+      window.clearTimeout(projectSaveTimers.collections);
+      window.clearTimeout(projectSaveTimers.music);
+      setStatus('Guardando contenido antes de publicar...');
+      await writeDataWithBackend({ targetMode: 'collections', backup: false, auto: false });
+      await writeDataWithBackend({ targetMode: 'music', backup: false, auto: false });
+
+      setStatus('Creando commit y subiendo a GitHub...');
+      const response = await fetch('/api/publish/github', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ message: 'Publish CMS content' })
+      });
+      const payload = await response.json();
+      if (!response.ok || !payload.ok) {
+        throw new Error(payload.error || 'No se pudo publicar a GitHub');
+      }
+
+      setStatus(payload.changed
+        ? `${payload.message}. GitHub Pages puede tardar cerca de un minuto en reflejarlo.`
+        : payload.message);
+    } catch (error) {
+      setStatus(`Publicación falló: ${error.message}`);
+    } finally {
+      if (publishButton) {
+        publishButton.disabled = !backendAvailable;
+        publishButton.textContent = previousLabel || 'Publicar a GitHub';
+      }
+    }
+  }
+
   async function previewMusicArchive() {
     if (mode !== 'music') return;
     previewCurrentEntry();
@@ -1600,38 +1651,46 @@
     if (collectionGallery) return collectionGallery;
 
     collectionGallery = document.createElement('div');
-    collectionGallery.className = 'admin-gallery-modal';
+    collectionGallery.className = 'image-viewer image-viewer--admin-review';
     collectionGallery.hidden = true;
+    collectionGallery.setAttribute('role', 'dialog');
+    collectionGallery.setAttribute('aria-modal', 'true');
+    collectionGallery.setAttribute('aria-label', 'Revisar galería');
     collectionGallery.innerHTML = `
-      <div class="admin-gallery-modal__backdrop" data-action="close-collection-gallery"></div>
-      <section class="admin-gallery-panel" role="dialog" aria-modal="true" aria-label="Revisar galería">
-        <header class="admin-gallery-panel__head">
-          <div>
-            <p class="eyebrow">Revisión</p>
-            <h2 data-gallery-title>Galería</h2>
-          </div>
-          <button type="button" class="admin-icon-button" data-action="close-collection-gallery" aria-label="Cerrar">×</button>
-        </header>
-        <div class="admin-gallery-layout">
-          <div class="admin-gallery-stage">
-            <button type="button" class="admin-gallery-nav admin-gallery-nav--prev" data-action="gallery-prev" aria-label="Anterior">‹</button>
-            <div class="admin-gallery-media" data-gallery-media></div>
-            <button type="button" class="admin-gallery-nav admin-gallery-nav--next" data-action="gallery-next" aria-label="Siguiente">›</button>
-          </div>
-          <aside class="admin-gallery-side">
-            <div>
-              <p class="eyebrow">Pieza activa</p>
-              <h3 data-gallery-item-title>Sin selección</h3>
-              <p data-gallery-item-path></p>
+      <button type="button" class="image-viewer__backdrop" data-action="close-collection-gallery" aria-label="Cerrar visor"></button>
+      <button type="button" class="image-viewer__close image-viewer__glass" data-action="close-collection-gallery" aria-label="Cerrar visor">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+      <button type="button" class="image-viewer__nav image-viewer__nav--prev" data-action="gallery-prev" aria-label="Anterior"><span aria-hidden="true">‹</span></button>
+      <button type="button" class="image-viewer__nav image-viewer__nav--next" data-action="gallery-next" aria-label="Siguiente"><span aria-hidden="true">›</span></button>
+      <div class="image-viewer__stage">
+        <div class="image-viewer__category" data-gallery-title></div>
+        <div class="image-viewer__shell">
+          <figure class="image-viewer__image-panel">
+            <div class="image-viewer__image-wrap" data-gallery-media></div>
+            <div class="image-viewer__tools">
+              <button type="button" class="image-viewer__tool image-viewer__glass image-viewer__delete" data-action="remove-gallery-item" aria-label="Quitar de colección">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M10 11v6M14 11v6M6 6l1 15h10l1-15"/></svg>
+              </button>
             </div>
-            <div class="admin-gallery-actions">
-              <button type="button" class="ghost admin-action--danger" data-action="remove-gallery-item">Quitar de colección</button>
-            </div>
+          </figure>
+          <aside class="image-viewer__meta image-viewer__meta--admin">
+            <dl class="image-viewer__meta-list" data-gallery-meta></dl>
             <div class="admin-gallery-strip" data-gallery-strip aria-label="Miniaturas"></div>
           </aside>
         </div>
-      </section>
+      </div>
     `;
+    collectionGallery.querySelector('[data-gallery-media]')?.addEventListener('dblclick', event => {
+      const image = collectionGallery.querySelector('.image-viewer__image');
+      if (!image) return;
+      const rect = image.getBoundingClientRect();
+      const originX = rect.width ? ((event.clientX - rect.left) / rect.width) * 100 : 50;
+      const originY = rect.height ? ((event.clientY - rect.top) / rect.height) * 100 : 50;
+      image.style.setProperty('--zoom-origin-x', `${Math.min(100, Math.max(0, originX))}%`);
+      image.style.setProperty('--zoom-origin-y', `${Math.min(100, Math.max(0, originY))}%`);
+      collectionGallery.classList.toggle('is-image-zoomed');
+    });
     collectionGallery.addEventListener('click', event => {
       const button = event.target.closest('[data-action]');
       if (!button) return;
@@ -1665,14 +1724,23 @@
     collectionGalleryIndex = Math.max(0, Math.min(index, items.length - 1));
     createCollectionGallery();
     collectionGallery.hidden = false;
-    document.body.classList.add('admin-gallery-open');
+    document.body.classList.add('image-viewer-open');
     renderCollectionGallery();
+    requestAnimationFrame(() => {
+      collectionGallery.classList.add('is-open');
+      collectionGallery.querySelector('[data-action="close-collection-gallery"]')?.focus({ preventScroll: true });
+    });
   }
 
   function closeCollectionGallery() {
     if (!collectionGallery) return;
-    collectionGallery.hidden = true;
-    document.body.classList.remove('admin-gallery-open');
+    collectionGallery.classList.remove('is-open', 'is-image-zoomed');
+    document.body.classList.remove('image-viewer-open');
+    window.setTimeout(() => {
+      if (collectionGallery && !collectionGallery.classList.contains('is-open')) {
+        collectionGallery.hidden = true;
+      }
+    }, 180);
   }
 
   function handleGlobalKeydown(event) {
@@ -1692,6 +1760,31 @@
     renderCollectionGallery();
   }
 
+  function renderGalleryMetadata(item, entry, index, total) {
+    const metaEl = collectionGallery?.querySelector('[data-gallery-meta]');
+    if (!metaEl) return;
+    const metadata = window.DE_LA_MANGA_IMAGE_METADATA?.[item.src] || {};
+    const rows = [
+      ['Categoría', entry.title || 'Colección'],
+      ['Índice', `${index + 1} / ${total}`],
+      ['Tipo', entry.type || 'Archivo'],
+      ['Cámara', metadata.camera],
+      ['Resolución', metadata.dimensions],
+      ['Fecha', metadata.date],
+      ['Proceso', metadata.software],
+      ['Ruta', item.src]
+    ].filter(([, value]) => value);
+
+    metaEl.replaceChildren();
+    rows.forEach(([label, value]) => {
+      const term = document.createElement('dt');
+      term.textContent = label;
+      const definition = document.createElement('dd');
+      definition.textContent = value;
+      metaEl.append(term, definition);
+    });
+  }
+
   function renderCollectionGallery() {
     if (!collectionGallery || collectionGallery.hidden) return;
     const entry = getCurrentEntry();
@@ -1706,18 +1799,19 @@
     const title = item.alt || item.caption || fileNameWithoutExtension(item.src) || `Pieza ${collectionGalleryIndex + 1}`;
     const titleEl = collectionGallery.querySelector('[data-gallery-title]');
     const mediaEl = collectionGallery.querySelector('[data-gallery-media]');
-    const itemTitleEl = collectionGallery.querySelector('[data-gallery-item-title]');
-    const itemPathEl = collectionGallery.querySelector('[data-gallery-item-path]');
     const stripEl = collectionGallery.querySelector('[data-gallery-strip]');
 
-    if (titleEl) titleEl.textContent = `${entry.title || 'Colección'} / ${collectionGalleryIndex + 1} de ${items.length}`;
-    if (itemTitleEl) itemTitleEl.textContent = title;
-    if (itemPathEl) itemPathEl.textContent = item.src;
-    if (mediaEl) {
-      mediaEl.innerHTML = isVideoPath(item.src)
-        ? `<video src="${escapeAttribute(item.src)}" controls playsinline preload="metadata"></video>`
-        : `<img src="${escapeAttribute(item.src)}" alt="${escapeAttribute(item.alt || title)}">`;
+    if (titleEl) {
+      titleEl.textContent = entry.title || 'Colección';
+      titleEl.dataset.counter = `${collectionGalleryIndex + 1} / ${items.length}`;
     }
+    if (mediaEl) {
+      collectionGallery.classList.remove('is-image-zoomed');
+      mediaEl.innerHTML = isVideoPath(item.src)
+        ? `<video class="image-viewer__image image-viewer__video" src="${escapeAttribute(item.src)}" controls playsinline preload="metadata"></video>`
+        : `<img class="image-viewer__image" src="${escapeAttribute(item.src)}" alt="${escapeAttribute(item.alt || title)}" draggable="false">`;
+    }
+    renderGalleryMetadata({ ...item, alt: title }, entry, collectionGalleryIndex, items.length);
     if (stripEl) {
       stripEl.innerHTML = items.map((galleryItem, index) => `
         <button type="button" class="admin-gallery-thumb ${index === collectionGalleryIndex ? 'is-active' : ''}" data-action="select-gallery-item" data-gallery-index="${index}" aria-label="Ver pieza ${index + 1}">
@@ -2324,6 +2418,7 @@
     if (action === 'reset-from-site') resetFromSite();
     if (action === 'copy-js') copyJs();
     if (action === 'download-js') exportData();
+    if (action === 'publish-github') publishToGitHub();
   });
 
   document.addEventListener('click', event => {
