@@ -3967,6 +3967,7 @@ body.image-viewer-open .fog {
 
 .image-viewer__image {
   display: block;
+  grid-area: 1 / 1;
   width: auto;
   max-width: min(100%, 880px);
   max-height: min(72svh, 720px);
@@ -3985,10 +3986,22 @@ body.image-viewer-open .fog {
     filter 420ms var(--viewer-ease);
 }
 
-.image-viewer__image.is-switching {
+.image-viewer__image--next {
   opacity: 0;
-  transform: translateY(10px) scale(0.985);
-  filter: blur(6px);
+  transform: translateY(0) scale(0.996);
+  filter: blur(4px);
+}
+
+.image-viewer__image.is-leaving {
+  opacity: 0;
+  transform: translateY(0) scale(1.004);
+  filter: blur(3px);
+}
+
+.image-viewer__image--next.is-entering {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
 }
 
 .image-viewer__tools {
@@ -5096,35 +5109,56 @@ body.prototype-home .window--origin::before {
   border-left: 1px solid rgba(238, 242, 232, 0.28);
   border-bottom: 1px solid rgba(238, 242, 232, 0.18);
   background:
-    linear-gradient(180deg, transparent calc(50% - 1px), rgba(238, 242, 232, 0.08) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)),
-    repeating-linear-gradient(180deg, transparent 0 16px, rgba(238, 242, 232, 0.18) 16px 17px, transparent 17px 25px),
+    repeating-linear-gradient(180deg, rgba(238, 242, 232, 0.2) 0 1px, transparent 1px 25px),
     linear-gradient(135deg, transparent 0 39%, rgba(238, 242, 232, 0.16) 39.4% 40%, transparent 40.4%),
     linear-gradient(135deg, transparent 0 57%, rgba(238, 242, 232, 0.24) 57.4% 58%, transparent 58.4%);
-  background-position: 0 0, 0 0, 0 0, 0 0;
-  background-size: 100% 100%, 100% 25px, 100% 100%, 100% 100%;
+  background-position: 0 calc(50% - 1px), 0 0, 0 0;
+  background-size: 100% 25px, 100% 100%, 100% 100%;
+}
+
+body.prototype-home .window--origin::after {
+  inset: 52px 34px 58px;
+  border: 0;
+  background:
+    linear-gradient(180deg, transparent calc(50% - 1px), rgba(114, 203, 102, 0.66) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px));
+  background-position: 0 0;
+  background-size: 100% 100%;
+  box-shadow: none;
+  opacity: 0.34;
 }
 
 body.prototype-home .window--origin:hover::before,
 body.prototype-home .window--origin:focus-visible::before {
   background:
-    linear-gradient(180deg, transparent calc(50% - 1px), rgba(114, 203, 102, 0.84) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)),
-    repeating-linear-gradient(180deg, transparent 0 16px, rgba(238, 242, 232, 0.22) 16px 17px, transparent 17px 25px),
+    repeating-linear-gradient(180deg, rgba(238, 242, 232, 0.24) 0 1px, transparent 1px 25px),
     linear-gradient(135deg, transparent 0 39%, rgba(238, 242, 232, 0.18) 39.4% 40%, transparent 40.4%),
     linear-gradient(135deg, transparent 0 57%, rgba(238, 242, 232, 0.3) 57.4% 58%, transparent 58.4%);
-  background-size: 100% 100%, 100% 25px, 100% 100%, 100% 100%;
+  background-size: 100% 25px, 100% 100%, 100% 100%;
   animation: originEscalator 1100ms linear infinite;
 }
 
+body.prototype-home .window--origin:hover::after,
+body.prototype-home .window--origin:focus-visible::after {
+  border: 0;
+  opacity: 1;
+  animation: originPulse 1100ms linear infinite;
+}
+
 body.prototype-home .window--music .wave {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  top: 50%;
   justify-content: center;
-  margin-top: 60px;
-  width: 100%;
+  width: auto;
+  margin-top: 0;
+  transform: translateY(-50%) scaleX(1);
 }
 
 body.prototype-home .window:hover .wave,
 body.prototype-home .window:focus-visible .wave {
   opacity: 1;
-  transform: scaleX(1.08);
+  transform: translateY(-50%) scaleX(1.08);
 }
 
 body.prototype-home .window--music:hover .wave i,
@@ -5259,17 +5293,17 @@ body.prototype-home .window--music:focus-visible .wave {
 
 @keyframes waveDrift {
   0% {
-    transform: translateX(-9px) scaleX(1.04);
+    transform: translate(-9px, -50%) scaleX(1.04);
   }
 
   100% {
-    transform: translateX(9px) scaleX(1.1);
+    transform: translate(9px, -50%) scaleX(1.1);
   }
 }
 
 @keyframes originEscalator {
   0% {
-    background-position: 0 0, 0 0, 0 0, 0 0;
+    background-position: 0 calc(50% - 1px), 0 0, 0 0;
     filter: brightness(1);
     transform: translateY(0);
   }
@@ -5279,9 +5313,36 @@ body.prototype-home .window--music:focus-visible .wave {
   }
 
   100% {
-    background-position: 0 0, 0 25px, 0 0, 0 0;
+    background-position: 0 calc(50% + 24px), 0 0, 0 0;
     filter: brightness(1.08);
     transform: translateY(0);
+  }
+}
+
+@keyframes originPulse {
+  0%,
+  100% {
+    opacity: 1;
+    filter: brightness(1.7);
+    box-shadow: 0 0 24px rgba(114, 203, 102, 0.24);
+  }
+
+  9% {
+    opacity: 0.72;
+    filter: brightness(1.2);
+    box-shadow: 0 0 12px rgba(114, 203, 102, 0.14);
+  }
+
+  42% {
+    opacity: 0.34;
+    filter: brightness(0.92);
+    box-shadow: 0 0 0 rgba(114, 203, 102, 0);
+  }
+
+  84% {
+    opacity: 0.48;
+    filter: brightness(1);
+    box-shadow: 0 0 8px rgba(114, 203, 102, 0.08);
   }
 }
 

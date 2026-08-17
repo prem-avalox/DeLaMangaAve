@@ -660,6 +660,7 @@ function initCollectionsPage() {
   let imageViewerItems = [];
   let imageViewerIndex = 0;
   let imageViewer = null;
+  let imageViewerTransitionId = 0;
 
   const isVideo = src => /\.(mp4|mov|webm)$/i.test(src || '');
 
@@ -808,11 +809,19 @@ function initCollectionsPage() {
     image.draggable = false;
     image.addEventListener('contextmenu', event => event.preventDefault());
 
+    const nextImage = document.createElement('img');
+    nextImage.className = 'image-viewer__image image-viewer__image--next';
+    nextImage.alt = '';
+    nextImage.decoding = 'async';
+    nextImage.draggable = false;
+    nextImage.setAttribute('aria-hidden', 'true');
+    nextImage.addEventListener('contextmenu', event => event.preventDefault());
+
     const tools = document.createElement('div');
     tools.className = 'image-viewer__tools';
     tools.append(fullscreenBtn, metadataBtn);
 
-    imageWrap.append(image);
+    imageWrap.append(image, nextImage);
     imagePanel.append(imageWrap, tools);
 
     const metaPanel = document.createElement('aside');
@@ -832,6 +841,7 @@ function initCollectionsPage() {
       stage,
       shell,
       image,
+      nextImage,
       category,
       metaPanel,
       metaRows,
@@ -917,18 +927,60 @@ function initCollectionsPage() {
     if (!imageViewerItems.length) return;
 
     const viewer = createImageViewer();
+    const transitionId = imageViewerTransitionId + 1;
+    imageViewerTransitionId = transitionId;
     imageViewerIndex = (index + imageViewerItems.length) % imageViewerItems.length;
     const item = imageViewerItems[imageViewerIndex];
+    const imageAlt = item.alt || `${item.collectionTitle} - imagen del archivo`;
+    const viewerIsOpen = viewer.overlay.classList.contains('is-open') && viewer.image.currentSrc;
 
     viewer.overlay.classList.remove('is-image-zoomed');
     viewer.image.style.removeProperty('--zoom-origin-x');
     viewer.image.style.removeProperty('--zoom-origin-y');
-    viewer.image.classList.add('is-switching');
-    window.setTimeout(() => {
+
+    const commitImage = () => {
+      if (transitionId !== imageViewerTransitionId) return;
+
+      if (!viewerIsOpen) {
+        viewer.image.src = item.src;
+        viewer.image.alt = imageAlt;
+        viewer.image.classList.remove('is-leaving');
+        viewer.nextImage.classList.remove('is-entering');
+        viewer.nextImage.removeAttribute('src');
+        return;
+      }
+
+      viewer.nextImage.src = item.src;
+      viewer.nextImage.classList.add('is-entering');
+      viewer.image.classList.add('is-leaving');
+
+      window.setTimeout(() => {
+        if (transitionId !== imageViewerTransitionId) return;
+
+        viewer.image.src = item.src;
+        viewer.image.alt = imageAlt;
+        viewer.image.classList.remove('is-leaving');
+        viewer.nextImage.classList.remove('is-entering');
+        viewer.nextImage.removeAttribute('src');
+      }, 430);
+    };
+
+    const preload = new Image();
+    preload.decoding = 'async';
+    preload.src = item.src;
+
+    if (viewerIsOpen && preload.decode) {
+      preload.decode().then(commitImage).catch(commitImage);
+    } else if (viewerIsOpen) {
+      preload.onload = commitImage;
+      preload.onerror = commitImage;
+    } else {
       viewer.image.src = item.src;
-      viewer.image.alt = item.alt || `${item.collectionTitle} - imagen del archivo`;
-      viewer.image.classList.remove('is-switching');
-    }, viewer.overlay.classList.contains('is-open') ? 140 : 0);
+      viewer.image.alt = imageAlt;
+      viewer.nextImage.removeAttribute('src');
+      viewer.image.classList.remove('is-leaving');
+      viewer.nextImage.classList.remove('is-entering');
+    }
 
     viewer.category.textContent = item.collectionTitle;
     viewer.category.dataset.counter = `${imageViewerIndex + 1} / ${imageViewerItems.length}`;
