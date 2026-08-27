@@ -910,7 +910,7 @@ function initCollectionsPage() {
 
   const renderViewerMetadata = item => {
     const viewer = createImageViewer();
-    const metadata = metadataBySrc[item.src] || {};
+    const metadata = metadataBySrc[item.originalSrc] || metadataBySrc[item.src] || {};
     const rows = formatViewerMetadataRows(metadata);
 
     viewer.metaRows.replaceChildren();
@@ -922,6 +922,35 @@ function initCollectionsPage() {
       viewer.metaRows.append(term, definition);
     });
   };
+
+  const preloadViewerImage = src => new Promise((resolve, reject) => {
+    if (!src) {
+      reject(new Error('Missing image source'));
+      return;
+    }
+
+    const preload = new Image();
+    preload.decoding = 'async';
+
+    const resolveWhenDecoded = () => {
+      if (!preload.naturalWidth) {
+        reject(new Error(`Image failed to load: ${src}`));
+        return;
+      }
+
+      if (preload.decode) {
+        preload.decode().catch(() => {}).finally(() => resolve(preload));
+      } else {
+        resolve(preload);
+      }
+    };
+
+    preload.onload = resolveWhenDecoded;
+    preload.onerror = () => reject(new Error(`Image failed to load: ${src}`));
+    preload.src = src;
+
+    if (preload.complete) resolveWhenDecoded();
+  });
 
   const showImageViewerItem = index => {
     if (!imageViewerItems.length) return;
@@ -935,6 +964,7 @@ function initCollectionsPage() {
     const viewerIsOpen = viewer.overlay.classList.contains('is-open') && viewer.image.currentSrc;
 
     viewer.overlay.classList.remove('is-image-zoomed');
+    viewer.overlay.classList.add('is-loading');
     viewer.image.style.removeProperty('--zoom-origin-x');
     viewer.image.style.removeProperty('--zoom-origin-y');
 
@@ -944,49 +974,52 @@ function initCollectionsPage() {
       if (!viewerIsOpen) {
         viewer.image.src = item.src;
         viewer.image.alt = imageAlt;
+        viewer.image.removeAttribute('aria-hidden');
         viewer.image.classList.remove('is-leaving');
         viewer.nextImage.classList.remove('is-entering');
+        viewer.nextImage.classList.add('image-viewer__image--next');
+        viewer.nextImage.setAttribute('aria-hidden', 'true');
         viewer.nextImage.removeAttribute('src');
+        viewer.overlay.classList.remove('is-loading');
         return;
       }
 
-      viewer.nextImage.src = item.src;
-      viewer.nextImage.classList.add('is-entering');
-      viewer.image.classList.add('is-leaving');
+      const leavingImage = viewer.image;
+      const enteringImage = viewer.nextImage;
+
+      enteringImage.src = item.src;
+      enteringImage.alt = imageAlt;
+      enteringImage.removeAttribute('aria-hidden');
+      enteringImage.classList.add('is-entering');
+      leavingImage.classList.add('is-leaving');
 
       window.setTimeout(() => {
         if (transitionId !== imageViewerTransitionId) return;
 
-        viewer.image.src = item.src;
-        viewer.image.alt = imageAlt;
-        viewer.image.classList.remove('is-leaving');
-        viewer.nextImage.classList.remove('is-entering');
-        viewer.nextImage.removeAttribute('src');
+        enteringImage.classList.remove('image-viewer__image--next', 'is-entering');
+        leavingImage.classList.remove('is-leaving');
+        leavingImage.classList.add('image-viewer__image--next');
+        leavingImage.setAttribute('aria-hidden', 'true');
+        leavingImage.removeAttribute('src');
+
+        viewer.image = enteringImage;
+        viewer.nextImage = leavingImage;
+        viewer.overlay.classList.remove('is-loading');
       }, 430);
     };
-
-    const preload = new Image();
-    preload.decoding = 'async';
-    preload.src = item.src;
-
-    if (viewerIsOpen && preload.decode) {
-      preload.decode().then(commitImage).catch(commitImage);
-    } else if (viewerIsOpen) {
-      preload.onload = commitImage;
-      preload.onerror = commitImage;
-    } else {
-      viewer.image.src = item.src;
-      viewer.image.alt = imageAlt;
-      viewer.nextImage.removeAttribute('src');
-      viewer.image.classList.remove('is-leaving');
-      viewer.nextImage.classList.remove('is-entering');
-    }
 
     viewer.category.textContent = item.collectionTitle;
     viewer.category.dataset.counter = `${imageViewerIndex + 1} / ${imageViewerItems.length}`;
     viewer.prevBtn.disabled = imageViewerItems.length < 2;
     viewer.nextBtn.disabled = imageViewerItems.length < 2;
     renderViewerMetadata(item);
+
+    preloadViewerImage(item.src)
+      .then(commitImage)
+      .catch(() => {
+        if (transitionId !== imageViewerTransitionId) return;
+        viewer.overlay.classList.remove('is-loading');
+      });
   };
 
   const openImageViewer = index => {
