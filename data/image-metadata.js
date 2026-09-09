@@ -759,6 +759,27 @@ window.DE_LA_MANGA_IMAGE_METADATA = {
     "software": "Adobe Lightroom 11.4.5 (Android)",
     "date": "2026-07-27 19:34:15"
   },
+  "assets/photography/retratos/full/pxl-20260818-233330210-raw-02-original.jpg": {
+    "dimensions": "3056 x 4064",
+    "camera": "Google Pixel 6",
+    "software": "Adobe Lightroom 11.5.01 (Android)",
+    "date": "2026-08-18 23:33:30",
+    "copyright": "Martín Dávalos | @anotherguycalledmartin"
+  },
+  "assets/photography/retratos/full/pxl-20260823-193759031-raw-02-original.jpg": {
+    "dimensions": "1663 x 2217",
+    "camera": "Google Pixel 6",
+    "software": "Adobe Lightroom 11.5.01 (Android)",
+    "date": "2026-08-23 19:37:58",
+    "copyright": "Martín Dávalos | @anotherguycalledmartin"
+  },
+  "assets/photography/retratos/full/pxl-20260823-194741869-raw-02-original.jpg": {
+    "dimensions": "2194 x 2926",
+    "camera": "Google Pixel 6",
+    "software": "Adobe Lightroom 11.5.01 (Android)",
+    "date": "2026-08-23 19:47:41",
+    "copyright": "Martín Dávalos | @anotherguycalledmartin"
+  },
   "assets/photography/sesiones/full/001-img-5630.jpg": {
     "dimensions": "1350 x 1800",
     "camera": "Canon Canon EOS Rebel T7i",
