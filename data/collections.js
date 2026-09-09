@@ -11,7 +11,7 @@ window.DE_LA_MANGA_COLLECTIONS = [
       "retrato",
       "personas",
       "edición",
-      "33 imágenes"
+      "36 imágenes"
     ],
     "items": [
       {
@@ -211,6 +211,24 @@ window.DE_LA_MANGA_COLLECTIONS = [
         "alt": "Retratos 33 - archivo visual De La Manga",
         "caption": "Retratos / 33",
         "originalSrc": "assets/photography/retratos/full/033-received-1414685769216916.jpg"
+      },
+      {
+        "src": "assets/photography/retratos/web/pxl-20260818-233330210-raw-02-original.webp",
+        "alt": "PXL 20260818 233330210.RAW 02.ORIGINAL",
+        "caption": "Retratos / 34",
+        "originalSrc": "assets/photography/retratos/full/pxl-20260818-233330210-raw-02-original.jpg"
+      },
+      {
+        "src": "assets/photography/retratos/web/pxl-20260823-193759031-raw-02-original.webp",
+        "alt": "PXL 20260823 193759031.RAW 02.ORIGINAL",
+        "caption": "Retratos / 35",
+        "originalSrc": "assets/photography/retratos/full/pxl-20260823-193759031-raw-02-original.jpg"
+      },
+      {
+        "src": "assets/photography/retratos/web/pxl-20260823-194741869-raw-02-original.webp",
+        "alt": "PXL 20260823 194741869.RAW 02.ORIGINAL",
+        "caption": "Retratos / 36",
+        "originalSrc": "assets/photography/retratos/full/pxl-20260823-194741869-raw-02-original.jpg"
       }
     ],
     "originalCover": "assets/photography/retratos/full/001-pxl-20260623-235506503-night-cover.jpg"

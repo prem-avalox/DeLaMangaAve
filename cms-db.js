@@ -156,6 +156,7 @@ function createSchema() {
       id INTEGER PRIMARY KEY,
       collection_id INTEGER NOT NULL REFERENCES collections(id) ON DELETE CASCADE,
       media_asset_id INTEGER REFERENCES media_assets(id) ON DELETE SET NULL,
+      original_asset_id INTEGER REFERENCES media_assets(id) ON DELETE SET NULL,
       alt TEXT,
       caption TEXT,
       sort_order INTEGER NOT NULL
@@ -171,6 +172,7 @@ function createSchema() {
   `);
   ensureColumn('music_archives', 'sort_order', 'INTEGER NOT NULL DEFAULT 0');
   ensureColumn('collections', 'sort_order', 'INTEGER NOT NULL DEFAULT 0');
+  ensureColumn('collection_items', 'original_asset_id', 'INTEGER REFERENCES media_assets(id) ON DELETE SET NULL');
 }
 
 function ensureColumn(table, column, definition) {
@@ -527,8 +529,8 @@ function replaceCollections(collections) {
     VALUES (?, ?, ?)
   `);
   const insertItem = db.prepare(`
-    INSERT INTO collection_items (collection_id, media_asset_id, alt, caption, sort_order)
-    VALUES (?, ?, ?, ?, ?)
+    INSERT INTO collection_items (collection_id, media_asset_id, original_asset_id, alt, caption, sort_order)
+    VALUES (?, ?, ?, ?, ?, ?)
   `);
 
   collections.forEach((collection, collectionIndex) => {
@@ -555,9 +557,13 @@ function replaceCollections(collections) {
       const mediaAssetId = upsertAsset(item.src, {
         title: item.alt || item.caption || `${collection.title || collection.id || 'Colección'} item ${index + 1}`
       });
+      const originalAssetId = upsertAsset(item.originalSrc, {
+        title: item.alt || item.caption || `${collection.title || collection.id || 'Colección'} original ${index + 1}`
+      });
       insertItem.run(
         collectionId,
         mediaAssetId,
+        originalAssetId,
         item.alt || '',
         item.caption || '',
         index
@@ -840,9 +846,14 @@ function getCollectionTags(collectionId) {
 
 function getCollectionItems(collectionId) {
   return db.prepare(`
-    SELECT asset.file_path AS src, collection_items.alt, collection_items.caption
+    SELECT
+      asset.file_path AS src,
+      original.file_path AS originalSrc,
+      collection_items.alt,
+      collection_items.caption
     FROM collection_items
     LEFT JOIN media_assets AS asset ON asset.id = collection_items.media_asset_id
+    LEFT JOIN media_assets AS original ON original.id = collection_items.original_asset_id
     WHERE collection_items.collection_id = ?
     ORDER BY collection_items.sort_order
   `).all(collectionId);

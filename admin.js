@@ -478,7 +478,8 @@
         ? collection.items.map(item => ({
           src: item.src?.trim() || '',
           alt: item.alt?.trim() || '',
-          caption: item.caption?.trim() || ''
+          caption: item.caption?.trim() || '',
+          originalSrc: item.originalSrc?.trim() || ''
         })).filter(item => item.src)
         : []
     };
@@ -1098,6 +1099,7 @@
           </div>
           <div class="admin-collection-item-card__fields">
           ${mediaField('Archivo', 'item-src', item.src, 'collection-media', '', 'assets/photography/serie/full/imagen.jpg')}
+            <input type="hidden" name="item-originalSrc" value="${escapeAttribute(item.originalSrc || '')}">
             <div class="admin-grid admin-grid--two">
               ${field('Texto alternativo', 'item-alt', item.alt)}
               ${field('Caption', 'item-caption', item.caption)}
@@ -1271,7 +1273,8 @@
         items: readRows('collection-item', row => ({
           src: row.querySelector('[name="item-src"]').value,
           alt: row.querySelector('[name="item-alt"]').value,
-          caption: row.querySelector('[name="item-caption"]').value
+          caption: row.querySelector('[name="item-caption"]').value,
+          originalSrc: row.querySelector('[name="item-originalSrc"]')?.value || ''
         }))
       });
     }
@@ -2050,7 +2053,8 @@
       entry.items.push({
         src: file.path,
         alt: fileTitle(selectedFiles[index]?.name || file.name),
-        caption: ''
+        caption: '',
+        originalSrc: file.originalPath || ''
       });
     });
 

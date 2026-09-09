@@ -897,7 +897,6 @@ function initCollectionsPage() {
       ['Resolución', metadata.dimensions],
       ['Fecha', metadata.date],
       ['Proceso', metadata.software],
-      ['GPS', metadata.gps],
       ['Crédito', metadata.copyright]
     ].filter(([, value]) => value);
 
