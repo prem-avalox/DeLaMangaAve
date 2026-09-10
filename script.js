@@ -661,8 +661,44 @@ function initCollectionsPage() {
   let imageViewerIndex = 0;
   let imageViewer = null;
   let imageViewerTransitionId = 0;
+  let imageViewerLoadingTimer = null;
 
   const isVideo = src => /\.(mp4|mov|webm)$/i.test(src || '');
+  const lazyMediaObserver = 'IntersectionObserver' in window
+    ? new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        loadLazyMedia(entry.target);
+        lazyMediaObserver.unobserve(entry.target);
+      });
+    }, { rootMargin: '420px 0px' })
+    : null;
+
+  const loadLazyMedia = media => {
+    const src = media.dataset.src;
+    if (!src) return;
+
+    if (media.tagName === 'IMG' && media.dataset.alt) {
+      media.alt = media.dataset.alt;
+    }
+
+    media.src = src;
+    media.removeAttribute('data-src');
+
+    if (media.tagName === 'VIDEO') {
+      media.play?.().catch(() => {});
+    }
+  };
+
+  const observeLazyMedia = media => {
+    if (!media?.dataset?.src) return;
+
+    if (lazyMediaObserver) {
+      lazyMediaObserver.observe(media);
+    } else {
+      loadLazyMedia(media);
+    }
+  };
 
   const createMedia = item => {
     if (!item?.src) {
@@ -671,7 +707,7 @@ function initCollectionsPage() {
 
     const media = isVideo(item.src) ? document.createElement('video') : document.createElement('img');
     media.className = 'collection-media__asset';
-    media.src = item.src;
+    media.dataset.src = item.src;
 
     if (isVideo(item.src)) {
       media.muted = true;
@@ -679,15 +715,16 @@ function initCollectionsPage() {
       media.playsInline = true;
       media.autoplay = true;
       media.setAttribute('aria-label', item.alt || item.caption || '');
-      media.play?.().catch(() => {});
     } else {
-      media.alt = item.alt || item.caption || '';
+      media.alt = '';
+      media.dataset.alt = item.alt || item.caption || '';
       media.loading = 'lazy';
       media.decoding = 'async';
       media.draggable = false;
       media.addEventListener('contextmenu', event => event.preventDefault());
     }
 
+    observeLazyMedia(media);
     return media;
   };
 
@@ -817,11 +854,15 @@ function initCollectionsPage() {
     nextImage.setAttribute('aria-hidden', 'true');
     nextImage.addEventListener('contextmenu', event => event.preventDefault());
 
+    const loader = document.createElement('div');
+    loader.className = 'image-viewer__loader';
+    loader.setAttribute('aria-hidden', 'true');
+
     const tools = document.createElement('div');
     tools.className = 'image-viewer__tools';
     tools.append(fullscreenBtn, metadataBtn);
 
-    imageWrap.append(image, nextImage);
+    imageWrap.append(image, nextImage, loader);
     imagePanel.append(imageWrap, tools);
 
     const metaPanel = document.createElement('aside');
@@ -842,6 +883,7 @@ function initCollectionsPage() {
       shell,
       image,
       nextImage,
+      loader,
       category,
       metaPanel,
       metaRows,
@@ -951,7 +993,67 @@ function initCollectionsPage() {
     if (preload.complete) resolveWhenDecoded();
   });
 
-  const showImageViewerItem = index => {
+  const scheduleViewerLoading = (viewer, transitionId) => {
+    window.clearTimeout(imageViewerLoadingTimer);
+    viewer.overlay.classList.remove('is-loading');
+    imageViewerLoadingTimer = window.setTimeout(() => {
+      if (transitionId === imageViewerTransitionId) {
+        viewer.overlay.classList.add('is-loading');
+      }
+    }, 160);
+  };
+
+  const clearViewerLoading = viewer => {
+    window.clearTimeout(imageViewerLoadingTimer);
+    imageViewerLoadingTimer = null;
+    viewer.overlay.classList.remove('is-loading');
+  };
+
+  const decodeViewerImage = image => {
+    if (image.decode) {
+      return image.decode().catch(() => {});
+    }
+
+    if (image.complete) {
+      return Promise.resolve();
+    }
+
+    return new Promise((resolve, reject) => {
+      image.addEventListener('load', resolve, { once: true });
+      image.addEventListener('error', reject, { once: true });
+    });
+  };
+
+  const prepareViewerImage = async (image, item, imageAlt, transitionId) => {
+    image.classList.add('image-viewer__image--next');
+    image.classList.remove('is-entering', 'is-leaving');
+    image.setAttribute('aria-hidden', 'true');
+    image.alt = '';
+    image.removeAttribute('data-src');
+
+    if (image.getAttribute('src') !== item.src) {
+      image.src = item.src;
+    }
+
+    await decodeViewerImage(image);
+    if (transitionId !== imageViewerTransitionId) return false;
+
+    image.alt = imageAlt;
+    image.dataset.src = item.src;
+    image.removeAttribute('aria-hidden');
+    return true;
+  };
+
+  const warmNearbyViewerImages = () => {
+    if (imageViewerItems.length < 2) return;
+
+    [imageViewerIndex - 1, imageViewerIndex + 1].forEach(index => {
+      const item = imageViewerItems[(index + imageViewerItems.length) % imageViewerItems.length];
+      if (item?.src) preloadViewerImage(item.src).catch(() => {});
+    });
+  };
+
+  const showImageViewerItem = async index => {
     if (!imageViewerItems.length) return;
 
     const viewer = createImageViewer();
@@ -960,52 +1062,12 @@ function initCollectionsPage() {
     imageViewerIndex = (index + imageViewerItems.length) % imageViewerItems.length;
     const item = imageViewerItems[imageViewerIndex];
     const imageAlt = item.alt || `${item.collectionTitle} - imagen del archivo`;
-    const viewerIsOpen = viewer.overlay.classList.contains('is-open') && viewer.image.currentSrc;
+    const viewerIsOpen = viewer.overlay.classList.contains('is-open') && viewer.image.dataset.src;
 
     viewer.overlay.classList.remove('is-image-zoomed');
-    viewer.overlay.classList.add('is-loading');
+    scheduleViewerLoading(viewer, transitionId);
     viewer.image.style.removeProperty('--zoom-origin-x');
     viewer.image.style.removeProperty('--zoom-origin-y');
-
-    const commitImage = () => {
-      if (transitionId !== imageViewerTransitionId) return;
-
-      if (!viewerIsOpen) {
-        viewer.image.src = item.src;
-        viewer.image.alt = imageAlt;
-        viewer.image.removeAttribute('aria-hidden');
-        viewer.image.classList.remove('is-leaving');
-        viewer.nextImage.classList.remove('is-entering');
-        viewer.nextImage.classList.add('image-viewer__image--next');
-        viewer.nextImage.setAttribute('aria-hidden', 'true');
-        viewer.nextImage.removeAttribute('src');
-        viewer.overlay.classList.remove('is-loading');
-        return;
-      }
-
-      const leavingImage = viewer.image;
-      const enteringImage = viewer.nextImage;
-
-      enteringImage.src = item.src;
-      enteringImage.alt = imageAlt;
-      enteringImage.removeAttribute('aria-hidden');
-      enteringImage.classList.add('is-entering');
-      leavingImage.classList.add('is-leaving');
-
-      window.setTimeout(() => {
-        if (transitionId !== imageViewerTransitionId) return;
-
-        enteringImage.classList.remove('image-viewer__image--next', 'is-entering');
-        leavingImage.classList.remove('is-leaving');
-        leavingImage.classList.add('image-viewer__image--next');
-        leavingImage.setAttribute('aria-hidden', 'true');
-        leavingImage.removeAttribute('src');
-
-        viewer.image = enteringImage;
-        viewer.nextImage = leavingImage;
-        viewer.overlay.classList.remove('is-loading');
-      }, 430);
-    };
 
     viewer.category.textContent = item.collectionTitle;
     viewer.category.dataset.counter = `${imageViewerIndex + 1} / ${imageViewerItems.length}`;
@@ -1013,12 +1075,58 @@ function initCollectionsPage() {
     viewer.nextBtn.disabled = imageViewerItems.length < 2;
     renderViewerMetadata(item);
 
-    preloadViewerImage(item.src)
-      .then(commitImage)
-      .catch(() => {
+    try {
+      await preloadViewerImage(item.src);
+      if (transitionId !== imageViewerTransitionId) return;
+
+      if (!viewerIsOpen) {
+        const ready = await prepareViewerImage(viewer.image, item, imageAlt, transitionId);
+        if (!ready) return;
+        clearViewerLoading(viewer);
+        viewer.image.classList.remove('image-viewer__image--next', 'is-entering', 'is-leaving');
+        viewer.nextImage.classList.remove('is-entering', 'is-leaving');
+        viewer.nextImage.classList.add('image-viewer__image--next');
+        viewer.nextImage.setAttribute('aria-hidden', 'true');
+        viewer.nextImage.alt = '';
+        viewer.nextImage.removeAttribute('src');
+        viewer.nextImage.removeAttribute('data-src');
+        warmNearbyViewerImages();
+        return;
+      }
+
+      const leavingImage = viewer.image;
+      const enteringImage = viewer.nextImage;
+      const ready = await prepareViewerImage(enteringImage, item, imageAlt, transitionId);
+      if (!ready) return;
+      clearViewerLoading(viewer);
+
+      requestAnimationFrame(() => {
         if (transitionId !== imageViewerTransitionId) return;
-        viewer.overlay.classList.remove('is-loading');
+
+        enteringImage.classList.add('is-entering');
+        leavingImage.classList.add('is-leaving');
+
+        window.setTimeout(() => {
+          if (transitionId !== imageViewerTransitionId) return;
+
+          enteringImage.classList.remove('image-viewer__image--next', 'is-entering', 'is-leaving');
+          leavingImage.classList.remove('is-leaving', 'is-entering');
+          leavingImage.classList.add('image-viewer__image--next');
+          leavingImage.setAttribute('aria-hidden', 'true');
+          leavingImage.alt = '';
+          leavingImage.removeAttribute('src');
+          leavingImage.removeAttribute('data-src');
+
+          viewer.image = enteringImage;
+          viewer.nextImage = leavingImage;
+          clearViewerLoading(viewer);
+          warmNearbyViewerImages();
+        }, 360);
       });
+    } catch (error) {
+      if (transitionId !== imageViewerTransitionId) return;
+      clearViewerLoading(viewer);
+    }
   };
 
   const openImageViewer = index => {
