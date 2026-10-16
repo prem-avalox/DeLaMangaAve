@@ -291,6 +291,15 @@
           winColor.classList.remove('is-lighting');
           winColor.classList.add('is-extinguishing');
         });
+
+        const colorLayer = winColor.querySelector('.cylinder-color-layer');
+        if (colorLayer) {
+          colorLayer.addEventListener('animationend', (e) => {
+            if (e.animationName === 'cylinderFeatherOut') {
+              winColor.classList.remove('is-extinguishing');
+            }
+          });
+        }
       }
     })();
   </script>
