@@ -5884,3 +5884,163 @@ body.prototype-home .footer {
     padding: 20px;
   }
 }
+
+/* ── About Page Centered Layout ──────────────────────────────── */
+body.page-about .page-header {
+  max-width: 800px;
+  min-height: clamp(200px, 34svh, 360px);
+  margin-inline: auto;
+  text-align: center;
+  justify-items: center;
+  align-content: end;
+  padding: 44px 0 28px;
+}
+
+body.page-about .page-header .eyebrow {
+  justify-content: center;
+}
+
+body.page-about .page-header__title {
+  max-width: none;
+  text-align: center;
+  margin-inline: auto;
+}
+
+body.page-about .stack {
+  max-width: 800px;
+  margin-inline: auto;
+  padding: 0 var(--page-gutter);
+}
+
+body.page-about .panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+}
+
+body.page-about .panel__head {
+  max-width: 100%;
+  margin-inline: auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+body.page-about .panel__head .eyebrow {
+  justify-content: center;
+}
+
+body.page-about .panel__title-group {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+body.page-about .panel__title-group h2 {
+  text-align: center;
+  margin-inline: auto;
+}
+
+body.page-about .panel__title-group p {
+  text-align: center;
+  margin-inline: auto;
+  max-width: var(--measure-prose);
+}
+
+body.page-about .panel > h2 {
+  text-align: center;
+  margin: 0 auto 24px;
+  font-size: clamp(28px, 4vw, 48px);
+}
+
+body.page-about .about__body {
+  margin-inline: auto;
+  text-align: center;
+  max-width: var(--measure-prose);
+  width: 100%;
+  justify-items: center;
+}
+
+body.page-about .about__body p {
+  text-align: center;
+  margin-inline: auto;
+  max-width: var(--measure-prose);
+}
+
+body.page-about .about__body h3 {
+  text-align: center;
+  margin: 32px auto 16px;
+  font-family: var(--font-artistic);
+  font-size: var(--text-lg);
+  color: var(--ink);
+  text-transform: uppercase;
+}
+
+body.page-about .about__body h4 {
+  text-align: center;
+  margin: 28px auto 14px;
+  font-family: var(--font-impact);
+  font-size: var(--text-sm);
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+body.page-about .about__body ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 auto 24px;
+  display: grid;
+  gap: 10px;
+  text-align: center;
+  justify-items: center;
+  width: 100%;
+}
+
+body.page-about .about__body li {
+  text-align: center;
+  padding: 0;
+  font-size: var(--text-base);
+  line-height: var(--leading-loose);
+  color: var(--muted);
+  max-width: var(--measure-prose);
+  margin-inline: auto;
+}
+
+body.page-about .map {
+  width: 100%;
+  max-width: 800px;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+body.page-about .map__frame {
+  width: 100%;
+  max-width: 800px;
+  margin-inline: auto;
+}
+
+body.page-about .map__note {
+  text-align: center;
+  margin-inline: auto;
+}
+
+body.page-about .footer {
+  max-width: 800px;
+  margin-inline: auto;
+  justify-content: center;
+  text-align: center;
+  position: relative;
+}
+
+body.page-about .footer::before {
+  left: 50%;
+  transform: translateX(-50%);
+}
