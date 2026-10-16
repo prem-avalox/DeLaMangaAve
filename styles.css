@@ -6019,12 +6019,32 @@ body.prototype-home .window--origin:focus-visible .origin-stage {
   z-index: 2;
 }
 
-/* Escalones que bajan perpetuamente de arriba a abajo, cortados por la diagonal */
+/* Escalones que bajan perpetuamente de arriba a abajo, cortados por la diagonal con difuminado orgánico en los bordes */
 .origin-ladder {
   position: absolute;
   inset: 0;
   z-index: 1;
   animation: originStepsScroll 700ms linear infinite;
+  -webkit-mask-image: linear-gradient(to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.2) 3%,
+    rgba(0, 0, 0, 0.6) 6%,
+    #000000 10%,
+    #000000 88%,
+    rgba(0, 0, 0, 0.6) 94%,
+    rgba(0, 0, 0, 0.2) 97%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.2) 3%,
+    rgba(0, 0, 0, 0.6) 6%,
+    #000000 10%,
+    #000000 88%,
+    rgba(0, 0, 0, 0.6) 94%,
+    rgba(0, 0, 0, 0.2) 97%,
+    transparent 100%
+  );
 }
 
 .origin-step {
