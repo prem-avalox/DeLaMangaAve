@@ -862,7 +862,11 @@ function initCollectionsPage() {
     tools.className = 'image-viewer__tools';
     tools.append(fullscreenBtn, metadataBtn);
 
-    imageWrap.append(image, nextImage, loader);
+    const watermark = document.createElement('div');
+    watermark.className = 'image-viewer__watermark';
+    watermark.setAttribute('aria-hidden', 'true');
+
+    imageWrap.append(image, nextImage, watermark, loader);
     imagePanel.append(imageWrap, tools);
 
     const metaPanel = document.createElement('aside');

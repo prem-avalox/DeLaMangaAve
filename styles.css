@@ -3332,11 +3332,18 @@ body::after {
 }
 
 .nav__brand {
+  display: inline-flex;
+  align-items: center;
   color: var(--ink);
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.18em;
   text-shadow: none;
+}
+
+.nav__brand a {
+  display: inline-flex;
+  align-items: center;
 }
 
 .nav__links {
@@ -4143,6 +4150,27 @@ body.image-viewer-open .fog {
   opacity: 0;
   transform: translateY(0) scale(1);
   filter: blur(0);
+}
+
+.image-viewer__watermark {
+  position: absolute;
+  right: 24px;
+  bottom: 24px;
+  width: 58px;
+  height: 28px;
+  background: url("assets/brand/delamanga-watermark.svg") no-repeat center / contain;
+  pointer-events: none;
+  z-index: 8;
+  transition: opacity 300ms ease;
+}
+
+@media (max-width: 720px) {
+  .image-viewer__watermark {
+    right: 14px;
+    bottom: 14px;
+    width: 44px;
+    height: 21px;
+  }
 }
 
 .image-viewer__image--next.is-entering {
@@ -4975,9 +5003,25 @@ body.prototype-home .topbar nav a {
 }
 
 body.prototype-home .brand {
+  display: inline-flex;
+  align-items: center;
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.18em;
+}
+
+.brand-logo {
+  display: block;
+  height: 22px;
+  width: auto;
+  max-width: 170px;
+  object-fit: contain;
+  transition: opacity 280ms ease, filter 280ms ease;
+}
+
+body.prototype-home .brand:hover .brand-logo,
+.nav__brand a:hover .brand-logo {
+  filter: drop-shadow(0 0 14px rgba(255, 255, 255, 0.45));
 }
 
 body.prototype-home .topbar nav {
@@ -5036,6 +5080,20 @@ body.prototype-home h1 {
   letter-spacing: 0;
   line-height: 0.84;
   text-transform: uppercase;
+}
+
+body.prototype-home h1.hero-brand {
+  max-width: none;
+  font-size: 0;
+  line-height: 0;
+}
+
+body.prototype-home .hero-brand__logo {
+  display: block;
+  width: clamp(210px, 28vw, 320px);
+  max-width: 100%;
+  height: auto;
+  filter: drop-shadow(0 0 35px rgba(255, 255, 255, 0.08));
 }
 
 body.prototype-home .statement {
