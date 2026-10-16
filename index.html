@@ -71,26 +71,70 @@
     <section id="ventanas" class="windows windows--home" aria-label="Entradas principales">
       <a class="window window--color" href="servicios.html">
         <span>Servicios</span>
+        <div class="window-graphic window-graphic--cylinder" aria-hidden="true">
+          <div class="cylinder-mesh"></div>
+          <div class="cylinder-specular"></div>
+        </div>
         <small>Color, video y postproducción</small>
       </a>
 
       <a class="window window--photo" href="colecciones.html">
         <span>Fotografía</span>
-        <small>Composición y post-producción</small>
+        <div class="window-graphic window-graphic--viewfinder" aria-hidden="true">
+          <div class="hud-frame">
+            <span class="hud-meta hud-meta--tl">REC <i class="rec-dot"></i></span>
+            <span class="hud-meta hud-meta--tr">WB 5600K</span>
+            <div class="hud-brackets">
+              <span class="bracket-tl"></span>
+              <span class="bracket-tr"></span>
+              <span class="bracket-bl"></span>
+              <span class="bracket-br"></span>
+            </div>
+            <div class="hud-reticle"></div>
+            <span class="hud-meta hud-meta--bl">f/2.8</span>
+            <span class="hud-meta hud-meta--br">1/250s</span>
+          </div>
+        </div>
+        <small>Composición y postproducción</small>
       </a>
 
       <a class="window window--music" href="musica.html">
         <span>Música</span>
-        <div class="wave" aria-hidden="true">
-          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        <div class="window-graphic window-graphic--vital" aria-hidden="true">
+          <div class="vital-scope">
+            <div class="vital-centerline"></div>
+            <svg class="vital-wave" viewBox="0 0 320 120" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="vitalGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="rgba(114, 203, 102, 0.25)"/>
+                  <stop offset="30%" stop-color="rgba(114, 203, 102, 0.95)"/>
+                  <stop offset="50%" stop-color="rgba(238, 242, 232, 1)"/>
+                  <stop offset="70%" stop-color="rgba(114, 203, 102, 0.95)"/>
+                  <stop offset="100%" stop-color="rgba(114, 203, 102, 0.25)"/>
+                </linearGradient>
+              </defs>
+              <path class="vital-path vital-path--glow" d="M0,60 L24,60 L40,42 L56,78 L72,32 L88,88 L104,22 L120,98 L136,12 L152,108 L168,18 L184,102 L200,28 L216,92 L232,38 L248,82 L264,48 L280,72 L296,60 L320,60"/>
+              <path class="vital-path vital-path--core" d="M0,60 L24,60 L40,42 L56,78 L72,32 L88,88 L104,22 L120,98 L136,12 L152,108 L168,18 L184,102 L200,28 L216,92 L232,38 L248,82 L264,48 L280,72 L296,60 L320,60"/>
+            </svg>
+            <div class="vital-scale">
+              <span>+6dB</span>
+              <span>0dB</span>
+              <span>-6dB</span>
+            </div>
+          </div>
         </div>
         <small>Producción, composición e interpretación</small>
       </a>
 
       <a class="window window--origin" href="about.html">
         <span>Origen</span>
-        <p>La historia detrás del nombre, el archivo y el proceso.</p>
+        <div class="window-graphic window-graphic--stairs" aria-hidden="true">
+          <div class="stairs-tracks"></div>
+          <div class="stairs-ladder">
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+          </div>
+          <div class="stairs-scanner"></div>
+        </div>
         <small>Acerca / biografía</small>
       </a>
     </section>
