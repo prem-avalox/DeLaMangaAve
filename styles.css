@@ -5487,14 +5487,6 @@ body.prototype-home .window:active {
   transform: scale(1.012);
 }
 
-body.prototype-home .window--origin:hover,
-body.prototype-home .window--origin:focus-visible {
-  background: var(--surface);
-  border-color: var(--line);
-  box-shadow: none;
-  transform: none;
-}
-
 body.prototype-home .window:hover::before,
 body.prototype-home .window:focus-visible::before {
   opacity: 0.92;
@@ -5545,18 +5537,6 @@ body.prototype-home .window:focus-visible > small {
   text-shadow: 0 0 14px rgba(114, 203, 102, 0.18);
 }
 
-body.prototype-home .window--origin:hover > span,
-body.prototype-home .window--origin:focus-visible > span {
-  color: var(--ink);
-  text-shadow: none;
-}
-
-body.prototype-home .window--origin:hover > small,
-body.prototype-home .window--origin:focus-visible > small {
-  color: var(--muted);
-  text-shadow: none;
-}
-
 body.prototype-home .window p {
   position: relative;
   z-index: 2;
@@ -5585,54 +5565,79 @@ body.prototype-home .window:focus-visible .window-graphic {
   transform: scale(1.035);
 }
 
-/* 1. Servicios: Cilindro Deformado con Ilusión Óptica 3D */
+/* 1. Servicios: Cilindro Deformado 3D con Reja Fija y Gradiente Activo en Hover */
 .window-graphic--cylinder {
-  clip-path: polygon(0 0, 78% 0, 100% 100%, 22% 100%);
-  border: 1px solid rgba(238, 242, 232, 0.22);
-  background: #050705;
+  inset: 48px 18px 44px;
 }
 
-.cylinder-mesh {
+.cylinder-barrel {
+  position: relative;
+  width: 100%;
+  height: 96px;
+  clip-path: polygon(14% 0%, 86% 0%, 100% 100%, 0% 100%);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.6);
+  transform: rotateX(12deg);
+  transition: transform var(--dur-normal) var(--ease-organic);
+}
+
+.cylinder-gradient {
   position: absolute;
   inset: -15px -30px;
-  background:
-    repeating-linear-gradient(90deg, rgba(238, 242, 232, 0.36) 0 1px, transparent 1px 13px),
-    linear-gradient(90deg, #E86E35 0%, #E89A3C 18%, #B33B70 42%, #5C1A4A 65%, #E86E35 100%);
-  background-size: 200% 100%, 200% 100%;
-  animation: cylinderRotate 5600ms linear infinite;
+  background: linear-gradient(90deg, #ff5e00 0%, #ff1a75 33%, #9e00c5 66%, #ff5e00 100%);
+  background-size: 200% 100%;
   opacity: 0.92;
   will-change: background-position;
 }
 
-.cylinder-specular {
+/* Las líneas fijas como una reja: NO SE MUEVEN NUNCA */
+.cylinder-cage {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(90deg, rgba(3, 4, 3, 0.78) 0%, transparent 22%, rgba(255, 255, 255, 0.42) 48%, transparent 68%, rgba(3, 4, 3, 0.78) 100%);
+    repeating-linear-gradient(90deg, rgba(238, 242, 232, 0.42) 0 1.5px, transparent 1.5px 16px),
+    repeating-linear-gradient(180deg, rgba(238, 242, 232, 0.16) 0 1px, transparent 1px 24px);
   pointer-events: none;
+  z-index: 2;
 }
 
-body.prototype-home .window:hover .cylinder-mesh,
-body.prototype-home .window:focus-visible .cylinder-mesh {
+/* Brillo especular y sombra 3D para volumen cilíndrico */
+.cylinder-specular {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(3, 4, 3, 0.75) 0%, transparent 22%, rgba(255, 255, 255, 0.45) 48%, transparent 68%, rgba(3, 4, 3, 0.75) 100%);
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* El elemento NO se mueve hasta que se toque (hover) */
+body.prototype-home .window--color:hover .cylinder-gradient,
+body.prototype-home .window--color:focus-visible .cylinder-gradient {
+  animation: cylinderColorFlow 2800ms linear infinite;
   opacity: 1;
-  animation-duration: 3200ms;
 }
 
-@keyframes cylinderRotate {
+body.prototype-home .window--color:hover .cylinder-barrel,
+body.prototype-home .window--color:focus-visible .cylinder-barrel {
+  transform: rotateX(16deg) scale(1.02);
+}
+
+@keyframes cylinderColorFlow {
   0% {
-    background-position: 0% 0, 0% 0;
+    background-position: 0% 0;
   }
   100% {
-    background-position: -200% 0, -200% 0;
+    background-position: -200% 0;
   }
 }
 
-/* 2. Fotografía: HUD Viewfinder de Cámara Cinematográfica */
+/* 2. Fotografía: Visor Cinematográfico con Retícula Cerrada en Reposo y Apertura en Hover */
 .window-graphic--viewfinder {
-  padding: 10px;
+  padding: 8px;
 }
 
-.hud-frame {
+.viewfinder-hud {
   position: relative;
   width: 100%;
   height: 100%;
@@ -5640,8 +5645,10 @@ body.prototype-home .window:focus-visible .cylinder-mesh {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: border-color var(--dur-normal) var(--ease-organic);
 }
 
+/* Metadatos y telemetría: Ocultos por defecto en reposo */
 .hud-meta {
   position: absolute !important;
   z-index: 3;
@@ -5654,6 +5661,10 @@ body.prototype-home .window:focus-visible .cylinder-mesh {
   align-items: center;
   gap: 5px;
   user-select: none;
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.9);
+  transition: opacity 350ms var(--ease-organic), transform 350ms var(--ease-organic);
 }
 
 .hud-meta--tl { top: 8px; left: 10px; }
@@ -5668,29 +5679,32 @@ body.prototype-home .window:focus-visible .cylinder-mesh {
   background: #e04040;
   box-shadow: 0 0 6px #e04040;
   display: inline-block;
-  animation: recBlink 1100ms ease-in-out infinite alternate;
 }
 
-@keyframes recBlink {
-  0% { opacity: 0.25; }
-  100% { opacity: 1; }
-}
-
-.hud-brackets {
+/* Retícula cerrada por defecto (24px x 24px) */
+.hud-reticle-box {
   position: absolute;
-  width: 52px;
-  height: 52px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   pointer-events: none;
-  animation: hudFocusLock 3000ms var(--ease-organic) infinite;
+  transition:
+    width 450ms var(--ease-organic),
+    height 450ms var(--ease-organic);
 }
 
-.bracket-tl, .bracket-tr, .bracket-bl, .bracket-br {
+.hud-bracket {
   position: absolute;
-  width: 9px;
-  height: 9px;
-  border-color: rgba(238, 242, 232, 0.72);
+  width: 8px;
+  height: 8px;
+  border-color: rgba(238, 242, 232, 0.55);
   border-style: solid;
-  transition: border-color var(--dur-normal) var(--ease-organic);
+  transition: border-color 350ms var(--ease-organic);
 }
 
 .bracket-tl { top: 0; left: 0; border-width: 1.5px 0 0 1.5px; }
@@ -5698,59 +5712,87 @@ body.prototype-home .window:focus-visible .cylinder-mesh {
 .bracket-bl { bottom: 0; left: 0; border-width: 0 0 1.5px 1.5px; }
 .bracket-br { bottom: 0; right: 0; border-width: 0 1.5px 1.5px 0; }
 
-.hud-reticle {
+.hud-collimator {
   position: relative;
-  width: 6px;
-  height: 6px;
+  width: 4px;
+  height: 4px;
   border-radius: 50%;
-  background: var(--accent);
-  box-shadow: 0 0 8px var(--accent);
+  background: rgba(238, 242, 232, 0.6);
+  transition: background 350ms var(--ease-organic), box-shadow 350ms var(--ease-organic);
 }
 
-.hud-reticle::before,
-.hud-reticle::after {
+.hud-collimator::before,
+.hud-collimator::after {
   content: "";
   position: absolute;
-  background: rgba(238, 242, 232, 0.22);
+  background: rgba(238, 242, 232, 0.25);
+  transition: background 350ms var(--ease-organic);
 }
 
-.hud-reticle::before {
-  left: -24px;
-  right: -24px;
+.hud-collimator::before {
+  left: -14px;
+  right: -14px;
   top: 50%;
   height: 1px;
   transform: translateY(-50%);
 }
 
-.hud-reticle::after {
-  top: -24px;
-  bottom: -24px;
+.hud-collimator::after {
+  top: -14px;
+  bottom: -14px;
   left: 50%;
   width: 1px;
   transform: translateX(-50%);
 }
 
-@keyframes hudFocusLock {
-  0%, 15% {
-    transform: scale(1.25);
-    border-color: rgba(238, 242, 232, 0.45);
-  }
-  45%, 82% {
-    transform: scale(0.92);
-    border-color: var(--accent);
-  }
-  100% {
-    transform: scale(1.25);
-    border-color: rgba(238, 242, 232, 0.45);
-  }
+/* En Hover: Se abre la retícula, aparece la telemetría, y SE QUEDA QUIETO */
+body.prototype-home .window--photo:hover .viewfinder-hud,
+body.prototype-home .window--photo:focus-visible .viewfinder-hud {
+  border-color: rgba(114, 203, 102, 0.38);
 }
 
-/* 3. Música: Osciloscopio Vital (Eje 50% con Onda Flotante) */
-.window-graphic--vital {
+body.prototype-home .window--photo:hover .hud-reticle-box,
+body.prototype-home .window--photo:focus-visible .hud-reticle-box {
+  width: 76px;
+  height: 76px;
+}
+
+body.prototype-home .window--photo:hover .hud-bracket,
+body.prototype-home .window--photo:focus-visible .hud-bracket {
+  border-color: var(--accent);
+}
+
+body.prototype-home .window--photo:hover .hud-collimator,
+body.prototype-home .window--photo:focus-visible .hud-collimator {
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+}
+
+body.prototype-home .window--photo:hover .hud-collimator::before,
+body.prototype-home .window--photo:hover .hud-collimator::after,
+body.prototype-home .window--photo:focus-visible .hud-collimator::before,
+body.prototype-home .window--photo:focus-visible .hud-collimator::after {
+  background: rgba(114, 203, 102, 0.45);
+}
+
+body.prototype-home .window--photo:hover .hud-meta,
+body.prototype-home .window--photo:focus-visible .hud-meta {
+  opacity: 1;
+  transform: scale(1);
+  transition-delay: 80ms;
+}
+
+body.prototype-home .window--photo:hover .rec-dot,
+body.prototype-home .window--photo:focus-visible .rec-dot {
+  animation: recBlink 1000ms ease-in-out infinite alternate;
+}
+
+/* 3. Música: Osciloscopio con Eje Central 50% y Onda Perpetua en Hover */
+.window-graphic--music {
   padding: 0 4px;
 }
 
-.vital-scope {
+.music-scope {
   position: relative;
   width: 100%;
   height: 96px;
@@ -5759,52 +5801,23 @@ body.prototype-home .window:focus-visible .cylinder-mesh {
   justify-content: center;
 }
 
-.vital-centerline {
+/* Línea central alineada exactamente al 50% vertical */
+.music-centerline {
   position: absolute;
   left: 0;
   right: 0;
   top: 50%;
   height: 1px;
-  background: rgba(114, 203, 102, 0.35);
-  transform: translateY(-50%);
-  z-index: 0;
-}
-
-.vital-wave {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  height: 76px;
-  top: 50%;
+  background: rgba(114, 203, 102, 0.4);
   transform: translateY(-50%);
   z-index: 1;
-  overflow: visible;
 }
 
-.vital-path {
-  fill: none;
-  stroke-linejoin: round;
-  stroke-linecap: round;
-}
-
-.vital-path--glow {
-  stroke: rgba(114, 203, 102, 0.6);
-  stroke-width: 4px;
-  filter: drop-shadow(0 0 10px rgba(114, 203, 102, 0.85));
-  animation: vitalWaveScroll 2200ms var(--ease-saw) infinite;
-}
-
-.vital-path--core {
-  stroke: #ffffff;
-  stroke-width: 1.5px;
-  animation: vitalWaveScroll 2200ms var(--ease-saw) infinite;
-}
-
-.vital-scale {
+.music-scale {
   position: absolute;
   right: 4px;
-  top: 4px;
-  bottom: 4px;
+  top: 6px;
+  bottom: 6px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -5813,83 +5826,167 @@ body.prototype-home .window:focus-visible .cylinder-mesh {
   color: var(--dim);
   letter-spacing: 0.1em;
   pointer-events: none;
-  z-index: 2;
+  z-index: 3;
 }
 
-@keyframes vitalWaveScroll {
-  0% {
-    stroke-dasharray: 400;
-    stroke-dashoffset: 0;
-    transform: translateY(0) scaleY(0.95);
-  }
-  50% {
-    transform: translateY(0) scaleY(1.15);
-  }
-  100% {
-    stroke-dasharray: 400;
-    stroke-dashoffset: -400;
-    transform: translateY(0) scaleY(0.95);
-  }
-}
-
-body.prototype-home .window:hover .vital-path--glow,
-body.prototype-home .window:focus-visible .vital-path--glow {
-  filter: drop-shadow(0 0 18px rgba(114, 203, 102, 1));
-}
-
-/* 4. Origen: Escalera Topográfica con Escaneo Sincronizado */
-.window-graphic--stairs {
-  inset: 48px 24px 44px;
-}
-
-.stairs-tracks {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(135deg, transparent 0 38%, rgba(238, 242, 232, 0.44) 38.5% 39.5%, transparent 40%),
-    linear-gradient(135deg, transparent 0 58%, rgba(238, 242, 232, 0.54) 58.5% 59.5%, transparent 60%);
-  pointer-events: none;
-}
-
-.stairs-ladder {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  border-left: 1px solid rgba(238, 242, 232, 0.48);
-}
-
-.stairs-ladder i {
-  display: block;
-  width: 100%;
-  height: 1px;
-  background: rgba(238, 242, 232, 0.32);
-}
-
-.stairs-scanner {
+/* Viewport para recorte de onda */
+.music-wave-viewport {
   position: absolute;
   left: 0;
   right: 0;
-  top: 0;
-  height: 2px;
-  background: var(--accent);
-  box-shadow: 0 0 12px var(--accent), 0 0 24px rgba(114, 203, 102, 0.6);
-  animation: stairsScanLaser 2200ms steps(10, end) infinite;
+  top: 50%;
+  height: 76px;
+  transform: translateY(-50%) scaleY(0.04);
+  overflow: hidden;
   z-index: 2;
+  opacity: 0.35;
+  transition: transform 380ms var(--ease-organic), opacity 380ms var(--ease-organic);
 }
 
-@keyframes stairsScanLaser {
+.music-wave-svg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 200%;
+  height: 100%;
+  animation: musicWaveScroll 1600ms linear infinite;
+  animation-play-state: paused;
+}
+
+.music-wave-path {
+  fill: none;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.music-wave-path--glow {
+  stroke: rgba(114, 203, 102, 0.7);
+  stroke-width: 4px;
+  filter: drop-shadow(0 0 10px rgba(114, 203, 102, 0.9));
+}
+
+.music-wave-path--core {
+  stroke: #ffffff;
+  stroke-width: 1.5px;
+}
+
+/* En Hover: La onda se abre desde el eje central y se mueve PERPETUAMENTE */
+body.prototype-home .window--music:hover .music-wave-viewport,
+body.prototype-home .window--music:focus-visible .music-wave-viewport {
+  transform: translateY(-50%) scaleY(1);
+  opacity: 1;
+}
+
+body.prototype-home .window--music:hover .music-wave-svg,
+body.prototype-home .window--music:focus-visible .music-wave-svg {
+  animation-play-state: running;
+}
+
+body.prototype-home .window--music:hover .music-centerline,
+body.prototype-home .window--music:focus-visible .music-centerline {
+  background: rgba(114, 203, 102, 0.6);
+  box-shadow: 0 0 8px rgba(114, 203, 102, 0.4);
+}
+
+@keyframes musicWaveScroll {
   0% {
-    top: 0%;
-    opacity: 0.35;
-  }
-  50% {
-    opacity: 1;
+    transform: translateX(0);
   }
   100% {
-    top: 100%;
-    opacity: 0.35;
+    transform: translateX(-50%);
+  }
+}
+
+/* 4. Origen: Línea Verde Fija en Centro (50%) con Escalera Móvil y Destello Milimétrico Sincronizado */
+.window-graphic--origin {
+  inset: 48px 22px 44px;
+}
+
+.origin-stage {
+  position: relative;
+  width: 100%;
+  height: 96px;
+  border-left: 1px solid rgba(238, 242, 232, 0.42);
+  border-bottom: 1px solid rgba(238, 242, 232, 0.22);
+  overflow: hidden;
+}
+
+.origin-rails {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(135deg, transparent 0 38%, rgba(238, 242, 232, 0.32) 38.5% 39.5%, transparent 40%),
+    linear-gradient(135deg, transparent 0 58%, rgba(238, 242, 232, 0.42) 58.5% 59.5%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Líneas de abajo que se mueven (escalera / escalones) */
+.origin-ladder {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  animation: originStepsScroll 600ms linear infinite;
+  animation-play-state: paused;
+}
+
+.origin-step {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(50% + var(--step-y));
+  height: 1px;
+  background: rgba(238, 242, 232, 0.36);
+  transition: background 150ms ease;
+}
+
+/* Línea verde siempre FIJA en el centro (50%) */
+.origin-centerline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 2px;
+  background: rgba(114, 203, 102, 0.45);
+  box-shadow: 0 0 6px rgba(114, 203, 102, 0.3);
+  z-index: 3;
+  animation: originCenterFlash 600ms linear infinite;
+  animation-play-state: paused;
+}
+
+/* En Hover: Las líneas de abajo se mueven y la línea verde se ilumina EXACTAMENTE cuando una pasa debajo */
+body.prototype-home .window--origin:hover .origin-ladder,
+body.prototype-home .window--origin:focus-visible .origin-ladder {
+  animation-play-state: running;
+}
+
+body.prototype-home .window--origin:hover .origin-centerline,
+body.prototype-home .window--origin:focus-visible .origin-centerline {
+  animation-play-state: running;
+}
+
+@keyframes originStepsScroll {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(24px);
+  }
+}
+
+@keyframes originCenterFlash {
+  0%, 100% {
+    background: #ffffff;
+    box-shadow: 0 0 16px var(--accent), 0 0 32px var(--accent), 0 0 48px rgba(114, 203, 102, 0.85);
+    height: 2.5px;
+    opacity: 1;
+  }
+  20%, 80% {
+    background: rgba(114, 203, 102, 0.45);
+    box-shadow: 0 0 5px rgba(114, 203, 102, 0.25);
+    height: 1.5px;
+    opacity: 0.55;
   }
 }
 
