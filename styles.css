@@ -5565,7 +5565,7 @@ body.prototype-home .window:focus-visible .window-graphic {
   transform: scale(1.02);
 }
 
-/* 1. Servicios: Cilindro Anamórfico 3D con Reja Fija y Toda la Verticalidad */
+/* 1. Servicios: Cilindro Anamórfico 3D con Silueta Wireframe y Carga de Colores en Hover */
 .window-graphic--cylinder {
   inset: 54px 18px 46px;
 }
@@ -5575,6 +5575,7 @@ body.prototype-home .window:focus-visible .window-graphic {
   width: 100%;
   height: 100%;
   clip-path: polygon(0 0, 78% 0, 100% 100%, 22% 100%);
+  background: #000000;
   border-radius: 6px;
   overflow: hidden;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
@@ -5582,39 +5583,49 @@ body.prototype-home .window:focus-visible .window-graphic {
   transition: transform var(--dur-normal) var(--ease-organic);
 }
 
+/* Colores ocultos en reposo; se cargan en hover y se desvanecen suavemente hacia el negro al soltar */
 .cylinder-gradient {
   position: absolute;
   inset: -20px -40px;
   background: linear-gradient(90deg, #ff5e00 0%, #ff1a75 33%, #9e00c5 66%, #ff5e00 100%);
   background-size: 200% 100%;
-  opacity: 0.92;
-  will-change: background-position;
+  opacity: 0;
+  transition: opacity 750ms var(--ease-organic);
+  will-change: background-position, opacity;
 }
 
-/* Las líneas fijas como una reja: NO SE MUEVEN */
+/* Silueta con líneas wireframe del cilindro siempre visibles */
 .cylinder-cage {
   position: absolute;
   inset: 0;
   background:
-    repeating-linear-gradient(90deg, rgba(238, 242, 232, 0.42) 0 1.5px, transparent 1.5px 16px),
-    repeating-linear-gradient(180deg, rgba(238, 242, 232, 0.16) 0 1px, transparent 1px 24px);
+    repeating-linear-gradient(90deg, rgba(238, 242, 232, 0.35) 0 1.5px, transparent 1.5px 16px),
+    repeating-linear-gradient(180deg, rgba(238, 242, 232, 0.14) 0 1px, transparent 1px 24px);
   pointer-events: none;
   z-index: 2;
 }
 
-/* Brillo especular y sombra 3D para volumen cilíndrico completo */
+/* Brillo especular y sombra 3D para volumen cilíndrico */
 .cylinder-specular {
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, rgba(3, 4, 3, 0.78) 0%, transparent 20%, rgba(255, 255, 255, 0.45) 48%, transparent 68%, rgba(3, 4, 3, 0.78) 100%);
+  background: linear-gradient(90deg, rgba(3, 4, 3, 0.78) 0%, transparent 20%, rgba(255, 255, 255, 0.35) 48%, transparent 68%, rgba(3, 4, 3, 0.78) 100%);
   pointer-events: none;
   z-index: 3;
+  opacity: 0.65;
+  transition: opacity 750ms var(--ease-organic);
 }
 
-/* En hover: la gradiente se desplaza a través de la reja fija */
+/* En hover: los colores se cargan y fluyen a través de la silueta */
 body.prototype-home .window--color:hover .cylinder-gradient,
 body.prototype-home .window--color:focus-visible .cylinder-gradient {
+  opacity: 1;
   animation: cylinderColorFlow 2800ms linear infinite;
+  transition: opacity 650ms var(--ease-organic);
+}
+
+body.prototype-home .window--color:hover .cylinder-specular,
+body.prototype-home .window--color:focus-visible .cylinder-specular {
   opacity: 1;
 }
 
@@ -5632,7 +5643,7 @@ body.prototype-home .window--color:focus-visible .cylinder-barrel {
   }
 }
 
-/* 2. Fotografía: Visor Cinematográfico con Revelación Uno a Uno */
+/* 2. Fotografía: Visor Cinematográfico con Revelación Uno a Uno y Rebote Orgánico */
 .window-graphic--viewfinder {
   inset: 54px 18px 46px;
   padding: 0;
@@ -5664,7 +5675,8 @@ body.prototype-home .window--color:focus-visible .cylinder-barrel {
   user-select: none;
   opacity: 0;
   pointer-events: none;
-  transform: scale(0.9);
+  transform: scale(0.85);
+  transition: opacity 300ms var(--ease-organic), transform 300ms var(--ease-organic);
 }
 
 .hud-meta--tl { top: 10px; left: 12px; }
@@ -5694,8 +5706,8 @@ body.prototype-home .window--color:focus-visible .cylinder-barrel {
   justify-content: center;
   pointer-events: none;
   transition:
-    width 400ms var(--ease-organic),
-    height 400ms var(--ease-organic);
+    width 440ms var(--ease-spring),
+    height 440ms var(--ease-spring);
 }
 
 .hud-bracket {
@@ -5745,7 +5757,7 @@ body.prototype-home .window--color:focus-visible .cylinder-barrel {
   transform: translateX(-50%);
 }
 
-/* EN HOVER: Se abre la retícula y los elementos aparecen UNO A UNO, luego se quedan quietos */
+/* EN HOVER: Se abre la retícula y los elementos aparecen UNO A UNO CON REBOTE ORGÁNICO */
 body.prototype-home .window--photo:hover .viewfinder-hud,
 body.prototype-home .window--photo:focus-visible .viewfinder-hud {
   border-color: rgba(114, 203, 102, 0.38);
@@ -5775,36 +5787,46 @@ body.prototype-home .window--photo:focus-visible .hud-collimator::after {
   background: rgba(114, 203, 102, 0.45);
 }
 
-/* Transición escalonada uno a uno */
+/* Transición escalonada uno a uno con micro-rebote orgánico */
 body.prototype-home .window--photo:hover .hud-meta--tl,
 body.prototype-home .window--photo:focus-visible .hud-meta--tl {
-  opacity: 1;
-  transform: scale(1);
-  transition: opacity 300ms var(--ease-organic) 100ms, transform 300ms var(--ease-organic) 100ms;
+  animation: hudBadgeBounce 440ms var(--ease-spring) 100ms both;
 }
 
 body.prototype-home .window--photo:hover .hud-meta--tr,
 body.prototype-home .window--photo:focus-visible .hud-meta--tr {
-  opacity: 1;
-  transform: scale(1);
-  transition: opacity 300ms var(--ease-organic) 240ms, transform 300ms var(--ease-organic) 240ms;
+  animation: hudBadgeBounce 440ms var(--ease-spring) 240ms both;
 }
 
 body.prototype-home .window--photo:hover .hud-meta--bl,
 body.prototype-home .window--photo:focus-visible .hud-meta--bl {
-  opacity: 1;
-  transform: scale(1);
-  transition: opacity 300ms var(--ease-organic) 380ms, transform 300ms var(--ease-organic) 380ms;
+  animation: hudBadgeBounce 440ms var(--ease-spring) 380ms both;
 }
 
 body.prototype-home .window--photo:hover .hud-meta--br,
 body.prototype-home .window--photo:focus-visible .hud-meta--br {
-  opacity: 1;
-  transform: scale(1);
-  transition: opacity 300ms var(--ease-organic) 520ms, transform 300ms var(--ease-organic) 520ms;
+  animation: hudBadgeBounce 440ms var(--ease-spring) 520ms both;
 }
 
-/* 3. Música: Osciloscopio con Línea que se Transforma en Onda Senoidal Ondulante */
+@keyframes hudBadgeBounce {
+  0% {
+    opacity: 0;
+    transform: scale(0.68) translateY(-4px);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(1.12) translateY(1.5px);
+  }
+  78% {
+    transform: scale(0.96) translateY(-0.5px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* 3. Música: Osciloscopio con Opacidad Sutil en Reposo y Transición Analógica Fluida */
 .window-graphic--music {
   inset: 54px 18px 46px;
   padding: 0;
@@ -5817,6 +5839,13 @@ body.prototype-home .window--photo:focus-visible .hud-meta--br {
   display: flex;
   align-items: center;
   justify-content: center;
+  opacity: 0.35;
+  transition: opacity 450ms var(--ease-organic);
+}
+
+body.prototype-home .window--music:hover .music-scope,
+body.prototype-home .window--music:focus-visible .music-scope {
+  opacity: 1;
 }
 
 .music-scale {
@@ -5841,7 +5870,7 @@ body.prototype-home .window--photo:focus-visible .hud-meta--br {
   display: block;
 }
 
-/* 4. Origen: Escalera Amplia y Separada con Línea Verde Fija al 50% */
+/* 4. Origen: Escalera que Ocupa Todo el Gráfico de Arriba a Abajo y Sigue Corriendo Perpetuamente */
 .window-graphic--origin {
   inset: 54px 18px 46px;
 }
@@ -5853,25 +5882,31 @@ body.prototype-home .window--photo:focus-visible .hud-meta--br {
   border-left: 1px solid rgba(238, 242, 232, 0.42);
   border-bottom: 1px solid rgba(238, 242, 232, 0.22);
   overflow: hidden;
+  opacity: 0.35;
+  transition: opacity 450ms var(--ease-organic);
+}
+
+body.prototype-home .window--origin:hover .origin-stage,
+body.prototype-home .window--origin:focus-visible .origin-stage {
+  opacity: 1;
 }
 
 .origin-rails {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(135deg, transparent 0 38%, rgba(238, 242, 232, 0.32) 38.5% 39.5%, transparent 40%),
-    linear-gradient(135deg, transparent 0 58%, rgba(238, 242, 232, 0.42) 58.5% 59.5%, transparent 60%);
+    linear-gradient(135deg, transparent 0 35%, rgba(238, 242, 232, 0.32) 35.5% 36.5%, transparent 37%),
+    linear-gradient(135deg, transparent 0 62%, rgba(238, 242, 232, 0.42) 62.5% 63.5%, transparent 64%);
   pointer-events: none;
   z-index: 0;
 }
 
-/* Escalones separados con más verticalidad */
+/* Escalera que ocupa todo el contenedor de arriba a abajo y SIGUE CORRIENDO SIEMPRE */
 .origin-ladder {
   position: absolute;
   inset: 0;
   z-index: 1;
-  animation: originStepsScroll 650ms linear infinite;
-  animation-play-state: paused;
+  animation: originStepsScroll 750ms linear infinite;
 }
 
 .origin-step {
@@ -5880,7 +5915,7 @@ body.prototype-home .window--photo:focus-visible .hud-meta--br {
   right: 0;
   top: calc(50% + var(--step-y));
   height: 1px;
-  background: rgba(238, 242, 232, 0.36);
+  background: rgba(238, 242, 232, 0.38);
   transition: background 150ms ease;
 }
 
@@ -5895,19 +5930,12 @@ body.prototype-home .window--photo:focus-visible .hud-meta--br {
   background: rgba(114, 203, 102, 0.45);
   box-shadow: 0 0 6px rgba(114, 203, 102, 0.3);
   z-index: 3;
-  animation: originCenterFlash 650ms linear infinite;
-  animation-play-state: paused;
 }
 
-/* En Hover: Las líneas de abajo se mueven y la línea verde se ilumina EXACTAMENTE al cruce */
-body.prototype-home .window--origin:hover .origin-ladder,
-body.prototype-home .window--origin:focus-visible .origin-ladder {
-  animation-play-state: running;
-}
-
+/* En Hover: El destello milimétrico se activa sobre la escalera que corre */
 body.prototype-home .window--origin:hover .origin-centerline,
 body.prototype-home .window--origin:focus-visible .origin-centerline {
-  animation-play-state: running;
+  animation: originCenterFlash 750ms linear infinite;
 }
 
 @keyframes originStepsScroll {
@@ -5915,7 +5943,7 @@ body.prototype-home .window--origin:focus-visible .origin-centerline {
     transform: translateY(0);
   }
   100% {
-    transform: translateY(36px);
+    transform: translateY(30px);
   }
 }
 

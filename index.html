@@ -122,13 +122,17 @@
           <div class="origin-stage">
             <div class="origin-rails"></div>
             <div class="origin-ladder">
-              <span class="origin-step" style="--step-y: -108px;"></span>
-              <span class="origin-step" style="--step-y: -72px;"></span>
-              <span class="origin-step" style="--step-y: -36px;"></span>
+              <span class="origin-step" style="--step-y: -150px;"></span>
+              <span class="origin-step" style="--step-y: -120px;"></span>
+              <span class="origin-step" style="--step-y: -90px;"></span>
+              <span class="origin-step" style="--step-y: -60px;"></span>
+              <span class="origin-step" style="--step-y: -30px;"></span>
               <span class="origin-step" style="--step-y: 0px;"></span>
-              <span class="origin-step" style="--step-y: 36px;"></span>
-              <span class="origin-step" style="--step-y: 72px;"></span>
-              <span class="origin-step" style="--step-y: 108px;"></span>
+              <span class="origin-step" style="--step-y: 30px;"></span>
+              <span class="origin-step" style="--step-y: 60px;"></span>
+              <span class="origin-step" style="--step-y: 90px;"></span>
+              <span class="origin-step" style="--step-y: 120px;"></span>
+              <span class="origin-step" style="--step-y: 150px;"></span>
             </div>
             <div class="origin-centerline"></div>
           </div>
@@ -174,42 +178,53 @@
 
         const maxAmp = h * 0.38;
         const ampPx = currentAmp * maxAmp;
+        const t = Math.max(0, Math.min(1, currentAmp));
 
-        // Phosphor outer glow trace
+        // Phosphor outer glow trace - smooth analog interpolation
+        const glowAlpha = 0.2 + 0.65 * t;
+        const glowBlur = 2 + 18 * t;
+        const glowWidth = 1.5 + 3.5 * t;
+
         ctx.beginPath();
         for (let x = 0; x <= w; x += 3) {
           const y = cy + Math.sin((x / w) * Math.PI * 4 + phase) * ampPx;
           if (x === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         }
-        ctx.strokeStyle = currentAmp > 0.02 ? 'rgba(114, 203, 102, 0.72)' : 'rgba(114, 203, 102, 0.45)';
-        ctx.lineWidth = currentAmp > 0.02 ? 5 : 1.5;
+        ctx.strokeStyle = `rgba(114, 203, 102, ${glowAlpha})`;
+        ctx.lineWidth = glowWidth;
         ctx.shadowColor = '#72cb66';
-        ctx.shadowBlur = currentAmp > 0.02 ? 18 : 2;
+        ctx.shadowBlur = glowBlur;
         ctx.stroke();
 
-        // Core white electron beam
+        // Core electron beam - smooth RGB morph from muted baseline green to brilliant white
+        const r = Math.round(114 + (255 - 114) * t);
+        const g = Math.round(203 + (255 - 203) * t);
+        const b = Math.round(102 + (255 - 102) * t);
+        const coreAlpha = 0.35 + 0.65 * t;
+
         ctx.beginPath();
         for (let x = 0; x <= w; x += 3) {
           const y = cy + Math.sin((x / w) * Math.PI * 4 + phase) * ampPx;
           if (x === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         }
-        ctx.strokeStyle = currentAmp > 0.02 ? '#ffffff' : '#72cb66';
+        ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${coreAlpha})`;
         ctx.lineWidth = 1.5;
         ctx.shadowBlur = 0;
         ctx.stroke();
       }
 
       function loop() {
-        currentAmp += (targetAmp - currentAmp) * 0.12;
-        if (isHovered) {
-          phase += 0.055;
+        const ease = isHovered ? 0.08 : 0.05;
+        currentAmp += (targetAmp - currentAmp) * ease;
+        if (isHovered || currentAmp > 0.01) {
+          phase += 0.052;
         }
 
         drawFrame();
 
-        if (isHovered || Math.abs(currentAmp - targetAmp) > 0.005) {
+        if (isHovered || currentAmp > 0.002) {
           animId = requestAnimationFrame(loop);
         } else {
           currentAmp = 0;
