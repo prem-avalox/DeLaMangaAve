@@ -5550,7 +5550,7 @@ body.prototype-home .window p {
 /* ── Modular Graphic System: The 4 Windows ────────────────── */
 .window-graphic {
   position: absolute;
-  inset: 52px 20px 48px;
+  inset: 54px 18px 46px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -5562,36 +5562,36 @@ body.prototype-home .window p {
 
 body.prototype-home .window:hover .window-graphic,
 body.prototype-home .window:focus-visible .window-graphic {
-  transform: scale(1.035);
+  transform: scale(1.02);
 }
 
-/* 1. Servicios: Cilindro Deformado 3D con Reja Fija y Gradiente Activo en Hover */
+/* 1. Servicios: Cilindro Anamórfico 3D con Reja Fija y Toda la Verticalidad */
 .window-graphic--cylinder {
-  inset: 48px 18px 44px;
+  inset: 54px 18px 46px;
 }
 
 .cylinder-barrel {
   position: relative;
   width: 100%;
-  height: 96px;
-  clip-path: polygon(14% 0%, 86% 0%, 100% 100%, 0% 100%);
+  height: 100%;
+  clip-path: polygon(0 0, 78% 0, 100% 100%, 22% 100%);
   border-radius: 6px;
   overflow: hidden;
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
   transform: rotateX(12deg);
   transition: transform var(--dur-normal) var(--ease-organic);
 }
 
 .cylinder-gradient {
   position: absolute;
-  inset: -15px -30px;
+  inset: -20px -40px;
   background: linear-gradient(90deg, #ff5e00 0%, #ff1a75 33%, #9e00c5 66%, #ff5e00 100%);
   background-size: 200% 100%;
   opacity: 0.92;
   will-change: background-position;
 }
 
-/* Las líneas fijas como una reja: NO SE MUEVEN NUNCA */
+/* Las líneas fijas como una reja: NO SE MUEVEN */
 .cylinder-cage {
   position: absolute;
   inset: 0;
@@ -5602,16 +5602,16 @@ body.prototype-home .window:focus-visible .window-graphic {
   z-index: 2;
 }
 
-/* Brillo especular y sombra 3D para volumen cilíndrico */
+/* Brillo especular y sombra 3D para volumen cilíndrico completo */
 .cylinder-specular {
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, rgba(3, 4, 3, 0.75) 0%, transparent 22%, rgba(255, 255, 255, 0.45) 48%, transparent 68%, rgba(3, 4, 3, 0.75) 100%);
+  background: linear-gradient(90deg, rgba(3, 4, 3, 0.78) 0%, transparent 20%, rgba(255, 255, 255, 0.45) 48%, transparent 68%, rgba(3, 4, 3, 0.78) 100%);
   pointer-events: none;
   z-index: 3;
 }
 
-/* El elemento NO se mueve hasta que se toque (hover) */
+/* En hover: la gradiente se desplaza a través de la reja fija */
 body.prototype-home .window--color:hover .cylinder-gradient,
 body.prototype-home .window--color:focus-visible .cylinder-gradient {
   animation: cylinderColorFlow 2800ms linear infinite;
@@ -5620,7 +5620,7 @@ body.prototype-home .window--color:focus-visible .cylinder-gradient {
 
 body.prototype-home .window--color:hover .cylinder-barrel,
 body.prototype-home .window--color:focus-visible .cylinder-barrel {
-  transform: rotateX(16deg) scale(1.02);
+  transform: rotateX(15deg) scale(1.02);
 }
 
 @keyframes cylinderColorFlow {
@@ -5632,9 +5632,10 @@ body.prototype-home .window--color:focus-visible .cylinder-barrel {
   }
 }
 
-/* 2. Fotografía: Visor Cinematográfico con Retícula Cerrada en Reposo y Apertura en Hover */
+/* 2. Fotografía: Visor Cinematográfico con Revelación Uno a Uno */
 .window-graphic--viewfinder {
-  padding: 8px;
+  inset: 54px 18px 46px;
+  padding: 0;
 }
 
 .viewfinder-hud {
@@ -5664,13 +5665,12 @@ body.prototype-home .window--color:focus-visible .cylinder-barrel {
   opacity: 0;
   pointer-events: none;
   transform: scale(0.9);
-  transition: opacity 350ms var(--ease-organic), transform 350ms var(--ease-organic);
 }
 
-.hud-meta--tl { top: 8px; left: 10px; }
-.hud-meta--tr { top: 8px; right: 10px; }
-.hud-meta--bl { bottom: 8px; left: 10px; }
-.hud-meta--br { bottom: 8px; right: 10px; }
+.hud-meta--tl { top: 10px; left: 12px; }
+.hud-meta--tr { top: 10px; right: 12px; }
+.hud-meta--bl { bottom: 10px; left: 12px; }
+.hud-meta--br { bottom: 10px; right: 12px; }
 
 .rec-dot {
   width: 5px;
@@ -5681,27 +5681,27 @@ body.prototype-home .window--color:focus-visible .cylinder-barrel {
   display: inline-block;
 }
 
-/* Retícula cerrada por defecto (24px x 24px) */
+/* Retícula cerrada por defecto (28px x 28px) */
 .hud-reticle-box {
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
   pointer-events: none;
   transition:
-    width 450ms var(--ease-organic),
-    height 450ms var(--ease-organic);
+    width 400ms var(--ease-organic),
+    height 400ms var(--ease-organic);
 }
 
 .hud-bracket {
   position: absolute;
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
   border-color: rgba(238, 242, 232, 0.55);
   border-style: solid;
   transition: border-color 350ms var(--ease-organic);
@@ -5730,22 +5730,22 @@ body.prototype-home .window--color:focus-visible .cylinder-barrel {
 }
 
 .hud-collimator::before {
-  left: -14px;
-  right: -14px;
+  left: -20px;
+  right: -20px;
   top: 50%;
   height: 1px;
   transform: translateY(-50%);
 }
 
 .hud-collimator::after {
-  top: -14px;
-  bottom: -14px;
+  top: -20px;
+  bottom: -20px;
   left: 50%;
   width: 1px;
   transform: translateX(-50%);
 }
 
-/* En Hover: Se abre la retícula, aparece la telemetría, y SE QUEDA QUIETO */
+/* EN HOVER: Se abre la retícula y los elementos aparecen UNO A UNO, luego se quedan quietos */
 body.prototype-home .window--photo:hover .viewfinder-hud,
 body.prototype-home .window--photo:focus-visible .viewfinder-hud {
   border-color: rgba(114, 203, 102, 0.38);
@@ -5753,8 +5753,8 @@ body.prototype-home .window--photo:focus-visible .viewfinder-hud {
 
 body.prototype-home .window--photo:hover .hud-reticle-box,
 body.prototype-home .window--photo:focus-visible .hud-reticle-box {
-  width: 76px;
-  height: 76px;
+  width: 104px;
+  height: 104px;
 }
 
 body.prototype-home .window--photo:hover .hud-bracket,
@@ -5775,49 +5775,55 @@ body.prototype-home .window--photo:focus-visible .hud-collimator::after {
   background: rgba(114, 203, 102, 0.45);
 }
 
-body.prototype-home .window--photo:hover .hud-meta,
-body.prototype-home .window--photo:focus-visible .hud-meta {
+/* Transición escalonada uno a uno */
+body.prototype-home .window--photo:hover .hud-meta--tl,
+body.prototype-home .window--photo:focus-visible .hud-meta--tl {
   opacity: 1;
   transform: scale(1);
-  transition-delay: 80ms;
+  transition: opacity 300ms var(--ease-organic) 100ms, transform 300ms var(--ease-organic) 100ms;
 }
 
-body.prototype-home .window--photo:hover .rec-dot,
-body.prototype-home .window--photo:focus-visible .rec-dot {
-  animation: recBlink 1000ms ease-in-out infinite alternate;
+body.prototype-home .window--photo:hover .hud-meta--tr,
+body.prototype-home .window--photo:focus-visible .hud-meta--tr {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 300ms var(--ease-organic) 240ms, transform 300ms var(--ease-organic) 240ms;
 }
 
-/* 3. Música: Osciloscopio con Eje Central 50% y Onda Perpetua en Hover */
+body.prototype-home .window--photo:hover .hud-meta--bl,
+body.prototype-home .window--photo:focus-visible .hud-meta--bl {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 300ms var(--ease-organic) 380ms, transform 300ms var(--ease-organic) 380ms;
+}
+
+body.prototype-home .window--photo:hover .hud-meta--br,
+body.prototype-home .window--photo:focus-visible .hud-meta--br {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 300ms var(--ease-organic) 520ms, transform 300ms var(--ease-organic) 520ms;
+}
+
+/* 3. Música: Osciloscopio con Línea que se Transforma en Onda Senoidal Ondulante */
 .window-graphic--music {
-  padding: 0 4px;
+  inset: 54px 18px 46px;
+  padding: 0;
 }
 
 .music-scope {
   position: relative;
   width: 100%;
-  height: 96px;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* Línea central alineada exactamente al 50% vertical */
-.music-centerline {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  height: 1px;
-  background: rgba(114, 203, 102, 0.4);
-  transform: translateY(-50%);
-  z-index: 1;
-}
-
 .music-scale {
   position: absolute;
   right: 4px;
-  top: 6px;
-  bottom: 6px;
+  top: 8px;
+  bottom: 8px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -5829,83 +5835,21 @@ body.prototype-home .window--photo:focus-visible .rec-dot {
   z-index: 3;
 }
 
-/* Viewport para recorte de onda */
-.music-wave-viewport {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  height: 76px;
-  transform: translateY(-50%) scaleY(0.04);
-  overflow: hidden;
-  z-index: 2;
-  opacity: 0.35;
-  transition: transform 380ms var(--ease-organic), opacity 380ms var(--ease-organic);
-}
-
-.music-wave-svg {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 200%;
+.music-wave-canvas {
+  width: 100%;
   height: 100%;
-  animation: musicWaveScroll 1600ms linear infinite;
-  animation-play-state: paused;
+  display: block;
 }
 
-.music-wave-path {
-  fill: none;
-  stroke-linejoin: round;
-  stroke-linecap: round;
-}
-
-.music-wave-path--glow {
-  stroke: rgba(114, 203, 102, 0.7);
-  stroke-width: 4px;
-  filter: drop-shadow(0 0 10px rgba(114, 203, 102, 0.9));
-}
-
-.music-wave-path--core {
-  stroke: #ffffff;
-  stroke-width: 1.5px;
-}
-
-/* En Hover: La onda se abre desde el eje central y se mueve PERPETUAMENTE */
-body.prototype-home .window--music:hover .music-wave-viewport,
-body.prototype-home .window--music:focus-visible .music-wave-viewport {
-  transform: translateY(-50%) scaleY(1);
-  opacity: 1;
-}
-
-body.prototype-home .window--music:hover .music-wave-svg,
-body.prototype-home .window--music:focus-visible .music-wave-svg {
-  animation-play-state: running;
-}
-
-body.prototype-home .window--music:hover .music-centerline,
-body.prototype-home .window--music:focus-visible .music-centerline {
-  background: rgba(114, 203, 102, 0.6);
-  box-shadow: 0 0 8px rgba(114, 203, 102, 0.4);
-}
-
-@keyframes musicWaveScroll {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
-/* 4. Origen: Línea Verde Fija en Centro (50%) con Escalera Móvil y Destello Milimétrico Sincronizado */
+/* 4. Origen: Escalera Amplia y Separada con Línea Verde Fija al 50% */
 .window-graphic--origin {
-  inset: 48px 22px 44px;
+  inset: 54px 18px 46px;
 }
 
 .origin-stage {
   position: relative;
   width: 100%;
-  height: 96px;
+  height: 100%;
   border-left: 1px solid rgba(238, 242, 232, 0.42);
   border-bottom: 1px solid rgba(238, 242, 232, 0.22);
   overflow: hidden;
@@ -5921,12 +5865,12 @@ body.prototype-home .window--music:focus-visible .music-centerline {
   z-index: 0;
 }
 
-/* Líneas de abajo que se mueven (escalera / escalones) */
+/* Escalones separados con más verticalidad */
 .origin-ladder {
   position: absolute;
   inset: 0;
   z-index: 1;
-  animation: originStepsScroll 600ms linear infinite;
+  animation: originStepsScroll 650ms linear infinite;
   animation-play-state: paused;
 }
 
@@ -5951,11 +5895,11 @@ body.prototype-home .window--music:focus-visible .music-centerline {
   background: rgba(114, 203, 102, 0.45);
   box-shadow: 0 0 6px rgba(114, 203, 102, 0.3);
   z-index: 3;
-  animation: originCenterFlash 600ms linear infinite;
+  animation: originCenterFlash 650ms linear infinite;
   animation-play-state: paused;
 }
 
-/* En Hover: Las líneas de abajo se mueven y la línea verde se ilumina EXACTAMENTE cuando una pasa debajo */
+/* En Hover: Las líneas de abajo se mueven y la línea verde se ilumina EXACTAMENTE al cruce */
 body.prototype-home .window--origin:hover .origin-ladder,
 body.prototype-home .window--origin:focus-visible .origin-ladder {
   animation-play-state: running;
@@ -5971,7 +5915,7 @@ body.prototype-home .window--origin:focus-visible .origin-centerline {
     transform: translateY(0);
   }
   100% {
-    transform: translateY(24px);
+    transform: translateY(36px);
   }
 }
 
