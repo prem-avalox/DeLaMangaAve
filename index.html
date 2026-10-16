@@ -191,10 +191,10 @@
         const ampPx = currentAmp * maxAmp;
         const t = Math.max(0, Math.min(1, currentAmp));
 
-        // Phosphor outer glow trace - smooth analog interpolation
-        const glowAlpha = 0.15 + 0.70 * t;
-        const glowBlur = 1 + 20 * t;
-        const glowWidth = 1.2 + 3.8 * t;
+        // Phosphor outer glow trace - smooth analog interpolation with canonical green
+        const glowAlpha = 0.15 + 0.65 * t;
+        const glowBlur = 1 + 10 * t;
+        const glowWidth = 1.2 + 2.4 * t;
 
         ctx.beginPath();
         for (let x = 0; x <= w; x += 3) {
@@ -204,15 +204,12 @@
         }
         ctx.strokeStyle = `rgba(114, 203, 102, ${glowAlpha})`;
         ctx.lineWidth = glowWidth;
-        ctx.shadowColor = `rgba(114, 203, 102, ${0.1 + 0.8 * t})`;
+        ctx.shadowColor = '#72cb66';
         ctx.shadowBlur = glowBlur;
         ctx.stroke();
 
-        // Core electron beam - smooth RGB morph from muted baseline green to brilliant white
-        const r = Math.round(114 + (255 - 114) * t);
-        const g = Math.round(203 + (255 - 203) * t);
-        const b = Math.round(102 + (255 - 102) * t);
-        const coreAlpha = 0.3 + 0.7 * t;
+        // Core electron beam - cohesive green with canonical #72cb66 (rgba(114, 203, 102))
+        const coreAlpha = 0.35 + 0.65 * t;
 
         ctx.beginPath();
         for (let x = 0; x <= w; x += 3) {
@@ -220,7 +217,7 @@
           if (x === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         }
-        ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${coreAlpha})`;
+        ctx.strokeStyle = `rgba(114, 203, 102, ${coreAlpha})`;
         ctx.lineWidth = 1.5;
         ctx.shadowBlur = 0;
         ctx.stroke();
