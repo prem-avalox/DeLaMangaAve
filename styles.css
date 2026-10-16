@@ -5583,15 +5583,22 @@ body.prototype-home .window:focus-visible .window-graphic {
   transition: transform var(--dur-normal) var(--ease-organic);
 }
 
-/* Colores ocultos en reposo; se cargan en hover y se desvanecen suavemente hacia el negro al soltar */
+/* Capa de color que ilumina progresivamente desde el lado izquierdo */
+.cylinder-color-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  clip-path: inset(0 100% 0 0); /* En reposo: apagado/cortado desde el lado izquierdo */
+  pointer-events: none;
+}
+
 .cylinder-gradient {
   position: absolute;
   inset: -20px -40px;
   background: linear-gradient(90deg, #ff5e00 0%, #ff1a75 33%, #9e00c5 66%, #ff5e00 100%);
   background-size: 200% 100%;
-  opacity: 0;
-  transition: opacity 750ms var(--ease-organic);
-  will-change: background-position, opacity;
+  animation: cylinderColorFlow 2800ms linear infinite;
+  will-change: background-position;
 }
 
 /* Silueta formada exclusivamente por las líneas verticales del cilindro */
@@ -5600,37 +5607,51 @@ body.prototype-home .window:focus-visible .window-graphic {
   inset: 0;
   background: repeating-linear-gradient(90deg, rgba(238, 242, 232, 0.42) 0 1.5px, transparent 1.5px 16px);
   pointer-events: none;
-  z-index: 2;
+  z-index: 4;
 }
 
-/* Brillo especular y volumen 3D: oculto en reposo, se desvanece suavemente hacia el negro */
+/* Brillo especular y volumen 3D dentro de la capa iluminada */
 .cylinder-specular {
   position: absolute;
   inset: 0;
   background: linear-gradient(90deg, rgba(3, 4, 3, 0.85) 0%, transparent 20%, rgba(255, 255, 255, 0.4) 48%, transparent 68%, rgba(3, 4, 3, 0.85) 100%);
   pointer-events: none;
-  z-index: 3;
-  opacity: 0;
-  transition: opacity 750ms var(--ease-organic);
+  z-index: 2;
 }
 
-/* En hover: los colores se cargan y fluyen a través de la silueta */
-body.prototype-home .window--color:hover .cylinder-gradient,
-body.prototype-home .window--color:focus-visible .cylinder-gradient {
-  opacity: 1;
-  animation: cylinderColorFlow 2800ms linear infinite;
-  transition: opacity 650ms var(--ease-organic);
+/* En hover / iluminación: los colores aparecen progresivamente desde el lado izquierdo */
+.window--color.is-lighting .cylinder-color-layer,
+body.prototype-home .window--color:hover .cylinder-color-layer,
+body.prototype-home .window--color:focus-visible .cylinder-color-layer {
+  animation: cylinderSweepIn 680ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-body.prototype-home .window--color:hover .cylinder-specular,
-body.prototype-home .window--color:focus-visible .cylinder-specular {
-  opacity: 0.9;
-  transition: opacity 650ms var(--ease-organic);
+/* Al soltar / apagado: los colores se apagan asimismo progresivamente desde el lado izquierdo */
+.window--color.is-extinguishing .cylinder-color-layer {
+  animation: cylinderSweepOut 620ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 body.prototype-home .window--color:hover .cylinder-barrel,
 body.prototype-home .window--color:focus-visible .cylinder-barrel {
   transform: rotateX(15deg) scale(1.02);
+}
+
+@keyframes cylinderSweepIn {
+  0% {
+    clip-path: inset(0 100% 0 0);
+  }
+  100% {
+    clip-path: inset(0 0% 0 0);
+  }
+}
+
+@keyframes cylinderSweepOut {
+  0% {
+    clip-path: inset(0 0% 0 0);
+  }
+  100% {
+    clip-path: inset(0 0% 0 100%);
+  }
 }
 
 @keyframes cylinderColorFlow {
@@ -5850,18 +5871,73 @@ body.prototype-home .window--music:focus-visible .music-scope {
 
 .music-scale {
   position: absolute;
-  right: 4px;
-  top: 8px;
-  bottom: 8px;
+  right: 8px;
+  top: 14%;
+  bottom: 14%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  font-family: var(--font-mono);
-  font-size: 8px;
-  color: var(--dim);
-  letter-spacing: 0.1em;
+  align-items: flex-end;
   pointer-events: none;
   z-index: 3;
+}
+
+.scale-mark {
+  display: inline-grid;
+  grid-template-columns: 8px 9px auto;
+  align-items: baseline;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--dim);
+  background: rgba(8, 11, 8, 0.72);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(114, 203, 102, 0.22);
+  border-radius: 3px;
+  padding: 1.5px 5px;
+  opacity: 0;
+  transform: scale(0.65) translateX(4px);
+  transition: opacity 300ms var(--ease-organic), transform 300ms var(--ease-organic);
+}
+
+.scale-sign {
+  text-align: center;
+  font-weight: 500;
+  color: var(--accent);
+}
+
+.scale-num {
+  text-align: center;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.scale-unit {
+  font-size: 8.5px;
+  opacity: 0.85;
+  margin-left: 1.5px;
+}
+
+/* En hover: aparecen uno a uno con rebote orgánico como en fotografía */
+body.prototype-home .window--music:hover .scale-mark--high,
+body.prototype-home .window--music:focus-visible .scale-mark--high {
+  animation: hudBadgeBounce 480ms cubic-bezier(0.2, 0.85, 0.35, 1) 90ms both;
+  color: #ffffff;
+  border-color: rgba(114, 203, 102, 0.55);
+}
+
+body.prototype-home .window--music:hover .scale-mark--zero,
+body.prototype-home .window--music:focus-visible .scale-mark--zero {
+  animation: hudBadgeBounce 480ms cubic-bezier(0.2, 0.85, 0.35, 1) 230ms both;
+  color: #ffffff;
+  border-color: rgba(114, 203, 102, 0.55);
+}
+
+body.prototype-home .window--music:hover .scale-mark--low,
+body.prototype-home .window--music:focus-visible .scale-mark--low {
+  animation: hudBadgeBounce 480ms cubic-bezier(0.2, 0.85, 0.35, 1) 370ms both;
+  color: #ffffff;
+  border-color: rgba(114, 203, 102, 0.55);
 }
 
 .music-wave-canvas {
@@ -5870,7 +5946,7 @@ body.prototype-home .window--music:focus-visible .music-scope {
   display: block;
 }
 
-/* 4. Origen: Escalera que Ocupa Todo el Gráfico de Arriba a Abajo y Sigue Corriendo Perpetuamente */
+/* 4. Origen: Escalera Diagonal Cortada entre Dos Rieles Paralelos de Arriba a Abajo */
 .window-graphic--origin {
   inset: 54px 18px 46px;
 }
@@ -5879,8 +5955,7 @@ body.prototype-home .window--music:focus-visible .music-scope {
   position: relative;
   width: 100%;
   height: 100%;
-  border-left: 1px solid rgba(238, 242, 232, 0.42);
-  border-bottom: 1px solid rgba(238, 242, 232, 0.22);
+  border: 1px solid rgba(238, 242, 232, 0.15);
   overflow: hidden;
   opacity: 0.20;
   transition: opacity 550ms var(--ease-organic);
@@ -5892,22 +5967,36 @@ body.prototype-home .window--origin:focus-visible .origin-stage {
   transition: opacity 350ms var(--ease-organic);
 }
 
-.origin-rails {
+.origin-staircase {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(135deg, transparent 0 35%, rgba(238, 242, 232, 0.32) 35.5% 36.5%, transparent 37%),
-    linear-gradient(135deg, transparent 0 62%, rgba(238, 242, 232, 0.42) 62.5% 63.5%, transparent 64%);
-  pointer-events: none;
-  z-index: 0;
 }
 
-/* Escalera que ocupa todo el contenedor de arriba a abajo y SIGUE CORRIENDO SIEMPRE */
+/* Rieles diagonales que enmarcan la escalera como bordes exactos */
+.staircase-rails {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* Interior de la escalera: cortado estrictamente entre los dos rieles diagonales */
+.staircase-interior {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(62% 0%, 92% 0%, 48% 100%, 18% 100%);
+  overflow: hidden;
+  z-index: 2;
+}
+
+/* Escalones que bajan perpetuamente de arriba a abajo, cortados por la diagonal */
 .origin-ladder {
   position: absolute;
   inset: 0;
   z-index: 1;
-  animation: originStepsScroll 750ms linear infinite;
+  animation: originStepsScroll 700ms linear infinite;
 }
 
 .origin-step {
@@ -5916,11 +6005,10 @@ body.prototype-home .window--origin:focus-visible .origin-stage {
   right: 0;
   top: calc(50% + var(--step-y));
   height: 1px;
-  background: rgba(238, 242, 232, 0.38);
-  transition: background 150ms ease;
+  background: rgba(238, 242, 232, 0.55);
 }
 
-/* Línea verde siempre FIJA en el centro (50%) */
+/* Línea verde central fija a 50%: se ilumina únicamente dentro de la escalera */
 .origin-centerline {
   position: absolute;
   left: 0;
@@ -5933,10 +6021,10 @@ body.prototype-home .window--origin:focus-visible .origin-stage {
   z-index: 3;
 }
 
-/* En Hover: El destello milimétrico se activa sobre la escalera que corre */
+/* En Hover: El destello sincronizado se activa sobre los peldaños que bajan */
 body.prototype-home .window--origin:hover .origin-centerline,
 body.prototype-home .window--origin:focus-visible .origin-centerline {
-  animation: originCenterFlash 750ms linear infinite;
+  animation: originCenterFlash 700ms linear infinite;
 }
 
 @keyframes originStepsScroll {
@@ -5944,7 +6032,7 @@ body.prototype-home .window--origin:focus-visible .origin-centerline {
     transform: translateY(0);
   }
   100% {
-    transform: translateY(30px);
+    transform: translateY(24px);
   }
 }
 

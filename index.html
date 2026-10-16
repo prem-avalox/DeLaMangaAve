@@ -73,9 +73,11 @@
         <span>Servicios</span>
         <div class="window-graphic window-graphic--cylinder" aria-hidden="true">
           <div class="cylinder-barrel">
-            <div class="cylinder-gradient"></div>
+            <div class="cylinder-color-layer">
+              <div class="cylinder-gradient"></div>
+              <div class="cylinder-specular"></div>
+            </div>
             <div class="cylinder-cage"></div>
-            <div class="cylinder-specular"></div>
           </div>
         </div>
         <small>Color, video y postproducción</small>
@@ -105,10 +107,10 @@
         <span>Música</span>
         <div class="window-graphic window-graphic--music" aria-hidden="true">
           <div class="music-scope">
-            <div class="music-scale">
-              <span>+6dB</span>
-              <span>0dB</span>
-              <span>-6dB</span>
+            <div class="music-scale" aria-hidden="true">
+              <span class="scale-mark scale-mark--high"><span class="scale-sign">+</span><span class="scale-num">6</span><span class="scale-unit">dB</span></span>
+              <span class="scale-mark scale-mark--zero"><span class="scale-sign"> </span><span class="scale-num">0</span><span class="scale-unit">dB</span></span>
+              <span class="scale-mark scale-mark--low"><span class="scale-sign">-</span><span class="scale-num">6</span><span class="scale-unit">dB</span></span>
             </div>
             <canvas id="musicWaveCanvas" class="music-wave-canvas"></canvas>
           </div>
@@ -120,21 +122,30 @@
         <span>Origen</span>
         <div class="window-graphic window-graphic--origin" aria-hidden="true">
           <div class="origin-stage">
-            <div class="origin-rails"></div>
-            <div class="origin-ladder">
-              <span class="origin-step" style="--step-y: -150px;"></span>
-              <span class="origin-step" style="--step-y: -120px;"></span>
-              <span class="origin-step" style="--step-y: -90px;"></span>
-              <span class="origin-step" style="--step-y: -60px;"></span>
-              <span class="origin-step" style="--step-y: -30px;"></span>
-              <span class="origin-step" style="--step-y: 0px;"></span>
-              <span class="origin-step" style="--step-y: 30px;"></span>
-              <span class="origin-step" style="--step-y: 60px;"></span>
-              <span class="origin-step" style="--step-y: 90px;"></span>
-              <span class="origin-step" style="--step-y: 120px;"></span>
-              <span class="origin-step" style="--step-y: 150px;"></span>
+            <div class="origin-staircase">
+              <svg class="staircase-rails" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <line x1="18" y1="100" x2="62" y2="0" stroke="rgba(238, 242, 232, 0.45)" stroke-width="1.5" />
+                <line x1="48" y1="100" x2="92" y2="0" stroke="rgba(238, 242, 232, 0.45)" stroke-width="1.5" />
+              </svg>
+              <div class="staircase-interior">
+                <div class="origin-ladder">
+                  <span class="origin-step" style="--step-y: -144px;"></span>
+                  <span class="origin-step" style="--step-y: -120px;"></span>
+                  <span class="origin-step" style="--step-y: -96px;"></span>
+                  <span class="origin-step" style="--step-y: -72px;"></span>
+                  <span class="origin-step" style="--step-y: -48px;"></span>
+                  <span class="origin-step" style="--step-y: -24px;"></span>
+                  <span class="origin-step" style="--step-y: 0px;"></span>
+                  <span class="origin-step" style="--step-y: 24px;"></span>
+                  <span class="origin-step" style="--step-y: 48px;"></span>
+                  <span class="origin-step" style="--step-y: 72px;"></span>
+                  <span class="origin-step" style="--step-y: 96px;"></span>
+                  <span class="origin-step" style="--step-y: 120px;"></span>
+                  <span class="origin-step" style="--step-y: 144px;"></span>
+                </div>
+                <div class="origin-centerline"></div>
+              </div>
             </div>
-            <div class="origin-centerline"></div>
           </div>
         </div>
         <small>Acerca / biografía</small>
@@ -260,6 +271,27 @@
 
       window.addEventListener('resize', resize);
       setTimeout(resize, 60);
+
+      // Servicios: barrido progresivo de color e iluminación desde el lado izquierdo
+      const winColor = document.querySelector('.window--color');
+      if (winColor) {
+        winColor.addEventListener('mouseenter', () => {
+          winColor.classList.remove('is-extinguishing');
+          winColor.classList.add('is-lighting');
+        });
+        winColor.addEventListener('mouseleave', () => {
+          winColor.classList.remove('is-lighting');
+          winColor.classList.add('is-extinguishing');
+        });
+        winColor.addEventListener('focusin', () => {
+          winColor.classList.remove('is-extinguishing');
+          winColor.classList.add('is-lighting');
+        });
+        winColor.addEventListener('focusout', () => {
+          winColor.classList.remove('is-lighting');
+          winColor.classList.add('is-extinguishing');
+        });
+      }
     })();
   </script>
 </body>
