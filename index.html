@@ -181,9 +181,9 @@
         const t = Math.max(0, Math.min(1, currentAmp));
 
         // Phosphor outer glow trace - smooth analog interpolation
-        const glowAlpha = 0.2 + 0.65 * t;
-        const glowBlur = 2 + 18 * t;
-        const glowWidth = 1.5 + 3.5 * t;
+        const glowAlpha = 0.15 + 0.70 * t;
+        const glowBlur = 1 + 20 * t;
+        const glowWidth = 1.2 + 3.8 * t;
 
         ctx.beginPath();
         for (let x = 0; x <= w; x += 3) {
@@ -193,7 +193,7 @@
         }
         ctx.strokeStyle = `rgba(114, 203, 102, ${glowAlpha})`;
         ctx.lineWidth = glowWidth;
-        ctx.shadowColor = '#72cb66';
+        ctx.shadowColor = `rgba(114, 203, 102, ${0.1 + 0.8 * t})`;
         ctx.shadowBlur = glowBlur;
         ctx.stroke();
 
@@ -201,7 +201,7 @@
         const r = Math.round(114 + (255 - 114) * t);
         const g = Math.round(203 + (255 - 203) * t);
         const b = Math.round(102 + (255 - 102) * t);
-        const coreAlpha = 0.35 + 0.65 * t;
+        const coreAlpha = 0.3 + 0.7 * t;
 
         ctx.beginPath();
         for (let x = 0; x <= w; x += 3) {
@@ -216,15 +216,16 @@
       }
 
       function loop() {
-        const ease = isHovered ? 0.08 : 0.05;
+        const ease = isHovered ? 0.08 : 0.045;
         currentAmp += (targetAmp - currentAmp) * ease;
-        if (isHovered || currentAmp > 0.01) {
-          phase += 0.052;
+        const t = Math.max(0, Math.min(1, currentAmp));
+        if (isHovered || currentAmp > 0.005) {
+          phase += 0.052 * (0.3 + 0.7 * t);
         }
 
         drawFrame();
 
-        if (isHovered || currentAmp > 0.002) {
+        if (isHovered || currentAmp > 0.001) {
           animId = requestAnimationFrame(loop);
         } else {
           currentAmp = 0;

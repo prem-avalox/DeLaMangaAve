@@ -5594,25 +5594,23 @@ body.prototype-home .window:focus-visible .window-graphic {
   will-change: background-position, opacity;
 }
 
-/* Silueta con líneas wireframe del cilindro siempre visibles */
+/* Silueta formada exclusivamente por las líneas verticales del cilindro */
 .cylinder-cage {
   position: absolute;
   inset: 0;
-  background:
-    repeating-linear-gradient(90deg, rgba(238, 242, 232, 0.35) 0 1.5px, transparent 1.5px 16px),
-    repeating-linear-gradient(180deg, rgba(238, 242, 232, 0.14) 0 1px, transparent 1px 24px);
+  background: repeating-linear-gradient(90deg, rgba(238, 242, 232, 0.42) 0 1.5px, transparent 1.5px 16px);
   pointer-events: none;
   z-index: 2;
 }
 
-/* Brillo especular y sombra 3D para volumen cilíndrico */
+/* Brillo especular y volumen 3D: oculto en reposo, se desvanece suavemente hacia el negro */
 .cylinder-specular {
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, rgba(3, 4, 3, 0.78) 0%, transparent 20%, rgba(255, 255, 255, 0.35) 48%, transparent 68%, rgba(3, 4, 3, 0.78) 100%);
+  background: linear-gradient(90deg, rgba(3, 4, 3, 0.85) 0%, transparent 20%, rgba(255, 255, 255, 0.4) 48%, transparent 68%, rgba(3, 4, 3, 0.85) 100%);
   pointer-events: none;
   z-index: 3;
-  opacity: 0.65;
+  opacity: 0;
   transition: opacity 750ms var(--ease-organic);
 }
 
@@ -5626,7 +5624,8 @@ body.prototype-home .window--color:focus-visible .cylinder-gradient {
 
 body.prototype-home .window--color:hover .cylinder-specular,
 body.prototype-home .window--color:focus-visible .cylinder-specular {
-  opacity: 1;
+  opacity: 0.9;
+  transition: opacity 650ms var(--ease-organic);
 }
 
 body.prototype-home .window--color:hover .cylinder-barrel,
@@ -5790,35 +5789,35 @@ body.prototype-home .window--photo:focus-visible .hud-collimator::after {
 /* Transición escalonada uno a uno con micro-rebote orgánico */
 body.prototype-home .window--photo:hover .hud-meta--tl,
 body.prototype-home .window--photo:focus-visible .hud-meta--tl {
-  animation: hudBadgeBounce 440ms var(--ease-spring) 100ms both;
+  animation: hudBadgeBounce 480ms cubic-bezier(0.2, 0.85, 0.35, 1) 80ms both;
 }
 
 body.prototype-home .window--photo:hover .hud-meta--tr,
 body.prototype-home .window--photo:focus-visible .hud-meta--tr {
-  animation: hudBadgeBounce 440ms var(--ease-spring) 240ms both;
+  animation: hudBadgeBounce 480ms cubic-bezier(0.2, 0.85, 0.35, 1) 220ms both;
 }
 
 body.prototype-home .window--photo:hover .hud-meta--bl,
 body.prototype-home .window--photo:focus-visible .hud-meta--bl {
-  animation: hudBadgeBounce 440ms var(--ease-spring) 380ms both;
+  animation: hudBadgeBounce 480ms cubic-bezier(0.2, 0.85, 0.35, 1) 360ms both;
 }
 
 body.prototype-home .window--photo:hover .hud-meta--br,
 body.prototype-home .window--photo:focus-visible .hud-meta--br {
-  animation: hudBadgeBounce 440ms var(--ease-spring) 520ms both;
+  animation: hudBadgeBounce 480ms cubic-bezier(0.2, 0.85, 0.35, 1) 500ms both;
 }
 
 @keyframes hudBadgeBounce {
   0% {
     opacity: 0;
-    transform: scale(0.68) translateY(-4px);
+    transform: scale(0.55) translateY(-5px);
   }
-  55% {
+  60% {
     opacity: 1;
-    transform: scale(1.12) translateY(1.5px);
+    transform: scale(1.18) translateY(1.5px);
   }
-  78% {
-    transform: scale(0.96) translateY(-0.5px);
+  80% {
+    transform: scale(0.94) translateY(-0.5px);
   }
   100% {
     opacity: 1;
@@ -5839,13 +5838,14 @@ body.prototype-home .window--photo:focus-visible .hud-meta--br {
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.35;
-  transition: opacity 450ms var(--ease-organic);
+  opacity: 0.20;
+  transition: opacity 550ms var(--ease-organic);
 }
 
 body.prototype-home .window--music:hover .music-scope,
 body.prototype-home .window--music:focus-visible .music-scope {
   opacity: 1;
+  transition: opacity 350ms var(--ease-organic);
 }
 
 .music-scale {
@@ -5882,13 +5882,14 @@ body.prototype-home .window--music:focus-visible .music-scope {
   border-left: 1px solid rgba(238, 242, 232, 0.42);
   border-bottom: 1px solid rgba(238, 242, 232, 0.22);
   overflow: hidden;
-  opacity: 0.35;
-  transition: opacity 450ms var(--ease-organic);
+  opacity: 0.20;
+  transition: opacity 550ms var(--ease-organic);
 }
 
 body.prototype-home .window--origin:hover .origin-stage,
 body.prototype-home .window--origin:focus-visible .origin-stage {
   opacity: 1;
+  transition: opacity 350ms var(--ease-organic);
 }
 
 .origin-rails {
