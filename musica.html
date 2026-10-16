@@ -65,6 +65,116 @@
 
         <div class="albums-grid" data-music-index></div>
       </section>
+
+      <section class="panel" data-reveal>
+        <div class="panel__head">
+          <p class="eyebrow">Reproductor</p>
+          <div class="panel__title-group">
+            <h2>Escucha en directo — Operación 14</h2>
+            <p>EP de cinco canciones. Archivo sonoro de origen, nocturnidad y afirmación personal disponible para reproducción directa.</p>
+          </div>
+        </div>
+
+        <div class="music-player" data-player>
+          <div class="music-player__artwork">
+            <img src="assets/music/operacion-14/web/cover.png" alt="Operación 14 portada" class="music-player__cover" width="500" height="500" loading="lazy">
+            <div class="music-player__presave">
+              <a href="https://open.spotify.com/album/1jueVag2lJrfA8HRilaX7o" target="_blank" rel="noopener noreferrer" class="music-player__presave-link">
+                Escuchar en Spotify
+              </a>
+            </div>
+          </div>
+
+          <div class="music-player__content">
+            <div class="music-player__tracklist">
+              <div class="track-item" data-index="0">
+                <div class="track-item__info">
+                  <span class="track-item__number">01</span>
+                  <div class="track-item__details">
+                    <h3 class="track-item__title">4AM</h3>
+                    <span class="track-item__duration">2:13</span>
+                  </div>
+                </div>
+                <button class="track-item__play" data-track-src="assets/music/operacion-14/audio/01-4am.wav" aria-label="Reproducir 4AM">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                </button>
+              </div>
+
+              <div class="track-item" data-index="1">
+                <div class="track-item__info">
+                  <span class="track-item__number">02</span>
+                  <div class="track-item__details">
+                    <h3 class="track-item__title">Fanático</h3>
+                    <span class="track-item__duration">2:32</span>
+                  </div>
+                </div>
+                <button class="track-item__play" data-track-src="assets/music/operacion-14/audio/02-fanatico.wav" aria-label="Reproducir Fanático">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                </button>
+              </div>
+
+              <div class="track-item" data-index="2">
+                <div class="track-item__info">
+                  <span class="track-item__number">03</span>
+                  <div class="track-item__details">
+                    <h3 class="track-item__title">Motivarte</h3>
+                    <span class="track-item__duration">4:03</span>
+                  </div>
+                </div>
+                <button class="track-item__play" data-track-src="assets/music/operacion-14/audio/03-motivarte.wav" aria-label="Reproducir Motivarte">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                </button>
+              </div>
+
+              <div class="track-item" data-index="3">
+                <div class="track-item__info">
+                  <span class="track-item__number">04</span>
+                  <div class="track-item__details">
+                    <h3 class="track-item__title">Amadeus (Escándalo)</h3>
+                    <span class="track-item__duration">2:28</span>
+                  </div>
+                </div>
+                <button class="track-item__play" data-track-src="assets/music/operacion-14/audio/04-amadeus-escandalo.wav" aria-label="Reproducir Amadeus (Escándalo)">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                </button>
+              </div>
+
+              <div class="track-item" data-index="4">
+                <div class="track-item__info">
+                  <span class="track-item__number">05</span>
+                  <div class="track-item__details">
+                    <h3 class="track-item__title">Encima del mar</h3>
+                    <span class="track-item__duration">2:53</span>
+                  </div>
+                </div>
+                <button class="track-item__play" data-track-src="assets/music/operacion-14/audio/05-encima-del-mar.wav" aria-label="Reproducir Encima del mar">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="music-player__controls">
+              <div class="player-progress">
+                <div class="progress-bar">
+                  <div class="progress-bar__filled" style="width: 0%"></div>
+                </div>
+                <div class="progress-time">
+                  <span class="time-current">0:00</span>
+                  <span class="time-duration">14:09</span>
+                </div>
+              </div>
+              <div class="player-buttons">
+                <button class="btn-player btn-player--play" aria-label="Reproducir o pausar">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                </button>
+                <div class="player-track-name">4AM</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <audio id="player-audio" preload="metadata"></audio>
+      </section>
     </main>
   </div>
 </body>

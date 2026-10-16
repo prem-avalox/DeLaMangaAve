@@ -1761,15 +1761,14 @@ function initMusicPlayer() {
                 document.querySelector('.btn-album-play');
   
   // Find track items
-  let trackItems = document.querySelectorAll('.track-item') || 
-                   document.querySelectorAll('.track-card');
-  
-  if (document.querySelectorAll('.track-card').length > 0) {
+  let trackItems = document.querySelectorAll('.track-item');
+  if (trackItems.length === 0) {
     trackItems = document.querySelectorAll('.track-card');
   }
 
   const progressBar = document.querySelector('.progress-bar__filled');
   const currentTimeEl = document.querySelector('.time-current');
+  const durationEl = document.querySelector('.time-duration');
   const container = document.querySelector('[data-player]');
   
   // Track name elements (handle both layouts)
@@ -1780,18 +1779,45 @@ function initMusicPlayer() {
 
   let currentTrackIndex = 0;
 
-  const updateProgressBar = () => {
-    if (audio.duration) {
-      const percentage = (audio.currentTime / audio.duration) * 100;
-      progressBar.style.width = `${percentage}%`;
-      currentTimeEl.textContent = formatTime(audio.currentTime);
-    }
-  };
-
   const formatTime = (seconds) => {
+    if (!seconds || !isFinite(seconds)) return '0:00';
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const updatePlayIcon = () => {
+    const svg = playBtn.querySelector('svg');
+    if (!svg) return;
+    if (audio.paused) {
+      svg.innerHTML = '<polygon points="6 3 20 12 6 21 6 3"/>';
+    } else {
+      svg.innerHTML = '<path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>';
+    }
+  };
+
+  const updateTrackIcons = () => {
+    trackItems.forEach((item, i) => {
+      const btn = item.querySelector('.track-item__play') || item.querySelector('.track-card__button');
+      if (!btn) return;
+      const svg = btn.querySelector('svg');
+      if (!svg) return;
+      const isPlaying = i === currentTrackIndex && !audio.paused;
+      if (isPlaying) {
+        svg.innerHTML = '<path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>';
+      } else {
+        svg.innerHTML = '<polygon points="6 3 20 12 6 21 6 3"/>';
+      }
+    });
+  };
+
+  const updateProgressBar = () => {
+    if (audio.duration && isFinite(audio.duration)) {
+      const percentage = (audio.currentTime / audio.duration) * 100;
+      if (progressBar) progressBar.style.width = `${percentage}%`;
+      if (currentTimeEl) currentTimeEl.textContent = formatTime(audio.currentTime);
+      if (durationEl) durationEl.textContent = formatTime(audio.duration);
+    }
   };
 
   const loadTrack = (index) => {
@@ -1804,14 +1830,14 @@ function initMusicPlayer() {
     
     const src = button.dataset.trackSrc;
     const title = trackItem.querySelector('h3')?.textContent || 
-                  trackItem.querySelector('.track-card__title')?.textContent;
+                  trackItem.querySelector('.track-card__title')?.textContent ||
+                  trackItem.querySelector('.track-item__title')?.textContent;
 
     audio.src = src;
     if (playerTrackNameEl) {
       playerTrackNameEl.textContent = title;
     }
 
-    // Update active track UI
     trackItems.forEach((item, i) => {
       item.classList.toggle('is-playing', i === index);
     });
@@ -1819,13 +1845,20 @@ function initMusicPlayer() {
 
   const play = () => {
     if (!audio.src) loadTrack(0);
-    audio.play();
+    const p = audio.play();
+    if (p !== undefined) {
+      p.catch(() => {});
+    }
     playBtn.classList.add('is-playing');
+    updatePlayIcon();
+    updateTrackIcons();
   };
 
   const pause = () => {
     audio.pause();
     playBtn.classList.remove('is-playing');
+    updatePlayIcon();
+    updateTrackIcons();
   };
 
   const togglePlay = () => {
@@ -1845,8 +1878,12 @@ function initMusicPlayer() {
     if (button) {
       button.addEventListener('click', (e) => {
         e.stopPropagation();
-        loadTrack(index);
-        play();
+        if (currentTrackIndex === index && !audio.paused) {
+          pause();
+        } else {
+          loadTrack(index);
+          play();
+        }
       });
     }
   });
@@ -1857,17 +1894,36 @@ function initMusicPlayer() {
     progressContainer.addEventListener('click', (e) => {
       const rect = progressContainer.getBoundingClientRect();
       const percent = (e.clientX - rect.left) / rect.width;
-      audio.currentTime = percent * audio.duration;
+      if (audio.duration && isFinite(audio.duration)) {
+        audio.currentTime = percent * audio.duration;
+      }
     });
   }
 
   // Audio events
   audio.addEventListener('timeupdate', updateProgressBar);
-  audio.addEventListener('ended', () => {
+  audio.addEventListener('play', () => {
+    playBtn.classList.add('is-playing');
+    updatePlayIcon();
+    updateTrackIcons();
+  });
+  audio.addEventListener('pause', () => {
     playBtn.classList.remove('is-playing');
+    updatePlayIcon();
+    updateTrackIcons();
+  });
+  audio.addEventListener('ended', () => {
+    if (currentTrackIndex + 1 < trackItems.length) {
+      loadTrack(currentTrackIndex + 1);
+      play();
+    } else {
+      playBtn.classList.remove('is-playing');
+      updatePlayIcon();
+      updateTrackIcons();
+    }
   });
 
-  // Load first track
+  // Initialize first track
   loadTrack(0);
 }
 
