@@ -16,6 +16,10 @@ function initSplits() {
       container.style.setProperty('--split', `${v}%`);
       if (range) range.value = v;
 
+      if (typeof container._onSplitUpdate === 'function') {
+        container._onSplitUpdate();
+      }
+
       // Dynamic fade for ANTES and DESPUES based on revealed footage:
       // Left side [0..v%] shows DESPUES:
       // When v >= 45%, DESPUES has ample room -> full opacity (1.0).
@@ -160,6 +164,140 @@ function wireImageInputs() {
 
   if (beforeInput && beforeImg) loadImage(beforeInput, beforeImg);
   if (afterInput && afterImg) loadImage(afterInput, afterImg);
+}
+
+function initVideoSplitCanvas() {
+  const container = document.querySelector('.split--video [data-split-container]');
+  if (!container) return;
+
+  const video = container.querySelector('#split-video-source') || container.querySelector('video');
+  const canvas = container.querySelector('.split__canvas');
+  if (!video || !canvas) return;
+
+  const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true }) || canvas.getContext('2d');
+  if (!ctx) return;
+
+  // Single unified stream: 2160x1920 (left 1080: graded/DESPUES, right 1080: ungraded/ANTES)
+  const halfW = 1080;
+  const h = 1920;
+  canvas.width = halfW;
+  canvas.height = h;
+
+  let currentSplit = 50;
+
+  const renderFrame = () => {
+    const splitProp = container.style.getPropertyValue('--split');
+    if (splitProp) {
+      const parsed = parseFloat(splitProp);
+      if (!isNaN(parsed)) currentSplit = Math.max(0, Math.min(100, parsed));
+    }
+
+    const splitRatio = currentSplit / 100;
+    const splitX = Math.round(splitRatio * halfW);
+
+    if (video.readyState >= 2) {
+      // Left slice: Graded (DESPUES) from [0 .. splitX] in source video
+      if (splitX > 0) {
+        ctx.drawImage(video, 0, 0, splitX, h, 0, 0, splitX, h);
+      }
+      // Right slice: Ungraded (ANTES) from [halfW + splitX .. 2 * halfW] in source video
+      if (splitX < halfW) {
+        const remainingW = halfW - splitX;
+        ctx.drawImage(video, halfW + splitX, 0, remainingW, h, splitX, 0, remainingW, h);
+      }
+    }
+  };
+
+  container._onSplitUpdate = renderFrame;
+
+  let isLooping = false;
+  const loopStep = () => {
+    if (!isLooping) return;
+    renderFrame();
+    if ('requestVideoFrameCallback' in video) {
+      video.requestVideoFrameCallback(loopStep);
+    } else {
+      requestAnimationFrame(loopStep);
+    }
+  };
+
+  const startLoop = () => {
+    if (isLooping) return;
+    isLooping = true;
+    if ('requestVideoFrameCallback' in video) {
+      video.requestVideoFrameCallback(loopStep);
+    } else {
+      requestAnimationFrame(loopStep);
+    }
+  };
+
+  // Video attributes & permanent playback guarantees
+  video.muted = true;
+  video.playsInline = true;
+  video.autoplay = true;
+  video.loop = true;
+
+  const ensurePlayback = () => {
+    if (video.paused) {
+      video.play().catch(() => {});
+    }
+  };
+
+  video.addEventListener('loadeddata', () => {
+    renderFrame();
+    ensurePlayback();
+    startLoop();
+  });
+
+  video.addEventListener('canplay', () => {
+    renderFrame();
+    ensurePlayback();
+    startLoop();
+  });
+
+  video.addEventListener('play', () => {
+    startLoop();
+  });
+
+  video.addEventListener('pause', () => {
+    ensurePlayback();
+  });
+
+  video.addEventListener('ended', () => {
+    video.currentTime = 0;
+    ensurePlayback();
+  });
+
+  video.addEventListener('seeked', () => {
+    renderFrame();
+  });
+
+  // Keep playing permanently - never pause on background tab wake
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      ensurePlayback();
+      startLoop();
+    }
+  });
+  window.addEventListener('focus', () => {
+    ensurePlayback();
+    startLoop();
+  });
+
+  // Gesture unlock fallback for strict browser autoplay policies
+  const unlock = () => {
+    ensurePlayback();
+    startLoop();
+    window.removeEventListener('pointerdown', unlock);
+    window.removeEventListener('scroll', unlock);
+    window.removeEventListener('touchstart', unlock);
+  };
+  window.addEventListener('pointerdown', unlock, { once: true });
+  window.addEventListener('scroll', unlock, { once: true, passive: true });
+  window.addEventListener('touchstart', unlock, { once: true, passive: true });
+
+  ensurePlayback();
+  startLoop();
 }
 
 function wireVideoInputs() {
@@ -739,6 +877,7 @@ function init() {
   initMobileMenu();
   initAdminCreateLink();
   initSplits();
+  initVideoSplitCanvas();
   wireImageInputs();
   wireVideoInputs();
   wireMeterVideos();

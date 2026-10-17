@@ -893,6 +893,33 @@ body::after {
   z-index: 1;
 }
 
+.split__source-video {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+  opacity: 0.001;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.split__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+  z-index: 2;
+  background: #000;
+}
+
 /* ── Eurostile Pure Floating Labels ──────────────────────────── */
 .split__label {
   position: absolute;

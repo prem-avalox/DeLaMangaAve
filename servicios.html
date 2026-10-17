@@ -130,8 +130,8 @@
 
           <div class="split split--video" data-kind="video">
             <div class="split__viewport" data-split-container style="--split:50%">
-              <video class="layer layer--before" autoplay loop muted playsinline preload="auto" data-video-display="before" src="assets/color/video/ungraded.mp4" aria-label="Toma 4AM antes de corrección de color" controlslist="nodownload nofullscreen noremoteplayback" disablepictureinpicture draggable="false" oncontextmenu="return false;"></video>
-              <video class="layer layer--after" autoplay loop muted playsinline preload="auto" data-video-display="after" src="assets/color/video/graded.mp4" aria-label="Toma 4AM con color grading final" controlslist="nodownload nofullscreen noremoteplayback" disablepictureinpicture draggable="false" oncontextmenu="return false;"></video>
+              <video id="split-video-source" class="split__source-video" src="assets/color/video/split-4am.mp4" autoplay loop muted playsinline preload="auto" aria-hidden="true" controlslist="nodownload nofullscreen noremoteplayback" disablepictureinpicture draggable="false" oncontextmenu="return false;"></video>
+              <canvas class="split__canvas layer" width="1080" height="1920" aria-label="Comparativa antes y después de corrección de color 4AM"></canvas>
               <span class="split__label split__label--before">ANTES</span>
               <span class="split__label split__label--after">DESPUES</span>
             </div>
