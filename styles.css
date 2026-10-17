@@ -1119,10 +1119,6 @@ body::after {
   margin: 0;
 }
 
-.layer--after {
-  clip-path: inset(0 calc(100% - var(--split)) 0 0);
-}
-
 /* ── Split Divider (Diamond) ─────────────────────────────────── */
 .split__divider {
   position: absolute;
@@ -1154,7 +1150,7 @@ body::after {
   background: #040804;
   border: 2px solid var(--accent);
   box-shadow: 0 0 20px rgba(114, 203, 102, 0.7), inset 0 0 8px rgba(114, 203, 102, 0.3);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14'%3E%3Cpath d='M4 7 L1 4 L1 10 Z' fill='%2372cb66'/%3E%3Cpath d='M10 7 L13 4 L13 10 Z' fill='%2372cb66'/%3E%3C/svg%3E');
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14'%3E%3Cpath d='M4 7 L1 4 L1 10 Z' fill='%2372cb66'/%3E%3Cpath d='M10 7 L13 4 L13 10 Z' fill='%2372cb66'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: center;
 }
