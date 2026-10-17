@@ -258,13 +258,13 @@
           if (x === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         }
-        ctx.strokeStyle = `rgba(114, 203, 102, ${glowAlpha})`;
+        ctx.strokeStyle = `rgba(155, 214, 153, ${glowAlpha})`;
         ctx.lineWidth = glowWidth;
-        ctx.shadowColor = '#72cb66';
+        ctx.shadowColor = '#9BD699';
         ctx.shadowBlur = glowBlur;
         ctx.stroke();
 
-        // Core electron beam - cohesive green with canonical #72cb66 (rgba(114, 203, 102))
+        // Core electron beam - cohesive green with canonical #9BD699 (rgba(155, 214, 153))
         const coreAlpha = 0.35 + 0.65 * t;
 
         ctx.beginPath();
@@ -273,7 +273,7 @@
           if (x === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         }
-        ctx.strokeStyle = `rgba(114, 203, 102, ${coreAlpha})`;
+        ctx.strokeStyle = `rgba(155, 214, 153, ${coreAlpha})`;
         ctx.lineWidth = 1.5;
         ctx.shadowBlur = 0;
         ctx.stroke();

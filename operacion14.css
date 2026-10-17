@@ -1385,3 +1385,18 @@ html, body {
     --op-text-max: 100%;
   }
 }
+
+/* ── Media & Archive Protection Against Unauthorized Download ─── */
+img,
+video,
+audio,
+picture,
+figure,
+.op14-text-image,
+.glass-card__image,
+.op14-section {
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  -webkit-user-drag: none !important;
+}

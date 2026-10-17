@@ -165,7 +165,7 @@
     <div class="op14-section__overlay"></div>
     <div class="op14-content">
       <div class="op14-text-block" data-reveal>
-        <img src="assets/music/operacion-14/web/nota-personal.png" alt="Nota Personal" class="op14-text-image">
+        <img src="assets/music/operacion-14/web/nota-personal.png" alt="Nota Personal" class="op14-text-image" draggable="false" oncontextmenu="return false;">
       </div>
     </div>
   </section>
@@ -175,6 +175,6 @@
     <a href="musica.html" class="op14-nav__back op14-nav__back--dark-bg">← Volver a música</a>
   </nav>
 
-  <audio id="player-audio" crossorigin="anonymous" preload="metadata"></audio>
+  <audio id="player-audio" crossorigin="anonymous" preload="metadata" controlslist="nodownload" oncontextmenu="return false;"></audio>
 </body>
 </html>

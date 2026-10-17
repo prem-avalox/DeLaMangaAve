@@ -11,11 +11,26 @@ function initSplits() {
     let isInteracting = false;
 
     const applySplit = (value) => {
-      const v = Math.min(98, Math.max(2, Number(value)));
+      const v = Math.min(99, Math.max(1, Number(value)));
       container.style.setProperty('--split', `${v}%`);
       if (range) range.value = v;
-      if (labelBefore) labelBefore.classList.toggle('is-visible', v < 75);
-      if (labelAfter) labelAfter.classList.toggle('is-visible', v > 25);
+
+      // Dynamic fade for ANTES and DESPUÉS based on revealed footage:
+      // Left side [0..v%] shows DESPUÉS: disappears when v <= 8%, fully visible when v >= 24%
+      if (labelAfter) {
+        const afterRatio = Math.max(0, Math.min(1, (v - 8) / 16));
+        labelAfter.style.opacity = afterRatio.toFixed(3);
+        labelAfter.style.transform = `translateY(${(1 - afterRatio) * 6}px)`;
+        labelAfter.style.pointerEvents = afterRatio > 0.1 ? 'auto' : 'none';
+      }
+
+      // Right side [v%..100%] shows ANTES: disappears when v >= 92%, fully visible when v <= 76%
+      if (labelBefore) {
+        const beforeRatio = Math.max(0, Math.min(1, (92 - v) / 16));
+        labelBefore.style.opacity = beforeRatio.toFixed(3);
+        labelBefore.style.transform = `translateY(${(1 - beforeRatio) * 6}px)`;
+        labelBefore.style.pointerEvents = beforeRatio > 0.1 ? 'auto' : 'none';
+      }
     };
 
     const updateFromPointer = (clientX) => {
@@ -48,43 +63,70 @@ function initSplits() {
       animId = requestAnimationFrame(step);
     };
 
-    // Hover-follow pointer tracking
+    // Desktop hover follow
     container.addEventListener('pointerenter', e => {
-      cancelAnimationFrame(animId);
-      isInteracting = true;
-      updateFromPointer(e.clientX);
+      if (e.pointerType === 'mouse') {
+        cancelAnimationFrame(animId);
+        isInteracting = true;
+        updateFromPointer(e.clientX);
+      }
     });
 
     container.addEventListener('pointermove', e => {
-      isInteracting = true;
-      cancelAnimationFrame(animId);
-      updateFromPointer(e.clientX);
+      if (isInteracting || e.pointerType === 'mouse') {
+        cancelAnimationFrame(animId);
+        updateFromPointer(e.clientX);
+      }
     });
 
-    container.addEventListener('pointerleave', () => {
-      isInteracting = false;
-      returnToCenter();
+    container.addEventListener('pointerleave', e => {
+      if (e.pointerType === 'mouse') {
+        isInteracting = false;
+        returnToCenter();
+      }
     });
 
-    // Touch support
+    // Touch & pointer interaction with pointer capture and scroll prevention
     container.addEventListener('pointerdown', e => {
       isInteracting = true;
       cancelAnimationFrame(animId);
-      updateFromPointer(e.clientX);
       try {
         container.setPointerCapture(e.pointerId);
       } catch (_) {}
-    });
+      updateFromPointer(e.clientX);
+      e.preventDefault();
+    }, { passive: false });
 
-    container.addEventListener('pointerup', e => {
+    const finishPointer = (e) => {
+      if (!isInteracting) return;
       isInteracting = false;
       try {
-        container.releasePointerCapture(e.pointerId);
+        if (e && e.pointerId) container.releasePointerCapture(e.pointerId);
       } catch (_) {}
       returnToCenter();
-    });
+    };
 
-    container.addEventListener('pointercancel', () => {
+    container.addEventListener('pointerup', finishPointer);
+    container.addEventListener('pointercancel', finishPointer);
+
+    // Native touch handlers to strictly prevent mobile viewport panning/stutter
+    container.addEventListener('touchstart', e => {
+      isInteracting = true;
+      cancelAnimationFrame(animId);
+      if (e.touches && e.touches[0]) {
+        updateFromPointer(e.touches[0].clientX);
+      }
+      e.preventDefault();
+    }, { passive: false });
+
+    container.addEventListener('touchmove', e => {
+      if (e.touches && e.touches[0]) {
+        updateFromPointer(e.touches[0].clientX);
+      }
+      e.preventDefault();
+    }, { passive: false });
+
+    container.addEventListener('touchend', () => {
       isInteracting = false;
       returnToCenter();
     });
@@ -186,6 +228,8 @@ function syncVideoPair(primary, secondary) {
   secondary.muted = true;
   primary.playsInline = true;
   secondary.playsInline = true;
+  primary.autoplay = true;
+  secondary.autoplay = true;
 
   const container = primary.closest('[data-split-container]') || primary.parentElement;
 
@@ -193,6 +237,10 @@ function syncVideoPair(primary, secondary) {
   let rafId = null;
 
   const checkSync = () => {
+    // Permanent play: continuously ensure both videos stay playing
+    if (primary.paused) primary.play().catch(() => {});
+    if (secondary.paused) secondary.play().catch(() => {});
+
     if (!primary.paused && !secondary.paused && !isSyncing) {
       const diff = primary.currentTime - secondary.currentTime;
       const absDiff = Math.abs(diff);
@@ -214,8 +262,6 @@ function syncVideoPair(primary, secondary) {
   const restartTogether = () => {
     if (isSyncing) return;
     isSyncing = true;
-    primary.pause();
-    secondary.pause();
     primary.currentTime = 0;
     secondary.currentTime = 0;
     secondary.playbackRate = 1.0;
@@ -238,12 +284,15 @@ function syncVideoPair(primary, secondary) {
     }
   });
 
-  // Mirror play/pause states
+  // Mirror play states and immediately recover from any pause
   primary.addEventListener('play', () => {
     if (secondary.paused && !isSyncing) secondary.play().catch(() => {});
   });
   primary.addEventListener('pause', () => {
-    if (!secondary.paused && !isSyncing) secondary.pause();
+    if (!isSyncing) primary.play().catch(() => {});
+  });
+  secondary.addEventListener('pause', () => {
+    if (!isSyncing) secondary.play().catch(() => {});
   });
 
   // Buffer check to ensure simultaneous start from frame 0
@@ -263,8 +312,6 @@ function syncVideoPair(primary, secondary) {
 
   const startTogether = async () => {
     isSyncing = true;
-    primary.pause();
-    secondary.pause();
     primary.currentTime = 0;
     secondary.currentTime = 0;
     secondary.playbackRate = 1.0;
@@ -278,9 +325,11 @@ function syncVideoPair(primary, secondary) {
         secondary.play().catch(() => {});
         window.removeEventListener('pointerdown', unlock);
         window.removeEventListener('scroll', unlock);
+        window.removeEventListener('touchstart', unlock);
       };
       window.addEventListener('pointerdown', unlock, { once: true });
       window.addEventListener('scroll', unlock, { once: true, passive: true });
+      window.addEventListener('touchstart', unlock, { once: true, passive: true });
     } finally {
       isSyncing = false;
       cancelAnimationFrame(rafId);
@@ -288,23 +337,83 @@ function syncVideoPair(primary, secondary) {
     }
   };
 
-  // Performance: pause videos when off-screen, resume when visible
+  // Permanent play: resume immediately on tab focus or visibility return
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      primary.play().catch(() => {});
+      secondary.play().catch(() => {});
+    }
+  });
+  window.addEventListener('focus', () => {
+    primary.play().catch(() => {});
+    secondary.play().catch(() => {});
+  });
+
+  // Keep playing permanently - never pause when offscreen
   if ('IntersectionObserver' in window && container) {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           if (primary.paused) primary.play().catch(() => {});
           if (secondary.paused) secondary.play().catch(() => {});
-        } else {
-          if (!primary.paused) primary.pause();
-          if (!secondary.paused) secondary.pause();
         }
       });
-    }, { threshold: 0.15 });
+    }, { threshold: 0.1 });
     observer.observe(container);
   }
 
   Promise.all([waitReady(primary), waitReady(secondary)]).then(startTogether);
+}
+
+function initMediaProtection() {
+  const isProtectedElement = (target) => {
+    if (!target) return false;
+    return !!target.closest(
+      'img, video, audio, picture, figure, ' +
+      '.image-viewer, .glass-card, .op14-track, .op14-player, .op14-section, ' +
+      '.album-card, .track-item, .split, .layer, .gallery-item, [data-protected]'
+    );
+  };
+
+  // Block right-click context menu on images, videos, audio, and archive assets
+  document.addEventListener('contextmenu', (e) => {
+    if (isProtectedElement(e.target) || e.target.tagName === 'IMG' || e.target.tagName === 'VIDEO' || e.target.tagName === 'AUDIO') {
+      e.preventDefault();
+      return false;
+    }
+  }, { capture: true });
+
+  // Block dragging of images, videos, audio elements
+  document.addEventListener('dragstart', (e) => {
+    if (isProtectedElement(e.target) || e.target.tagName === 'IMG' || e.target.tagName === 'VIDEO') {
+      e.preventDefault();
+      return false;
+    }
+  }, { capture: true });
+
+  const protectAllMedia = () => {
+    document.querySelectorAll('video').forEach(vid => {
+      vid.setAttribute('controlsList', 'nodownload nofullscreen noremoteplayback');
+      vid.setAttribute('disablePictureInPicture', 'true');
+      vid.setAttribute('draggable', 'false');
+      vid.setAttribute('oncontextmenu', 'return false;');
+    });
+    document.querySelectorAll('audio').forEach(aud => {
+      aud.setAttribute('controlsList', 'nodownload');
+      aud.setAttribute('oncontextmenu', 'return false;');
+    });
+    document.querySelectorAll('img').forEach(img => {
+      img.setAttribute('draggable', 'false');
+      img.setAttribute('oncontextmenu', 'return false;');
+    });
+  };
+
+  protectAllMedia();
+
+  if ('MutationObserver' in window) {
+    const observer = new MutationObserver(() => protectAllMedia());
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+  }
 }
 
 function syncVideos(a, b) {
@@ -639,6 +748,7 @@ function initMobileMenu() {
 let audioControl;
 
 function init() {
+  initMediaProtection();
   initMobileMenu();
   initAdminCreateLink();
   initSplits();
