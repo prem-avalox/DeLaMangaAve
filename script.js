@@ -176,8 +176,8 @@ function autoPlayVideos() {
 
 /**
  * Pairs two videos for frame-locked synchronised playback and endless looping.
- * Handles HUD timecode readout (00:MM:SS:FF at 24fps), drift correction,
- * and zero-offset simultaneous start.
+ * Uses micro-drift playbackRate adjustments to eliminate seeking stutter,
+ * synchronous zero-offset looping, and IntersectionObserver for performance.
  */
 function syncVideoPair(primary, secondary) {
   if (!primary || !secondary) return;
@@ -188,16 +188,6 @@ function syncVideoPair(primary, secondary) {
   secondary.playsInline = true;
 
   const container = primary.closest('[data-split-container]') || primary.parentElement;
-  const timecodeEl = container ? container.querySelector('[data-video-timecode]') : null;
-
-  const updateTimecode = (sec) => {
-    if (!timecodeEl) return;
-    const clamped = Math.max(0, sec || 0);
-    const m = String(Math.floor((clamped % 3600) / 60)).padStart(2, '0');
-    const s = String(Math.floor(clamped % 60)).padStart(2, '0');
-    const f = String(Math.floor((clamped % 1) * 24)).padStart(2, '0');
-    timecodeEl.textContent = `00:${m}:${s}:${f}`;
-  };
 
   let isSyncing = false;
   let rafId = null;
@@ -205,11 +195,18 @@ function syncVideoPair(primary, secondary) {
   const checkSync = () => {
     if (!primary.paused && !secondary.paused && !isSyncing) {
       const diff = primary.currentTime - secondary.currentTime;
-      // If drift exceeds ~35ms (roughly one frame at 24fps)
-      if (Math.abs(diff) > 0.035) {
+      const absDiff = Math.abs(diff);
+
+      if (absDiff > 0.25) {
+        // Hard drift (e.g. background tab wake): seek directly
         secondary.currentTime = primary.currentTime;
+        secondary.playbackRate = 1.0;
+      } else if (absDiff > 0.02) {
+        // Micro-drift: seamlessly adjust secondary playback rate to eliminate drift without stuttering
+        secondary.playbackRate = diff > 0 ? 1.05 : 0.95;
+      } else if (secondary.playbackRate !== 1.0) {
+        secondary.playbackRate = 1.0;
       }
-      updateTimecode(primary.currentTime);
     }
     rafId = requestAnimationFrame(checkSync);
   };
@@ -221,20 +218,11 @@ function syncVideoPair(primary, secondary) {
     secondary.pause();
     primary.currentTime = 0;
     secondary.currentTime = 0;
-    updateTimecode(0);
+    secondary.playbackRate = 1.0;
 
-    let ready = 0;
-    const onSeeked = function () {
-      ready++;
-      if (ready < 2) return;
-      primary.removeEventListener('seeked', onSeeked);
-      secondary.removeEventListener('seeked', onSeeked);
-      Promise.allSettled([primary.play(), secondary.play()]).finally(() => {
-        isSyncing = false;
-      });
-    };
-    primary.addEventListener('seeked', onSeeked);
-    secondary.addEventListener('seeked', onSeeked);
+    Promise.allSettled([primary.play(), secondary.play()]).finally(() => {
+      isSyncing = false;
+    });
   };
 
   primary.loop = false;
@@ -243,9 +231,9 @@ function syncVideoPair(primary, secondary) {
   primary.addEventListener('ended', restartTogether);
   secondary.addEventListener('ended', restartTogether);
 
-  // Fallback if one video reaches end fractionally ahead
+  // Seamless loop trigger just before stream terminates
   primary.addEventListener('timeupdate', () => {
-    if (primary.duration && primary.currentTime >= primary.duration - 0.04) {
+    if (primary.duration && primary.currentTime >= primary.duration - 0.08) {
       restartTogether();
     }
   });
@@ -279,7 +267,7 @@ function syncVideoPair(primary, secondary) {
     secondary.pause();
     primary.currentTime = 0;
     secondary.currentTime = 0;
-    updateTimecode(0);
+    secondary.playbackRate = 1.0;
 
     try {
       await Promise.all([primary.play(), secondary.play()]);
@@ -299,6 +287,22 @@ function syncVideoPair(primary, secondary) {
       rafId = requestAnimationFrame(checkSync);
     }
   };
+
+  // Performance: pause videos when off-screen, resume when visible
+  if ('IntersectionObserver' in window && container) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          if (primary.paused) primary.play().catch(() => {});
+          if (secondary.paused) secondary.play().catch(() => {});
+        } else {
+          if (!primary.paused) primary.pause();
+          if (!secondary.paused) secondary.pause();
+        }
+      });
+    }, { threshold: 0.15 });
+    observer.observe(container);
+  }
 
   Promise.all([waitReady(primary), waitReady(secondary)]).then(startTogether);
 }

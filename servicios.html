@@ -125,20 +125,20 @@
           <div class="service-showcase__header">
             <span class="service-showcase__eyebrow">Color grading &middot; 4AM</span>
             <h3 class="service-showcase__title">Etalonaje y tratamiento visual</h3>
-            <p class="service-showcase__desc">Desliza el cursor sobre el video para contrastar la toma cruda (Log) frente al acabado final.</p>
+            <p class="service-showcase__desc">Desliza el cursor sobre el video para contrastar la toma cruda en HLG10 frente al acabado cinematográfico.</p>
           </div>
 
           <div class="split split--video" data-kind="video">
             <div class="split__viewport" data-split-container style="--split:50%">
-              <video class="layer layer--before" muted playsinline preload="auto" data-video-display="before" src="assets/color/video/ungraded.mp4" aria-label="Toma 4AM sin corrección de color (Flat / Log)"></video>
-              <video class="layer layer--after" muted playsinline preload="auto" data-video-display="after" src="assets/color/video/graded.mp4" aria-label="Toma 4AM con color grading final"></video>
-              <div class="split__label split__label--before">Antes &middot; Log</div>
-              <div class="split__label split__label--after">Después &middot; Graded</div>
+              <video class="layer layer--before" autoplay loop muted playsinline preload="auto" data-video-display="before" src="assets/color/video/ungraded.mp4" aria-label="Toma 4AM en HLG10 Rec.2020 crudo sin corrección"></video>
+              <video class="layer layer--after" autoplay loop muted playsinline preload="auto" data-video-display="after" src="assets/color/video/graded.mp4" aria-label="Toma 4AM con color grading final"></video>
+              <span class="split__label split__label--before">Antes &middot; HLG10</span>
+              <span class="split__label split__label--after">Después &middot; Graded</span>
               <div class="split__divider" aria-hidden="true"></div>
             </div>
           </div>
 
-          <p class="service-showcase__caption">4AM [Operación 14] &middot; Filmado en ProRes Log &middot; Color grading por De La Manga</p>
+          <p class="service-showcase__caption">4AM [Operación 14] &middot; Grabado en HLG10 Rec.2020 con Pure App &middot; Color grading por De La Manga</p>
         </div>
       </section>
 
@@ -222,8 +222,8 @@
             <div class="split__viewport" data-split-container style="--split:50%">
               <img class="layer layer--before" alt="Antes de retoque de fotografía (Original)" data-image-display="before" src="assets/color/before-after/unedited.jpeg">
               <img class="layer layer--after" alt="Después de retoque de fotografía (Final)" data-image-display="after" src="assets/color/before-after/edited.jpeg">
-              <div class="split__label split__label--before">Antes &middot; Raw</div>
-              <div class="split__label split__label--after">Después &middot; Retoque</div>
+              <span class="split__label split__label--before">Antes &middot; Raw</span>
+              <span class="split__label split__label--after">Después &middot; Retoque</span>
               <div class="split__divider" aria-hidden="true"></div>
             </div>
           </div>
