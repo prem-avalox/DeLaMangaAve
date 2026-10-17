@@ -120,17 +120,36 @@
           </div>
         </div>
 
-        <div class="split" data-kind="video" style="margin-top: 28px;">
-          <div class="split__viewport" data-split-container style="--split:50%">
-            <video class="layer layer--before" muted loop playsinline autoplay data-video-display="before" src="assets/color/video/ungraded.mp4" aria-label="Toma 4AM sin corrección de color (Flat / Log)"></video>
-            <video class="layer layer--after" muted loop playsinline autoplay data-video-display="after" src="assets/color/video/graded.mp4" aria-label="Toma 4AM con color grading final"></video>
-            <div class="split__label split__label--before">Antes / Flat</div>
-            <div class="split__label split__label--after">Después / Graded</div>
-            <div class="split__divider" aria-hidden="true"></div>
+        <div class="service-showcase">
+          <div class="service-showcase__header">
+            <span class="service-showcase__eyebrow">// COMPARADOR INTERACTIVO &middot; 4AM [OPERACIÓN 14]</span>
+            <h3 class="service-showcase__title">Etalonaje y color cinematográfico</h3>
+            <p class="service-showcase__desc">Pasa el cursor sobre el video para deslizar el visor y comparar en tiempo real la toma cruda (Log) frente al etalonaje final.</p>
           </div>
-          <div class="split__controls">
-            <input type="range" min="0" max="100" value="50" step="1" aria-label="Deslizar para comparar color grading de video" data-split-range>
-            <span class="hint">Desliza para comparar la toma en crudo vs. el etalonaje cinematográfico final de 4AM.</span>
+
+          <div class="split split--video" data-kind="video">
+            <div class="split__viewport" data-split-container style="--split:50%">
+              <video class="layer layer--before" muted playsinline preload="auto" data-video-display="before" src="assets/color/video/ungraded.mp4" aria-label="Toma 4AM sin corrección de color (Flat / Log)"></video>
+              <video class="layer layer--after" muted playsinline preload="auto" data-video-display="after" src="assets/color/video/graded.mp4" aria-label="Toma 4AM con color grading final"></video>
+              <div class="split__hud-top">
+                <span class="hud-timecode" data-video-timecode>00:00:00:00</span>
+                <span class="hud-tag">4AM &middot; PURE PRORES &middot; REC.709</span>
+              </div>
+              <div class="split__label split__label--before">Antes &middot; Flat Log</div>
+              <div class="split__label split__label--after">Después &middot; Graded</div>
+              <div class="split__divider" aria-hidden="true"></div>
+              <div class="split__hint-pill" aria-hidden="true">
+                <span class="hint-arrow">◄</span> MUEVE EL CURSOR <span class="hint-arrow">►</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="service-showcase__footer">
+            <div class="showcase-meta">
+              <span class="showcase-meta__item"><strong>Proyecto:</strong> 4AM [Op. 14]</span>
+              <span class="showcase-meta__item"><strong>Cámara:</strong> Pure App (ProRes Log)</span>
+              <span class="showcase-meta__item"><strong>Acabado:</strong> Look nocturno DLM</span>
+            </div>
           </div>
         </div>
       </section>
@@ -204,17 +223,32 @@
           </div>
         </div>
 
-        <div class="split" data-kind="image" style="margin-top: 28px;">
-          <div class="split__viewport" data-split-container style="--split:50%">
-            <img class="layer layer--before" alt="Antes de retoque de fotografía (Original)" data-image-display="before" src="assets/color/before-after/unedited.jpeg">
-            <img class="layer layer--after" alt="Después de retoque de fotografía (Final)" data-image-display="after" src="assets/color/before-after/edited.jpeg">
-            <div class="split__label split__label--before">Antes / Original</div>
-            <div class="split__label split__label--after">Después / Retoque</div>
-            <div class="split__divider" aria-hidden="true"></div>
+        <div class="service-showcase">
+          <div class="service-showcase__header">
+            <span class="service-showcase__eyebrow">// COMPARADOR INTERACTIVO &middot; RETOQUE EDITORIAL</span>
+            <h3 class="service-showcase__title">Revelado digital y textura analógica</h3>
+            <p class="service-showcase__desc">Pasa el cursor sobre la fotografía para deslizar el visor y evaluar el balance de piel, contraste de sombras y acabado tonal.</p>
           </div>
-          <div class="split__controls">
-            <input type="range" min="0" max="100" value="50" step="1" aria-label="Deslizar para comparar retoque fotográfico" data-split-range>
-            <span class="hint">Desliza para comparar el disparo crudo vs. el acabado tonal y tratamiento de textura.</span>
+
+          <div class="split split--image" data-kind="image">
+            <div class="split__viewport" data-split-container style="--split:50%">
+              <img class="layer layer--before" alt="Antes de retoque de fotografía (Original)" data-image-display="before" src="assets/color/before-after/unedited.jpeg">
+              <img class="layer layer--after" alt="Después de retoque de fotografía (Final)" data-image-display="after" src="assets/color/before-after/edited.jpeg">
+              <div class="split__label split__label--before">Antes &middot; Original</div>
+              <div class="split__label split__label--after">Después &middot; Retoque</div>
+              <div class="split__divider" aria-hidden="true"></div>
+              <div class="split__hint-pill" aria-hidden="true">
+                <span class="hint-arrow">◄</span> MUEVE EL CURSOR <span class="hint-arrow">►</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="service-showcase__footer">
+            <div class="showcase-meta">
+              <span class="showcase-meta__item"><strong>Técnica:</strong> Revelado RAW + Color grading</span>
+              <span class="showcase-meta__item"><strong>Tratamiento:</strong> Grano orgánico y microcontraste</span>
+              <span class="showcase-meta__item"><strong>Aplicación:</strong> Retrato y editorial</span>
+            </div>
           </div>
         </div>
       </section>

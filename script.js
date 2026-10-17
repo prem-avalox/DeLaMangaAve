@@ -1,24 +1,109 @@
 function initSplits() {
   const splitContainers = document.querySelectorAll('[data-split-container]');
   splitContainers.forEach(container => {
-    const range = container.parentElement.querySelector('[data-split-range]');
-    const divider = container.querySelector('.split__divider');
-    if (!range || !divider) return;
-
+    const parent = container.closest('.split') || container.parentElement;
+    const range = parent ? parent.querySelector('[data-split-range]') : null;
     const labelBefore = container.querySelector('.split__label--before');
     const labelAfter = container.querySelector('.split__label--after');
+    const hintPill = container.querySelector('.split__hint-pill');
 
-    const applySplit = value => {
-      container.style.setProperty('--split', `${value}%`);
-      const v = Number(value);
-      // "Antes" visible when slider shows enough of the before side (low values)
-      // "Después" visible when slider shows enough of the after side (high values)
+    let animId = null;
+    let isInteracting = false;
+
+    const applySplit = (value) => {
+      const v = Math.min(98, Math.max(2, Number(value)));
+      container.style.setProperty('--split', `${v}%`);
+      if (range) range.value = v;
       if (labelBefore) labelBefore.classList.toggle('is-visible', v < 75);
       if (labelAfter) labelAfter.classList.toggle('is-visible', v > 25);
     };
 
-    range.addEventListener('input', e => applySplit(e.target.value));
-    applySplit(range.value || 50);
+    const updateFromPointer = (clientX) => {
+      const rect = container.getBoundingClientRect();
+      if (!rect.width) return;
+      const x = clientX - rect.left;
+      const pct = (x / rect.width) * 100;
+      applySplit(pct);
+      if (hintPill && !hintPill.classList.contains('is-hidden')) {
+        hintPill.classList.add('is-hidden');
+      }
+    };
+
+    const returnToCenter = () => {
+      if (isInteracting) return;
+      cancelAnimationFrame(animId);
+      const step = () => {
+        if (isInteracting) return;
+        const currentStr = container.style.getPropertyValue('--split') || '50%';
+        let current = parseFloat(currentStr);
+        if (isNaN(current)) current = 50;
+        const diff = 50 - current;
+        if (Math.abs(diff) < 0.25) {
+          applySplit(50);
+          return;
+        }
+        applySplit(current + diff * 0.12);
+        animId = requestAnimationFrame(step);
+      };
+      animId = requestAnimationFrame(step);
+    };
+
+    // Hover-follow pointer tracking
+    container.addEventListener('pointerenter', e => {
+      cancelAnimationFrame(animId);
+      isInteracting = true;
+      updateFromPointer(e.clientX);
+    });
+
+    container.addEventListener('pointermove', e => {
+      isInteracting = true;
+      cancelAnimationFrame(animId);
+      updateFromPointer(e.clientX);
+    });
+
+    container.addEventListener('pointerleave', () => {
+      isInteracting = false;
+      returnToCenter();
+    });
+
+    // Touch support
+    container.addEventListener('pointerdown', e => {
+      isInteracting = true;
+      cancelAnimationFrame(animId);
+      updateFromPointer(e.clientX);
+      try {
+        container.setPointerCapture(e.pointerId);
+      } catch (_) {}
+    });
+
+    container.addEventListener('pointerup', e => {
+      isInteracting = false;
+      try {
+        container.releasePointerCapture(e.pointerId);
+      } catch (_) {}
+      returnToCenter();
+    });
+
+    container.addEventListener('pointercancel', () => {
+      isInteracting = false;
+      returnToCenter();
+    });
+
+    // Range slider fallback if present
+    if (range) {
+      range.addEventListener('input', e => {
+        isInteracting = true;
+        cancelAnimationFrame(animId);
+        applySplit(e.target.value);
+        if (hintPill) hintPill.classList.add('is-hidden');
+      });
+      range.addEventListener('change', () => {
+        isInteracting = false;
+      });
+    }
+
+    // Initialize at center
+    applySplit(50);
   });
 }
 
@@ -81,12 +166,7 @@ function wireVideoInputs() {
 }
 
 function autoPlayVideos() {
-  const vids = document.querySelectorAll('[data-video-display]');
-  vids.forEach(v => {
-    v.muted = true;
-    v.play().catch(() => {});
-  });
-
+  // Split comparator videos are controlled directly by syncVideoPair to ensure frame lock
   const meters = document.querySelectorAll('[data-meter-display]');
   meters.forEach(v => {
     v.muted = true; // start muted to satisfy autoplay; will unmute when volume rises
@@ -95,36 +175,53 @@ function autoPlayVideos() {
 }
 
 /**
- * Pairs two videos for synchronised looping.
- *
- * Native loop is hardware-accelerated and gapless. Both videos share the same
- * duration, so the browser keeps them within ~20-30 ms of each other — invisible
- * in a split view. Zero JS overhead during playback: no intervals, no rAF,
- * no event listeners. Just start them together and let the browser do its job.
- */
-/**
- * Keeps two videos perfectly synchronised with endless looping.
- *
- * Native loop is disabled so `ended` fires. When either video ends, both
- * pause, seek to 0, wait for both `seeked` confirmations, then play together.
- * Zero JS during normal playback — no intervals, no polling, no drift
- * correction. The only cost is a micro-pause (~50ms) at each loop boundary.
+ * Pairs two videos for frame-locked synchronised playback and endless looping.
+ * Handles HUD timecode readout (00:MM:SS:FF at 24fps), drift correction,
+ * and zero-offset simultaneous start.
  */
 function syncVideoPair(primary, secondary) {
   if (!primary || !secondary) return;
 
-  primary.loop = false;
-  secondary.loop = false;
+  primary.muted = true;
+  secondary.muted = true;
+  primary.playsInline = true;
+  secondary.playsInline = true;
 
-  let resetting = false;
+  const container = primary.closest('[data-split-container]') || primary.parentElement;
+  const timecodeEl = container ? container.querySelector('[data-video-timecode]') : null;
 
-  const restart = () => {
-    if (resetting) return;
-    resetting = true;
+  const updateTimecode = (sec) => {
+    if (!timecodeEl) return;
+    const clamped = Math.max(0, sec || 0);
+    const m = String(Math.floor((clamped % 3600) / 60)).padStart(2, '0');
+    const s = String(Math.floor(clamped % 60)).padStart(2, '0');
+    const f = String(Math.floor((clamped % 1) * 24)).padStart(2, '0');
+    timecodeEl.textContent = `00:${m}:${s}:${f}`;
+  };
+
+  let isSyncing = false;
+  let rafId = null;
+
+  const checkSync = () => {
+    if (!primary.paused && !secondary.paused && !isSyncing) {
+      const diff = primary.currentTime - secondary.currentTime;
+      // If drift exceeds ~35ms (roughly one frame at 24fps)
+      if (Math.abs(diff) > 0.035) {
+        secondary.currentTime = primary.currentTime;
+      }
+      updateTimecode(primary.currentTime);
+    }
+    rafId = requestAnimationFrame(checkSync);
+  };
+
+  const restartTogether = () => {
+    if (isSyncing) return;
+    isSyncing = true;
     primary.pause();
     secondary.pause();
     primary.currentTime = 0;
     secondary.currentTime = 0;
+    updateTimecode(0);
 
     let ready = 0;
     const onSeeked = function () {
@@ -132,30 +229,78 @@ function syncVideoPair(primary, secondary) {
       if (ready < 2) return;
       primary.removeEventListener('seeked', onSeeked);
       secondary.removeEventListener('seeked', onSeeked);
-      Promise.allSettled([primary.play(), secondary.play()])
-        .finally(() => { resetting = false; });
+      Promise.allSettled([primary.play(), secondary.play()]).finally(() => {
+        isSyncing = false;
+      });
     };
     primary.addEventListener('seeked', onSeeked);
     secondary.addEventListener('seeked', onSeeked);
   };
 
-  primary.addEventListener('ended', restart);
-  secondary.addEventListener('ended', restart);
+  primary.loop = false;
+  secondary.loop = false;
 
-  // Initial sync start — wait for both to buffer
-  const start = () => {
-    if (primary.readyState < 3 || secondary.readyState < 3) return;
-    primary.removeEventListener('canplay', start);
-    secondary.removeEventListener('canplay', start);
+  primary.addEventListener('ended', restartTogether);
+  secondary.addEventListener('ended', restartTogether);
+
+  // Fallback if one video reaches end fractionally ahead
+  primary.addEventListener('timeupdate', () => {
+    if (primary.duration && primary.currentTime >= primary.duration - 0.04) {
+      restartTogether();
+    }
+  });
+
+  // Mirror play/pause states
+  primary.addEventListener('play', () => {
+    if (secondary.paused && !isSyncing) secondary.play().catch(() => {});
+  });
+  primary.addEventListener('pause', () => {
+    if (!secondary.paused && !isSyncing) secondary.pause();
+  });
+
+  // Buffer check to ensure simultaneous start from frame 0
+  const waitReady = (vid) => new Promise(resolve => {
+    if (vid.readyState >= 2) {
+      resolve();
+    } else {
+      const onReady = () => {
+        vid.removeEventListener('loadeddata', onReady);
+        vid.removeEventListener('canplay', onReady);
+        resolve();
+      };
+      vid.addEventListener('loadeddata', onReady);
+      vid.addEventListener('canplay', onReady);
+    }
+  });
+
+  const startTogether = async () => {
+    isSyncing = true;
+    primary.pause();
+    secondary.pause();
     primary.currentTime = 0;
     secondary.currentTime = 0;
-    primary.play().catch(() => {});
-    secondary.play().catch(() => {});
+    updateTimecode(0);
+
+    try {
+      await Promise.all([primary.play(), secondary.play()]);
+    } catch (_) {
+      // If browser autoplay policy requires user gesture
+      const unlock = () => {
+        primary.play().catch(() => {});
+        secondary.play().catch(() => {});
+        window.removeEventListener('pointerdown', unlock);
+        window.removeEventListener('scroll', unlock);
+      };
+      window.addEventListener('pointerdown', unlock, { once: true });
+      window.addEventListener('scroll', unlock, { once: true, passive: true });
+    } finally {
+      isSyncing = false;
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(checkSync);
+    }
   };
 
-  primary.addEventListener('canplay', start);
-  secondary.addEventListener('canplay', start);
-  start();
+  Promise.all([waitReady(primary), waitReady(secondary)]).then(startTogether);
 }
 
 function syncVideos(a, b) {
