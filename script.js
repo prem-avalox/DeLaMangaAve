@@ -439,16 +439,69 @@ function bufferToWave(abuffer) {
   }
 }
 
+function initMobileMenu() {
+  const toggle = document.querySelector('.menu-toggle');
+  const overlay = document.getElementById('mobile-menu');
+  if (!toggle || !overlay) return;
+
+  const closeBtn = overlay.querySelector('.mobile-overlay__close');
+  const navLinks = overlay.querySelectorAll('.mobile-nav-link');
+  const backdrop = overlay.querySelector('.mobile-overlay__backdrop');
+
+  const openMenu = () => {
+    overlay.classList.add('is-open');
+    overlay.setAttribute('aria-hidden', 'false');
+    toggle.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+    closeBtn?.focus();
+  };
+
+  const closeMenu = () => {
+    overlay.classList.remove('is-open');
+    overlay.setAttribute('aria-hidden', 'true');
+    toggle.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+    toggle.focus();
+  };
+
+  toggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = overlay.classList.contains('is-open');
+    if (isOpen) closeMenu();
+    else openMenu();
+  });
+
+  closeBtn?.addEventListener('click', closeMenu);
+  backdrop?.addEventListener('click', closeMenu);
+
+  navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      closeMenu();
+    });
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && overlay.classList.contains('is-open')) {
+      closeMenu();
+    }
+  });
+}
+
 let audioControl;
 
-async function init() {
+function init() {
+  initMobileMenu();
   initAdminCreateLink();
   initSplits();
   wireImageInputs();
   wireVideoInputs();
   wireMeterVideos();
-  audioControl = await wireAudio();
-  initAudioMasterScroll(audioControl);
+  if (document.querySelector('[data-audio-display="before"]')) {
+    wireAudio().then(ctrl => {
+      audioControl = ctrl;
+      initAudioMasterScroll(audioControl);
+    }).catch(() => {});
+  }
   autoPlayVideos();
   initCollectionsPage();
   initMusicIndexPage();
@@ -466,24 +519,27 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function initAdminCreateLink() {
-  const navLists = document.querySelectorAll('.nav__links');
+  const navLists = document.querySelectorAll('.nav__links, .topbar-nav');
   if (!navLists.length) return;
+
+  // Only check session when running locally on localhost/127.0.0.1
+  const isLocal = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+  if (!isLocal) return;
 
   try {
     const response = await fetch('/api/auth/session', { cache: 'no-store' });
+    if (!response.ok) return;
     const payload = await response.json();
-    if (!response.ok || !payload.authenticated) return;
+    if (!payload.authenticated) return;
 
     navLists.forEach(list => {
       if (list.querySelector('[data-admin-create-link]')) return;
-      const item = document.createElement('li');
       const link = document.createElement('a');
       link.href = 'admin.html';
-      link.className = 'nav__link nav__link--create';
+      link.className = list.classList.contains('topbar-nav') ? 'topbar-link' : 'nav__link nav__link--create';
       link.dataset.adminCreateLink = '';
-      link.textContent = 'Crear';
-      item.append(link);
-      list.append(item);
+      link.textContent = 'CMS';
+      list.append(link);
     });
   } catch (error) {
     // Public pages stay unchanged when the local backend is not available.
@@ -1402,7 +1458,7 @@ function initMusicIndexPage() {
 function createMusicIndexCard(archive) {
   const card = document.createElement('a');
   card.className = 'album-card';
-  card.href = `music-archive.html?id=${encodeURIComponent(archive.id)}`;
+  card.href = archive.href || (archive.id === 'operacion-14' ? 'operacion14.html' : `music-archive.html?id=${encodeURIComponent(archive.id)}`);
   card.dataset.reveal = '';
 
   const cover = document.createElement('div');

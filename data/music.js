@@ -3,6 +3,7 @@ window.DE_LA_MANGA_MUSIC_ARCHIVES = [
     "id": "operacion-14",
     "title": "Operación 14",
     "artist": "Martín Alejandro",
+    "href": "operacion14.html",
     "summary": "EP de cinco canciones nacido como archivo sonoro de origen, nocturnidad y afirmación personal.",
     "releaseType": "EP",
     "year": "2025",
@@ -79,31 +80,31 @@ window.DE_LA_MANGA_MUSIC_ARCHIVES = [
         "number": "01",
         "title": "4AM",
         "duration": "2:13",
-        "webAudio": "assets/music/operacion-14/audio/01-4am.wav"
+        "webAudio": "assets/music/operacion-14/audio/01-4am.mp3"
       },
       {
         "number": "02",
         "title": "Fanático",
         "duration": "2:32",
-        "webAudio": "assets/music/operacion-14/audio/02-fanatico.wav"
+        "webAudio": "assets/music/operacion-14/audio/02-fanatico.mp3"
       },
       {
         "number": "03",
         "title": "Motivarte",
         "duration": "4:03",
-        "webAudio": "assets/music/operacion-14/audio/03-motivarte.wav"
+        "webAudio": "assets/music/operacion-14/audio/03-motivarte.mp3"
       },
       {
         "number": "04",
         "title": "Amadeus (Escándalo)",
         "duration": "2:28",
-        "webAudio": "assets/music/operacion-14/audio/04-amadeus-escandalo.wav"
+        "webAudio": "assets/music/operacion-14/audio/04-amadeus-escandalo.mp3"
       },
       {
         "number": "05",
         "title": "Encima del Mar",
         "duration": "2:53",
-        "webAudio": "assets/music/operacion-14/audio/05-encima-del-mar.wav"
+        "webAudio": "assets/music/operacion-14/audio/05-encima-del-mar.mp3"
       }
     ]
   }

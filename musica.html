@@ -29,21 +29,56 @@
   <div class="fog fog--1" aria-hidden="true"></div>
   <div class="fog fog--2" aria-hidden="true"></div>
 
-  <div class="page-shell">
-    <nav class="nav" aria-label="Páginas">
-      <div class="nav__brand">
-        <a href="index.html" aria-label="De La Manga">
-          <img src="assets/brand/delamanga-logo-horizontal.svg" alt="De La Manga" class="brand-logo" width="138" height="25">
-        </a>
-      </div>
-      <ul class="nav__links">
-        <li><a href="colecciones.html" class="nav__link">Archivo</a></li>
-        <li><a href="musica.html" class="nav__link is-active">Música</a></li>
-        <li><a href="about.html" class="nav__link">Acerca</a></li>
-        <li><a href="servicios.html" class="nav__link">Servicios</a></li>
-        <li><a href="contacto.html" class="nav__link">Contacto</a></li>
-      </ul>
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="De La Manga">
+      <img src="assets/brand/delamanga-logo-horizontal.svg" alt="De La Manga" class="brand-logo" width="138" height="25">
+    </a>
+    <nav class="topbar-nav" aria-label="Páginas">
+      <a href="colecciones.html" class="topbar-link">Archivo</a>
+      <a href="musica.html" class="topbar-link is-active">Música</a>
+      <a href="about.html" class="topbar-link">Acerca</a>
+      <a href="servicios.html" class="topbar-link">Servicios</a>
+      <a href="contacto.html" class="topbar-link">Contacto</a>
     </nav>
+    <button class="menu-toggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobile-menu">
+      <span class="menu-toggle__box">
+        <span class="menu-toggle__bar"></span>
+        <span class="menu-toggle__bar"></span>
+      </span>
+      <span class="menu-toggle__label">Menú</span>
+    </button>
+  </header>
+
+  <div id="mobile-menu" class="mobile-overlay" aria-hidden="true">
+    <div class="mobile-overlay__backdrop"></div>
+    <div class="mobile-overlay__panel">
+      <div class="mobile-overlay__header">
+        <span class="mobile-overlay__tag">// DLM NAVEGACIÓN</span>
+        <button class="mobile-overlay__close" aria-label="Cerrar menú">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <nav class="mobile-overlay__nav" aria-label="Menú móvil">
+        <a href="index.html" class="mobile-nav-link"><span class="nav-idx">00</span> Inicio</a>
+        <a href="colecciones.html" class="mobile-nav-link"><span class="nav-idx">01</span> Archivo</a>
+        <a href="musica.html" class="mobile-nav-link is-active"><span class="nav-idx">02</span> Música</a>
+        <a href="about.html" class="mobile-nav-link"><span class="nav-idx">03</span> Acerca</a>
+        <a href="servicios.html" class="mobile-nav-link"><span class="nav-idx">04</span> Servicios</a>
+        <a href="contacto.html" class="mobile-nav-link"><span class="nav-idx">05</span> Contacto</a>
+      </nav>
+      <div class="mobile-overlay__footer">
+        <div class="mobile-overlay__status">
+          <span class="status-indicator"></span> SISTEMA OPERATIVO
+        </div>
+        <a href="mailto:delamanga.art@gmail.com" class="mobile-overlay__email">delamanga.art@gmail.com</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-shell">
 
     <header class="hero-banner hero-banner--split" data-reveal>
       <div class="hero-banner__inner">
@@ -117,7 +152,7 @@
                     <span class="track-item__duration">2:13</span>
                   </div>
                 </div>
-                <button class="track-item__play" data-track-src="assets/music/operacion-14/audio/01-4am.wav" aria-label="Reproducir 4AM">
+                <button class="track-item__play" data-track-src="assets/music/operacion-14/audio/01-4am.mp3" aria-label="Reproducir 4AM">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
                 </button>
               </div>
@@ -130,7 +165,7 @@
                     <span class="track-item__duration">2:32</span>
                   </div>
                 </div>
-                <button class="track-item__play" data-track-src="assets/music/operacion-14/audio/02-fanatico.wav" aria-label="Reproducir Fanático">
+                <button class="track-item__play" data-track-src="assets/music/operacion-14/audio/02-fanatico.mp3" aria-label="Reproducir Fanático">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
                 </button>
               </div>
@@ -143,7 +178,7 @@
                     <span class="track-item__duration">4:03</span>
                   </div>
                 </div>
-                <button class="track-item__play" data-track-src="assets/music/operacion-14/audio/03-motivarte.wav" aria-label="Reproducir Motivarte">
+                <button class="track-item__play" data-track-src="assets/music/operacion-14/audio/03-motivarte.mp3" aria-label="Reproducir Motivarte">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
                 </button>
               </div>
@@ -156,7 +191,7 @@
                     <span class="track-item__duration">2:28</span>
                   </div>
                 </div>
-                <button class="track-item__play" data-track-src="assets/music/operacion-14/audio/04-amadeus-escandalo.wav" aria-label="Reproducir Amadeus (Escándalo)">
+                <button class="track-item__play" data-track-src="assets/music/operacion-14/audio/04-amadeus-escandalo.mp3" aria-label="Reproducir Amadeus (Escándalo)">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
                 </button>
               </div>
@@ -169,7 +204,7 @@
                     <span class="track-item__duration">2:53</span>
                   </div>
                 </div>
-                <button class="track-item__play" data-track-src="assets/music/operacion-14/audio/05-encima-del-mar.wav" aria-label="Reproducir Encima del mar">
+                <button class="track-item__play" data-track-src="assets/music/operacion-14/audio/05-encima-del-mar.mp3" aria-label="Reproducir Encima del mar">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
                 </button>
               </div>

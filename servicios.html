@@ -28,21 +28,54 @@
   <div class="fog fog--1" aria-hidden="true"></div>
   <div class="fog fog--2" aria-hidden="true"></div>
 
-  <div class="page-shell">
-    <nav class="nav" aria-label="Páginas">
-      <div class="nav__brand">
-        <a href="index.html" aria-label="De La Manga">
-          <img src="assets/brand/delamanga-logo-horizontal.svg" alt="De La Manga" class="brand-logo" width="138" height="25">
-        </a>
-      </div>
-      <ul class="nav__links">
-        <li><a href="colecciones.html" class="nav__link">Archivo</a></li>
-        <li><a href="musica.html" class="nav__link">Música</a></li>
-        <li><a href="about.html" class="nav__link">Acerca</a></li>
-        <li><a href="servicios.html" class="nav__link is-active">Servicios</a></li>
-        <li><a href="contacto.html" class="nav__link">Contacto</a></li>
-      </ul>
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="De La Manga">
+      <img src="assets/brand/delamanga-logo-horizontal.svg" alt="De La Manga" class="brand-logo" width="138" height="25">
+    </a>
+    <nav class="topbar-nav" aria-label="Páginas">
+      <a href="colecciones.html" class="topbar-link">Archivo</a>
+      <a href="musica.html" class="topbar-link">Música</a>
+      <a href="about.html" class="topbar-link">Acerca</a>
+      <a href="servicios.html" class="topbar-link is-active">Servicios</a>
+      <a href="contacto.html" class="topbar-link">Contacto</a>
     </nav>
+    <button class="menu-toggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobile-menu">
+      <span class="menu-toggle__box">
+        <span class="menu-toggle__bar"></span>
+        <span class="menu-toggle__bar"></span>
+      </span>
+      <span class="menu-toggle__label">Menú</span>
+    </button>
+  </header>
+
+  <div id="mobile-menu" class="mobile-overlay" aria-hidden="true">
+    <div class="mobile-overlay__backdrop"></div>
+    <div class="mobile-overlay__panel">
+      <div class="mobile-overlay__header">
+        <span class="mobile-overlay__tag">// DLM NAVEGACIÓN</span>
+        <button class="mobile-overlay__close" aria-label="Cerrar menú">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <nav class="mobile-overlay__nav" aria-label="Menú móvil">
+        <a href="index.html" class="mobile-nav-link"><span class="nav-idx">00</span> Inicio</a>
+        <a href="colecciones.html" class="mobile-nav-link"><span class="nav-idx">01</span> Archivo</a>
+        <a href="musica.html" class="mobile-nav-link"><span class="nav-idx">02</span> Música</a>
+        <a href="about.html" class="mobile-nav-link"><span class="nav-idx">03</span> Acerca</a>
+        <a href="servicios.html" class="mobile-nav-link is-active"><span class="nav-idx">04</span> Servicios</a>
+        <a href="contacto.html" class="mobile-nav-link"><span class="nav-idx">05</span> Contacto</a>
+      </nav>
+      <div class="mobile-overlay__footer">
+        <div class="mobile-overlay__status">
+          <span class="status-indicator"></span> SISTEMA OPERATIVO
+        </div>
+        <a href="mailto:delamanga.art@gmail.com" class="mobile-overlay__email">delamanga.art@gmail.com</a>
+      </div>
+    </div>
+  </div>
 
     <header class="page-header" data-reveal>
       <p class="eyebrow">Estudio audiovisual</p>
@@ -82,6 +115,20 @@
               <li>Envíame duración, fecha límite y una referencia visual.</li>
               <li><a class="inline-cta" href="contacto.html">Cotizar color grading</a></li>
             </ul>
+          </div>
+        </div>
+
+        <div class="split" data-kind="video" style="margin-top: 28px;">
+          <div class="split__viewport" data-split-container style="--split:50%">
+            <video class="layer layer--before" muted loop playsinline autoplay data-video-display="before" src="assets/color/video/ungraded.mp4" aria-label="Toma 4AM sin corrección de color (Flat / Log)"></video>
+            <video class="layer layer--after" muted loop playsinline autoplay data-video-display="after" src="assets/color/video/graded.mp4" aria-label="Toma 4AM con color grading final"></video>
+            <div class="split__label split__label--before">Antes / Flat</div>
+            <div class="split__label split__label--after">Después / Graded</div>
+            <div class="split__divider" aria-hidden="true"></div>
+          </div>
+          <div class="split__controls">
+            <input type="range" min="0" max="100" value="50" step="1" aria-label="Deslizar para comparar color grading de video" data-split-range>
+            <span class="hint">Desliza para comparar la toma en crudo vs. el etalonaje cinematográfico final de 4AM.</span>
           </div>
         </div>
       </section>
@@ -152,6 +199,20 @@
               <li>Envíame lugar, cantidad de fotos y uso final.</li>
               <li><a class="inline-cta" href="contacto.html">Cotizar fotografía</a></li>
             </ul>
+          </div>
+        </div>
+
+        <div class="split" data-kind="image" style="margin-top: 28px;">
+          <div class="split__viewport" data-split-container style="--split:50%">
+            <img class="layer layer--before" alt="Antes de retoque de fotografía (Original)" data-image-display="before" src="assets/color/before-after/unedited.jpeg">
+            <img class="layer layer--after" alt="Después de retoque de fotografía (Final)" data-image-display="after" src="assets/color/before-after/edited.jpeg">
+            <div class="split__label split__label--before">Antes / Original</div>
+            <div class="split__label split__label--after">Después / Retoque</div>
+            <div class="split__divider" aria-hidden="true"></div>
+          </div>
+          <div class="split__controls">
+            <input type="range" min="0" max="100" value="50" step="1" aria-label="Deslizar para comparar retoque fotográfico" data-split-range>
+            <span class="hint">Desliza para comparar el disparo crudo vs. el acabado tonal y tratamiento de textura.</span>
           </div>
         </div>
       </section>
