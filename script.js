@@ -9,24 +9,29 @@ function initSplits() {
 
     let animId = null;
     let isInteracting = false;
+    let activePointerType = null;
 
     const applySplit = (value) => {
       const v = Math.min(99, Math.max(1, Number(value)));
       container.style.setProperty('--split', `${v}%`);
       if (range) range.value = v;
 
-      // Dynamic fade for ANTES and DESPUÉS based on revealed footage:
-      // Left side [0..v%] shows DESPUÉS: disappears when v <= 8%, fully visible when v >= 24%
+      // Dynamic fade for ANTES and DESPUES based on revealed footage:
+      // Left side [0..v%] shows DESPUES:
+      // When v >= 45%, DESPUES has ample room -> full opacity (1.0).
+      // As v decreases from 45% towards 15%, DESPUES footage shrinks -> smoothly fades out to 0.
       if (labelAfter) {
-        const afterRatio = Math.max(0, Math.min(1, (v - 8) / 16));
+        const afterRatio = Math.max(0, Math.min(1, (v - 15) / 30));
         labelAfter.style.opacity = afterRatio.toFixed(3);
         labelAfter.style.transform = `translateY(${(1 - afterRatio) * 6}px)`;
         labelAfter.style.pointerEvents = afterRatio > 0.1 ? 'auto' : 'none';
       }
 
-      // Right side [v%..100%] shows ANTES: disappears when v >= 92%, fully visible when v <= 76%
+      // Right side [v%..100%] shows ANTES:
+      // When v <= 55%, ANTES has ample room -> full opacity (1.0).
+      // As v increases from 55% towards 85%, ANTES footage shrinks -> smoothly fades out to 0.
       if (labelBefore) {
-        const beforeRatio = Math.max(0, Math.min(1, (92 - v) / 16));
+        const beforeRatio = Math.max(0, Math.min(1, (85 - v) / 30));
         labelBefore.style.opacity = beforeRatio.toFixed(3);
         labelBefore.style.transform = `translateY(${(1 - beforeRatio) * 6}px)`;
         labelBefore.style.pointerEvents = beforeRatio > 0.1 ? 'auto' : 'none';
@@ -63,11 +68,12 @@ function initSplits() {
       animId = requestAnimationFrame(step);
     };
 
-    // Desktop hover follow
+    // Desktop hover follow: follows mouse smoothly, centers when mouse leaves
     container.addEventListener('pointerenter', e => {
       if (e.pointerType === 'mouse') {
         cancelAnimationFrame(animId);
         isInteracting = true;
+        activePointerType = 'mouse';
         updateFromPointer(e.clientX);
       }
     });
@@ -82,13 +88,15 @@ function initSplits() {
     container.addEventListener('pointerleave', e => {
       if (e.pointerType === 'mouse') {
         isInteracting = false;
+        activePointerType = null;
         returnToCenter();
       }
     });
 
-    // Touch & pointer interaction with pointer capture and scroll prevention
+    // Touch & pointer dragging with pointer capture and scroll lock
     container.addEventListener('pointerdown', e => {
       isInteracting = true;
+      activePointerType = e.pointerType;
       cancelAnimationFrame(animId);
       try {
         container.setPointerCapture(e.pointerId);
@@ -100,36 +108,19 @@ function initSplits() {
     const finishPointer = (e) => {
       if (!isInteracting) return;
       isInteracting = false;
+      const wasMouse = activePointerType === 'mouse' || (e && e.pointerType === 'mouse');
+      activePointerType = null;
       try {
         if (e && e.pointerId) container.releasePointerCapture(e.pointerId);
       } catch (_) {}
-      returnToCenter();
+      // On mouse pointerup, return to center; on touch, let it stay at the dragged position
+      if (wasMouse) {
+        returnToCenter();
+      }
     };
 
     container.addEventListener('pointerup', finishPointer);
     container.addEventListener('pointercancel', finishPointer);
-
-    // Native touch handlers to strictly prevent mobile viewport panning/stutter
-    container.addEventListener('touchstart', e => {
-      isInteracting = true;
-      cancelAnimationFrame(animId);
-      if (e.touches && e.touches[0]) {
-        updateFromPointer(e.touches[0].clientX);
-      }
-      e.preventDefault();
-    }, { passive: false });
-
-    container.addEventListener('touchmove', e => {
-      if (e.touches && e.touches[0]) {
-        updateFromPointer(e.touches[0].clientX);
-      }
-      e.preventDefault();
-    }, { passive: false });
-
-    container.addEventListener('touchend', () => {
-      isInteracting = false;
-      returnToCenter();
-    });
 
     // Range slider fallback if present
     if (range) {
@@ -230,69 +221,62 @@ function syncVideoPair(primary, secondary) {
   secondary.playsInline = true;
   primary.autoplay = true;
   secondary.autoplay = true;
+  primary.loop = true;
+  secondary.loop = true;
 
   const container = primary.closest('[data-split-container]') || primary.parentElement;
 
   let isSyncing = false;
   let rafId = null;
+  let lastPrimaryTime = 0;
 
   const checkSync = () => {
     // Permanent play: continuously ensure both videos stay playing
-    if (primary.paused) primary.play().catch(() => {});
-    if (secondary.paused) secondary.play().catch(() => {});
+    if (primary.paused && !isSyncing) primary.play().catch(() => {});
+    if (secondary.paused && !isSyncing) secondary.play().catch(() => {});
 
     if (!primary.paused && !secondary.paused && !isSyncing) {
-      const diff = primary.currentTime - secondary.currentTime;
-      const absDiff = Math.abs(diff);
+      const pTime = primary.currentTime;
+      const sTime = secondary.currentTime;
 
-      if (absDiff > 0.25) {
-        // Hard drift (e.g. background tab wake): seek directly
-        secondary.currentTime = primary.currentTime;
+      // Loop turnaround detection: primary just wrapped around
+      if (pTime < lastPrimaryTime - 0.5) {
+        secondary.currentTime = pTime;
         secondary.playbackRate = 1.0;
-      } else if (absDiff > 0.02) {
-        // Micro-drift: seamlessly adjust secondary playback rate to eliminate drift without stuttering
-        secondary.playbackRate = diff > 0 ? 1.05 : 0.95;
-      } else if (secondary.playbackRate !== 1.0) {
-        secondary.playbackRate = 1.0;
+      } else {
+        const diff = pTime - sTime;
+        const absDiff = Math.abs(diff);
+
+        if (absDiff > 0.25) {
+          // Hard drift (e.g. background tab wake): seek directly
+          secondary.currentTime = pTime;
+          secondary.playbackRate = 1.0;
+        } else if (absDiff > 0.02) {
+          // Micro-drift: seamlessly adjust secondary playback rate to eliminate drift without stuttering
+          secondary.playbackRate = diff > 0 ? 1.05 : 0.95;
+        } else if (secondary.playbackRate !== 1.0) {
+          secondary.playbackRate = 1.0;
+        }
       }
+      lastPrimaryTime = pTime;
     }
     rafId = requestAnimationFrame(checkSync);
   };
 
-  const restartTogether = () => {
-    if (isSyncing) return;
-    isSyncing = true;
-    primary.currentTime = 0;
-    secondary.currentTime = 0;
-    secondary.playbackRate = 1.0;
-
-    Promise.allSettled([primary.play(), secondary.play()]).finally(() => {
-      isSyncing = false;
-    });
-  };
-
-  primary.loop = false;
-  secondary.loop = false;
-
-  primary.addEventListener('ended', restartTogether);
-  secondary.addEventListener('ended', restartTogether);
-
-  // Seamless loop trigger just before stream terminates
-  primary.addEventListener('timeupdate', () => {
-    if (primary.duration && primary.currentTime >= primary.duration - 0.08) {
-      restartTogether();
-    }
-  });
-
-  // Mirror play states and immediately recover from any pause
-  primary.addEventListener('play', () => {
-    if (secondary.paused && !isSyncing) secondary.play().catch(() => {});
-  });
+  // Immediate recovery on pause events
   primary.addEventListener('pause', () => {
     if (!isSyncing) primary.play().catch(() => {});
   });
   secondary.addEventListener('pause', () => {
     if (!isSyncing) secondary.play().catch(() => {});
+  });
+
+  // Mirror play states
+  primary.addEventListener('play', () => {
+    if (secondary.paused && !isSyncing) secondary.play().catch(() => {});
+  });
+  secondary.addEventListener('play', () => {
+    if (primary.paused && !isSyncing) primary.play().catch(() => {});
   });
 
   // Buffer check to ensure simultaneous start from frame 0
@@ -369,9 +353,11 @@ function initMediaProtection() {
   const isProtectedElement = (target) => {
     if (!target) return false;
     return !!target.closest(
-      'img, video, audio, picture, figure, ' +
-      '.image-viewer, .glass-card, .op14-track, .op14-player, .op14-section, ' +
-      '.album-card, .track-item, .split, .layer, .gallery-item, [data-protected]'
+      'img, video, audio, picture, figure, canvas, ' +
+      '.image-viewer, .image-viewer__image, .image-viewer__image-wrap, ' +
+      '.collection-media, .collection-card, .collection-media__asset, .collection-media-grid, .collection-music-mosaic, ' +
+      '.glass-card, .glass-card__image, .op14-track, .op14-player, .op14-section, .op14-text-image, ' +
+      '.album-card, .track-item, .track-art, .split, .split__viewport, .layer, .gallery-item, .gallery-card, .project-card, [data-protected]'
     );
   };
 
@@ -383,9 +369,9 @@ function initMediaProtection() {
     }
   }, { capture: true });
 
-  // Block dragging of images, videos, audio elements
+  // Block dragging of images, videos, audio elements and archive assets
   document.addEventListener('dragstart', (e) => {
-    if (isProtectedElement(e.target) || e.target.tagName === 'IMG' || e.target.tagName === 'VIDEO') {
+    if (isProtectedElement(e.target) || e.target.tagName === 'IMG' || e.target.tagName === 'VIDEO' || e.target.tagName === 'AUDIO') {
       e.preventDefault();
       return false;
     }
@@ -400,6 +386,7 @@ function initMediaProtection() {
     });
     document.querySelectorAll('audio').forEach(aud => {
       aud.setAttribute('controlsList', 'nodownload');
+      aud.setAttribute('draggable', 'false');
       aud.setAttribute('oncontextmenu', 'return false;');
     });
     document.querySelectorAll('img').forEach(img => {
@@ -1029,7 +1016,11 @@ function initCollectionsPage() {
       media.loop = true;
       media.playsInline = true;
       media.autoplay = true;
+      media.draggable = false;
+      media.setAttribute('controlsList', 'nodownload nofullscreen noremoteplayback');
+      media.setAttribute('disablePictureInPicture', 'true');
       media.setAttribute('aria-label', item.alt || item.caption || '');
+      media.addEventListener('contextmenu', event => event.preventDefault());
     } else {
       media.alt = '';
       media.dataset.alt = item.alt || item.caption || '';
